@@ -1,0 +1,62 @@
+{
+    "name": "functions",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "apps/functions/src",
+    "projectType": "application",
+    "prefix": "functions",
+    "generators": {},
+    "targets": {
+        "build": {
+            "executor": "@nrwl/webpack:webpack",
+            "options": {
+                "webpackConfig": "apps/functions/webpack.config.js",
+                "outputPath": "dist/apps/functions",
+                "main": "apps/functions/src/main.ts",
+                "tsConfig": "apps/functions/tsconfig.app.json",
+                "assets": ["apps/functions/src/assets"],
+                "target": "node",
+                "compiler": "tsc"
+            },
+            "configurations": {
+                "production": {
+                    "optimization": true,
+                    "extractLicenses": true,
+                    "inspect": false,
+                    "fileReplacements": [
+                        {
+                            "replace": "apps/functions/src/environments/environment.ts",
+                            "with": "apps/functions/src/environments/environment.prod.ts"
+                        }
+                    ]
+                }
+            },
+            "outputs": ["{options.outputPath}"]
+        },
+        "serve": {
+            "executor": "@nx/node:node",
+            "options": {
+                "buildTarget": "functions:build"
+            }
+        },
+        "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "options": {
+                "lintFilePatterns": [
+                    "apps/functions/**/*.ts",
+                    "apps/functions/**/*.spec.ts",
+                    "apps/functions/**/*.d.ts"
+                ]
+            },
+            "outputs": ["{options.outputFile}"]
+        },
+        "test": {
+            "executor": "@nx/jest:jest",
+            "options": {
+                "jestConfig": "apps/functions/jest.config.ts",
+                "passWithNoTests": true
+            },
+            "outputs": ["{workspaceRoot}/coverage/apps/functions"]
+        }
+    },
+    "tags": []
+}

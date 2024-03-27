@@ -1,0 +1,88 @@
+{
+    "name": "web-app",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "apps/web-app/src",
+    "projectType": "application",
+    "generators": {},
+    "targets": {
+        "build": {
+            "executor": "@nx/webpack:webpack",
+            "options": {
+                "outputPath": "dist/apps/web-app",
+                "index": "apps/web-app/src/index.html",
+                "main": "apps/web-app/src/main.tsx",
+                "polyfills": "apps/web-app/src/polyfills.ts",
+                "tsConfig": "apps/web-app/tsconfig.app.json",
+                "assets": [
+                    "apps/web-app/src/favicon.ico",
+                    "apps/web-app/src/assets"
+                ],
+                "styles": [],
+                "scripts": [],
+                "webpackConfig": "@nx/react/plugins/webpack"
+            },
+            "configurations": {
+                "production": {
+                    "fileReplacements": [
+                        {
+                            "replace": "apps/web-app/src/environments/environment.ts",
+                            "with": "apps/web-app/src/environments/environment.prod.ts"
+                        }
+                    ],
+                    "optimization": true,
+                    "outputHashing": "all",
+                    "extractCss": true,
+                    "sourceMap": true,
+                    "namedChunks": false,
+                    "extractLicenses": true,
+                    "vendorChunk": true,
+                    "budgets": [
+                        {
+                            "type": "initial",
+                            "maximumWarning": "2mb",
+                            "maximumError": "5mb"
+                        }
+                    ]
+                }
+            },
+            "outputs": ["{options.outputPath}"]
+        },
+        "serve": {
+            "executor": "@nx/webpack:dev-server",
+            "options": {
+                "buildTarget": "web-app:build"
+            },
+            "configurations": {
+                "production": {
+                    "buildTarget": "web-app:build:production"
+                }
+            }
+        },
+        "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "options": {
+                "lintFilePatterns": [
+                    "apps/web-app/**/*.js",
+                    "apps/web-app/**/*.jsx",
+                    "apps/web-app/**/*.ts",
+                    "apps/web-app/**/*.tsx",
+                    "apps/web-app/**/*.spec.ts",
+                    "apps/web-app/**/*.spec.tsx",
+                    "apps/web-app/**/*.spec.js",
+                    "apps/web-app/**/*.spec.jsx",
+                    "apps/web-app/**/*.d.ts"
+                ]
+            },
+            "outputs": ["{options.outputFile}"]
+        },
+        "test": {
+            "executor": "@nx/jest:jest",
+            "options": {
+                "jestConfig": "apps/web-app/jest.config.ts",
+                "passWithNoTests": true
+            },
+            "outputs": ["{workspaceRoot}/coverage/apps/web-app"]
+        }
+    },
+    "tags": []
+}

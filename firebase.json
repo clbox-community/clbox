@@ -1,0 +1,44 @@
+{
+    "hosting": {
+        "predeploy": "npm run -- build:web-app",
+        "public": "dist/apps/web-app/",
+        "ignore": [
+            "firebase.json",
+            "**/.*",
+            "**/node_modules/**"
+        ],
+        "rewrites": [
+            {
+                "source": "**",
+                "destination": "/index.html"
+            }
+        ],
+        "headers": [
+            {
+                "source": "/**",
+                "headers": [
+                    {
+                        "key": "Cache-Control",
+                        "value": "no-cache"
+                    }
+                ]
+            },
+            {
+                "source": "**/*.@(jpg|jpeg|gif|png|js|webp|svg)",
+                "headers": [
+                    {
+                        "key": "Cache-Control",
+                        "value": "max-age=31536000"
+                    }
+                ]
+            }
+        ]
+    },
+    "functions": {
+        "predeploy": "npm run -- build:functions",
+        "source": "dist/apps/functions"
+    },
+    "firestore": {
+        "rules": "packages/firestore/firestore.rules"
+    }
+}

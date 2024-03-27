@@ -1,0 +1,89 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+  	function isAuthentiacted(req) {
+      return request.auth != null
+    }
+    function authEmail(req) {
+      return request.auth.token.email
+    }
+
+    function getUser(user) {
+      return get(/databases/$(database)/documents/user/$(user)).data
+    }
+    function getTeamUser(team, user) {
+      return get(/databases/$(database)/documents/team/$(team)/user/$(user)).data
+    }
+    function getChannel(team, channel) {
+      return get(/databases/$(database)/documents/team/$(team)/channel/$(channel)).data
+    }
+    function getCampaign(team, campaign) {
+      return get(/databases/$(database)/documents/team/$(team)/campaign/$(campaign)).data
+    }
+
+    match /user/{user} {
+      allow read: if isAuthentiacted(request) && user == authEmail(request)
+    }
+  	match /team/{team} {
+      allow read: if isAuthentiacted(request) && getUser(authEmail(request)).teams[team] == true
+    }
+    match /team/{team}/user/{user}/{document=**} {
+      allow read: if isAuthentiacted(request) && user == authEmail(request)
+    }
+    match /team/{team}/user/{user}/inbox/{document=**} {
+      allow read,write: if isAuthentiacted(request) && user == authEmail(request)
+    }
+    match /team/{team}/user/{user}/assessment-survey/{document=**} {
+      allow read,write: if isAuthentiacted(request) && user == authEmail(request)
+    }
+    match /team/{team}/user/{user} {
+      allow read: if isAuthentiacted(request) && getTeamUser(team, authEmail(request)).leader == true
+    }
+    match /team/{team}/user/{user} {
+      allow read: if isAuthentiacted(request) && getTeamUser(team, user).chapterLeader == authEmail(request)
+    }
+    match /team/{team}/assessment/{assessment} {
+      allow create: if isAuthentiacted(request);
+      allow read, write: if isAuthentiacted(request) && resource.data.chapterLeader == authEmail(request)
+    }
+    match /team/{team}/assessment/{assessment}/result/{document=**} {
+      allow read: if isAuthentiacted(request) && get(/databases/$(database)/documents/team/$(team)/assessment/$(assessment)).data.chapterLeader == authEmail(request)
+    }
+    match /team/{team}/user/{user}/data/skills {
+      allow write: if isAuthentiacted(request) && user == authEmail(request)
+    }
+    match /team/{team}/user/{user}/data/skills {
+      allow read: if isAuthentiacted(request) && getTeamUser(team, user).chapterLeader == authEmail(request)
+    }
+    match /team/{team}/sent/{user}/{document=**} {
+      allow read, write: if isAuthentiacted(request) && user == authEmail(request)
+    }
+  	match /team/{team}/stats/{day} {
+      allow read: if isAuthentiacted(request) && getUser(authEmail(request)).teams[team] == true
+    }
+    match /team/{team}/channel/{channel}/{document=**} {
+      allow read, write: if isAuthentiacted(request) && getChannel(team, channel).managerMap[authEmail(request)] == true
+    }
+    match /team/{team}/survey/{survey} {
+      allow read, delete: if true;
+    }
+    match /team/{team}/campaign/{campaign} {
+      allow read: if isAuthentiacted(request) && authEmail(request) in resource.data.owners;
+      allow write: if isAuthentiacted(request) && authEmail(request) in resource.data.owners && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
+    }
+    match /team/{team}/campaign/{campaign}/answers/{answers} {
+      allow read: if isAuthentiacted(request) && authEmail(request) in getCampaign(team, campaign).owners;
+    }
+    match /team/{team}/campaign/{campaign}/answers/{answers} {
+      allow write: if true;
+    }
+    match /team/{team}/skill/{document=**} {
+      allow read, write: if isAuthentiacted(request);
+    }
+
+    // default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+    "presets": ["@nx/react/babel"],
+    "plugins": [
+        [
+            "styled-components",
+            {
+                "pure": true,
+                "ssr": true
+            }
+        ]
+    ]
+}
