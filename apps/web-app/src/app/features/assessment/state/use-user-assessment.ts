@@ -1,7 +1,8 @@
-import {UserAssessment} from "../model/user-assessment";
-import {firebaseApp} from "../../firebase/firebase.app";
-import {useCallback, useEffect, useState} from "react";
-import {WithId} from "../model/with-id";
+import { UserAssessment } from '../model/user-assessment';
+import { firebaseApp } from '../../firebase/firebase.app';
+import { useCallback, useEffect, useState } from 'react';
+import { WithId } from '../model/with-id';
+import { UserAssessmentRef } from '../model/user-assessment-ref';
 
 const firestore = firebaseApp.firestore();
 
@@ -12,15 +13,27 @@ export const useUserAssessment = (team: string, user: string, id: string): [With
     useEffect(
         () => {
             if (team && user && id) {
-                return firestore
+                const controller = new AbortController();
+                firestore
                     .doc(`/team/${team}/user/${user}/assessment-survey/${id}`)
-                    .onSnapshot(doc => {
-                        if (doc.exists) {
-                            setAssessment({id: doc.id, ...doc.data() as UserAssessment})
-                        } else {
-                            setAssessment(null);
-                        }
+                    .get()
+                    .then(userAssessmentRef => {
+                        const userAssessmentRefData = userAssessmentRef.data() as UserAssessmentRef;
+                        const unsubscribe = firestore
+                            .doc(`/team/${team}/assessment/${userAssessmentRefData.assessmentId}/result/${id}`)
+                            .onSnapshot(doc => {
+                                if (doc.exists) {
+                                    setAssessment({ id: doc.id, ...doc.data() as UserAssessment });
+                                } else {
+                                    setAssessment(null);
+                                }
+                            });
+                        controller.signal.addEventListener('abort', () => {
+                            console.log('unsubscribing...');
+                            unsubscribe();
+                        });
                     });
+                return () => controller.abort();
             }
         },
         [team, user, id]
@@ -49,4 +62,4 @@ export const useUserAssessment = (team: string, user: string, id: string): [With
         [team, user, id]
     );
     return [assessment, updateAssessment, finishAssessment];
-}
+};

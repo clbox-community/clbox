@@ -1,19 +1,11 @@
 import {AssessmentUserDetails} from "./assessment-user-details";
 
-/**
- * Source: created by user via ui.
- * Created by: ui.
- * Collection: /team/{team}/assessment/{id}
- * Permissions:
- * - read: author, assessed, assessees, chapterLeader
- * - create: authenticated user of team
- */
 export interface Assessment {
     /** User system/authentication identifiers of assessed person, e.g. grzegorz@lipecki.net */
     assessed: string;
     /** User system/authentication identifiers of assessees, e.g. [grzegorz@lipecki.net] */
-    assessees: string[];
-    finishedAssessees: {
+    assessors: string[];
+    finishedAssessors: {
         [email: string]: boolean
     };
     /** Users chapter leader identifier */

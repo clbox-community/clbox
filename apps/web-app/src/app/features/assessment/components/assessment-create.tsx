@@ -3,7 +3,6 @@ import {OneColumnLayoutWide} from "../../layout/one-column-layout-wide";
 import {AppState} from "../../../state/app-state";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import TextField from "@mui/material/TextField";
 import {FormControl, InputLabel} from "@mui/material";
 import React, {useCallback, useMemo, useState} from "react";
 import {useUserProfiles} from "../../user/firestore/use-user-profiles";
@@ -16,27 +15,28 @@ import {useNavigate} from "react-router-dom";
 
 const firestore = firebaseApp.firestore();
 
-const TextInput = ({label, value, valueHandler}: {
-    label: string, value: string, valueHandler:
-        (value: string) => void
-}) => {
-    return <FormControl fullWidth sx={{marginBottom: '16px'}}>
-        <TextField
-            label={label}
-            variant="outlined"
-            multiline
-            value={value}
-            onChange={change => valueHandler(change.target.value)}
-        />
-    </FormControl>;
-}
+// import TextField from "@mui/material/TextField";
+// const TextInput = ({label, value, valueHandler}: {
+//     label: string, value: string, valueHandler:
+//         (value: string) => void
+// }) => {
+//     return <FormControl fullWidth sx={{marginBottom: '16px'}}>
+//         <TextField
+//             label={label}
+//             variant="outlined"
+//             multiline
+//             value={value}
+//             onChange={change => valueHandler(change.target.value)}
+//         />
+//     </FormControl>;
+// }
 
 export const AssessmentCreateView = ({userId, teamId}: ConnectedProps<typeof connector>) => {
     const navigate = useNavigate();
     const users = useUserProfiles(teamId);
     const [locekd, setLocked] = useState<boolean>(false);
     const [assessed, setAssessed] = useState<string>('');
-    const [assessees, setAssessees] = useState<string[]>([]);
+    const [assessors, setAssessors] = useState<string[]>([]);
     const [errors, setErrors] = useState<string[]>();
 
     const selectDomain = useMemo(() => {
@@ -56,7 +56,7 @@ export const AssessmentCreateView = ({userId, teamId}: ConnectedProps<typeof con
             if (!assessed) {
                 errors.push('Musisz wybrać osobę ocenianą')
             }
-            if (assessees.length === 0) {
+            if (assessors.length === 0) {
                 errors.push('Musisz wybrać osoby oceniane')
             }
             setErrors(errors);
@@ -66,13 +66,13 @@ export const AssessmentCreateView = ({userId, teamId}: ConnectedProps<typeof con
 
             setLocked(true);
             const assessedUserProfile = users.find(user => user.email === assessed);
-            if (assessees.indexOf(assessedUserProfile.email) < 0) {
-                assessees.push(assessedUserProfile.email);
+            if (assessors.indexOf(assessedUserProfile.email) < 0) {
+                assessors.push(assessedUserProfile.email);
             }
             const userAssessment: Assessment = {
                 assessed: assessedUserProfile.email,
-                assessees: assessees,
-                finishedAssessees: {},
+                assessors: assessors,
+                finishedAssessors: {},
                 // chapterLeader: assessedUserProfile.chapterLeader, // TODO: na czas testów wyniki dostaje autor ankiety!
                 chapterLeader: userId, // TODO: na czas testów wyniki dostaje autor ankiety!
                 deadline: new Date().getTime() + 1000 * 60 * 60 * 24 * 30,
@@ -98,7 +98,7 @@ export const AssessmentCreateView = ({userId, teamId}: ConnectedProps<typeof con
                     setErrors(['Nie udało się stworzyć ankiety, skontaktuj się z glipecki.']);
                 });
         },
-        [assessed, assessees, navigate, teamId, userId, users]
+        [assessed, assessors, navigate, teamId, userId, users]
     );
 
     return <OneColumnLayoutWide>
@@ -125,10 +125,10 @@ export const AssessmentCreateView = ({userId, teamId}: ConnectedProps<typeof con
                     <InputLabel>Lista oceniających</InputLabel>
                     <SelectFromDomain
                         disabled={locekd}
-                        value={assessees}
+                        value={assessors}
                         label="Lista oceniających"
                         domain={selectDomain}
-                        onChange={setAssessees}
+                        onChange={setAssessors}
                     />
                 </FormControl>
                 {locekd && <span>Tworzenie ankiety oceny...</span>}

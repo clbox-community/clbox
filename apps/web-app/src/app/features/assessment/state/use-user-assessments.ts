@@ -1,12 +1,12 @@
-import {firebaseApp} from "../../firebase/firebase.app";
-import {useEffect, useState} from "react";
-import {WithId} from "../model/with-id";
-import {UserAssessment} from "../model/user-assessment";
+import { firebaseApp } from '../../firebase/firebase.app';
+import { useEffect, useState } from 'react';
+import { WithId } from '../model/with-id';
+import { UserAssessmentRef } from '../model/user-assessment-ref';
 
 const firestore = firebaseApp.firestore();
 
 export function useUserAssessments(team: string, user: string) {
-    const [assessments, setAssessments] = useState<(WithId & UserAssessment)[]>();
+    const [assessments, setAssessments] = useState<(WithId & UserAssessmentRef)[]>();
     useEffect(
         () => {
             return firestore
@@ -16,7 +16,7 @@ export function useUserAssessments(team: string, user: string) {
                     docs => setAssessments(docs.docs.map(
                         doc => ({
                             id: doc.id,
-                            ...(doc.data() as UserAssessment)
+                            ...(doc.data() as UserAssessmentRef)
                         })
                     ))
                 );
