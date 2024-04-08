@@ -6,60 +6,56 @@ import { UserAssessmentRef } from '../model/user-assessment-ref';
 
 const firestore = firebaseApp.firestore();
 
-export const useUserAssessment = (team: string, user: string, id: string): [WithId & UserAssessment, (update: {
+export const useUserAssessment = (team: string, user: string, assessmentId: string, userAssessmentId: string, userAssessmentRefId: string): [WithId & UserAssessment, (update: {
     [key: string]: unknown
-}) => void, ((finishDate: number) => void)] => {
+}) => void, (() => void)] => {
     const [assessment, setAssessment] = useState<WithId & UserAssessment | undefined>();
     useEffect(
         () => {
-            if (team && user && id) {
-                const controller = new AbortController();
-                firestore
-                    .doc(`/team/${team}/user/${user}/assessment-survey/${id}`)
-                    .get()
-                    .then(userAssessmentRef => {
-                        const userAssessmentRefData = userAssessmentRef.data() as UserAssessmentRef;
-                        const unsubscribe = firestore
-                            .doc(`/team/${team}/assessment/${userAssessmentRefData.assessmentId}/result/${id}`)
-                            .onSnapshot(doc => {
-                                if (doc.exists) {
-                                    setAssessment({ id: doc.id, ...doc.data() as UserAssessment });
-                                } else {
-                                    setAssessment(null);
-                                }
-                            });
-                        controller.signal.addEventListener('abort', () => {
-                            console.log('unsubscribing...');
-                            unsubscribe();
-                        });
+            if (team && user && assessmentId && userAssessmentId) {
+                return firestore
+                    .doc(`/team/${team}/assessment/${assessmentId}/result/${userAssessmentId}`)
+                    .onSnapshot(doc => {
+                        if (doc.exists) {
+                            setAssessment({ id: doc.id, ...doc.data() as UserAssessment });
+                        } else {
+                            setAssessment(null);
+                        }
                     });
-                return () => controller.abort();
             }
         },
-        [team, user, id]
+        [team, user, assessmentId, userAssessmentId]
     );
     const updateAssessment = useCallback(
-        (update: { [key: string]: unknown }) => {
-            if (team && user && id) {
-                firestore
-                    .doc(`/team/${team}/user/${user}/assessment-survey/${id}`)
+        async (update: { [key: string]: unknown }) => {
+            if (team && user && assessmentId && userAssessmentId) {
+                await firestore
+                    .doc(`/team/${team}/assessment/${assessmentId}/result/${userAssessmentId}`)
                     .update(update);
             } else {
                 throw new Error('Update for assessment without team && user && id');
             }
         },
-        [team, user, id]
+        [team, user, assessmentId, userAssessmentId]
     );
     const finishAssessment = useCallback(
-        async (finishDate: number) => {
-            await firestore
-                .doc(`/team/${team}/user/${user}/assessment-survey/${id}`)
-                .update('finished', true);
-            await firestore.doc(`/team/${team}/user/${user}/assessment-survey/${id}/data/state`).set({
-                finishedDate: finishDate ?? new Date().getTime()
+        async () => {
+            await firestore.runTransaction(async (trn) => {
+                const pendingDoc = firestore.doc(`/team/${team}/user/${user}/user-assessment-pending/${userAssessmentRefId}`);
+                const sentDoc = firestore.doc(`/team/${team}/user/${user}/user-assessment-sent/${userAssessmentRefId}`);
+
+                const sent = await trn.get(sentDoc);
+                if (!sent.exists) {
+                    const finishedAssessment = await trn.get(pendingDoc);
+                    trn.set(sentDoc, {
+                        ...finishedAssessment.data(),
+                        finished: true,
+                        finishedDate: new Date().getTime()
+                    } as UserAssessmentRef);
+                }
             });
         },
-        [team, user, id]
+        [team, user, userAssessmentRefId]
     );
     return [assessment, updateAssessment, finishAssessment];
 };

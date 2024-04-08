@@ -10,7 +10,7 @@ export function useUserAssessments(team: string, user: string) {
     useEffect(
         () => {
             return firestore
-                .collection(`/team/${team}/user/${user}/assessment-survey`)
+                .collection(`/team/${team}/user/${user}/user-assessment-pending`)
                 .orderBy('deadline', 'asc')
                 .onSnapshot(
                     docs => setAssessments(docs.docs.map(

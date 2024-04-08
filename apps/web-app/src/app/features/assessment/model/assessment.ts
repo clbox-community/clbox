@@ -18,5 +18,4 @@ export interface Assessment {
     createdAt: number;
     /** User state in the moment of assessment */
     user: AssessmentUserDetails;
-    // todo: in future pass object used to determine which questions should be asked and which should be skipped
 }

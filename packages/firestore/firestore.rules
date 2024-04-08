@@ -33,7 +33,10 @@ service cloud.firestore {
     match /team/{team}/user/{user}/inbox/{document=**} {
       allow read,write: if isAuthentiacted(request) && user == authEmail(request)
     }
-    match /team/{team}/user/{user}/assessment-survey/{document=**} {
+    match /team/{team}/user/{user}/user-assessment-pending/{document=**} {
+      allow read,write: if isAuthentiacted(request) && user == authEmail(request)
+    }
+    match /team/{team}/user/{user}/user-assessment-sent/{document=**} {
       allow read,write: if isAuthentiacted(request) && user == authEmail(request)
     }
     match /team/{team}/user/{user} {
@@ -45,6 +48,9 @@ service cloud.firestore {
     match /team/{team}/assessment/{assessment} {
       allow create: if isAuthentiacted(request);
       allow read, write: if isAuthentiacted(request) && resource.data.chapterLeader == authEmail(request)
+    }
+    match /team/{team}/assessment/{assessment}/result/{userAssessment} {
+      allow read, write: if isAuthentiacted(request) && get(/databases/$(database)/documents/team/$(team)/assessment/$(assessment)/result/$(userAssessment)).data.assessor == authEmail(request)
     }
     match /team/{team}/assessment/{assessment}/result/{document=**} {
       allow read: if isAuthentiacted(request) && get(/databases/$(database)/documents/team/$(team)/assessment/$(assessment)).data.chapterLeader == authEmail(request)

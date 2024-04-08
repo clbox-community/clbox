@@ -56,7 +56,7 @@ export const AppRoutingAuthenticated = () => <Routes>
         <Route path='' element={<Assessments/>}/>
         <Route path='new' element={<AssessmentCreate/>}/>
         <Route path=':uuid/result' element={<AssessmentResult/>}/>
-        <Route path=':uuid' element={<Assessment/>}/>
+        <Route path=':assessmentId/:userAssessmentId/:userAssessmentRefId' element={<Assessment/>}/>
     </Route>
     <Route path='/changelog' element={<Changelog/>}/>
     <Route path='/profile'>

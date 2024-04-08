@@ -75,9 +75,8 @@ const AssessmentsActiveView = ({teamId, userId}: ViewProps) => {
                         <AssessmentRowCell>{asLocalDate(assessment.deadline)}</AssessmentRowCell>
                         <AssessmentRowCell>
                             <AssessmentAssessesList>
-                                {assessment.assessees.map((assessee, idx) => <AssessmentAssessesListItem key={assessee}>
-                                    {assessee}
-                                    &nbsp;{assessment.finishedAssessees?.[assessee.replace('.', '_')] ? <CheckIcon fontSize="small" color="success"/> : <CloseIcon fontSize="small" color="warning"/>}
+                                {assessment.assessors?.map((assessor) => <AssessmentAssessesListItem key={assessor}>
+                                    {assessor}&nbsp;{assessment.finishedAssessors?.[assessor.replace('.', '_')] ? <CheckIcon fontSize="small" color="success"/> : <CloseIcon fontSize="small" color="warning"/>}
                                 </AssessmentAssessesListItem>)}
                             </AssessmentAssessesList>
                         </AssessmentRowCell>

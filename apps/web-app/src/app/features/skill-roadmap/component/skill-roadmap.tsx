@@ -53,6 +53,7 @@ export const SkillRoadmapView = () => {
             </div>
             {labels.map(
                 label => <div
+                    key={label}
                     style={{
                         marginLeft: '8px',
                         cursor: 'pointer',

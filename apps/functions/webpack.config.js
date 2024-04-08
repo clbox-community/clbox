@@ -1,4 +1,4 @@
-const GeneratePackageJsonPlugin = require("generate-package-json-webpack-plugin");
+const GeneratePackageJsonPlugin = require('generate-package-json-webpack-plugin');
 
 module.exports = (config, context) => {
     return {
@@ -12,23 +12,23 @@ module.exports = (config, context) => {
             ...config.plugins,
             new GeneratePackageJsonPlugin(
                 {
-                    "name": "clbox.functions",
-                    "version": "1.0.0",
-                    "main": "./index.js",
-                    "license": "MIT",
-                    "private": true,
-                    "dependencies": {
-                        "tslib": "",
-                        "firebase-admin": "11.8.0",
-                        "firebase-functions": "^4.6.0",
-                        "tsscmp": "",
-                        "node-fetch": ""
+                    'name': 'clbox.functions',
+                    'version': '1.0.0',
+                    'main': './index.js',
+                    'license': 'MIT',
+                    'private': true,
+                    'dependencies': {
+                        'tslib': '',
+                        'firebase-admin': '11.8.0',
+                        'firebase-functions': '^4.6.0',
+                        'tsscmp': '',
+                        'node-fetch': ''
                     },
-                    "engines": {
-                        "node": "18"
+                    'engines': {
+                        'node': '18'
                     }
                 },
-                __dirname + "/../../package.json"
+                __dirname + '/../../package.json'
             )
         ]
     };

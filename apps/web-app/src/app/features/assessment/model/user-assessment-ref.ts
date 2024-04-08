@@ -11,4 +11,6 @@ export interface UserAssessmentRef {
     deadline?: number;
     /** Is survey finished by answering all questions. False when no questions left. */
     finished: boolean;
+    /** Date when survey changed to finished state. */
+    finishedDate?: number;
 }

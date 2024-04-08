@@ -19,7 +19,7 @@
             },
             "configurations": {
                 "production": {
-                    "optimization": true,
+                    "optimization": false,
                     "extractLicenses": true,
                     "inspect": false,
                     "fileReplacements": [

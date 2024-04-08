@@ -5,7 +5,7 @@ import {UserAssessment} from "../model/user-assessment";
 import {QuestionWithCategory} from "./question-with-category";
 import {questionsWithCategories} from "./questions-with-categories";
 
-function nextQuestion(assessment: UserAssessment, assessee: string) {
+function nextQuestion(assessment: UserAssessment, assessed: string) {
     const context: SurveyContext = {
         user: assessment.user,
         answers: {
@@ -17,9 +17,9 @@ function nextQuestion(assessment: UserAssessment, assessee: string) {
 
         const valid = !candidate.question.validWhen || candidate.question.validWhen(context);
         const answered = assessment.response?.[candidate.question.id] !== undefined;
-        const hasQuestionTextForAssessee = (assessment.assessed === assessee ? candidate.question.text1st : candidate.question.text3rd) !== undefined;
+        const hasQuestionTextForAssessed = (assessment.assessed === assessed ? candidate.question.text1st : candidate.question.text3rd) !== undefined;
 
-        if (valid && !answered && hasQuestionTextForAssessee) {
+        if (valid && !answered && hasQuestionTextForAssessed) {
             return candidate;
         }
     }
@@ -30,8 +30,7 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
                                              updateAssessment: (assessment: {
                                                  [key: string]: unknown
                                              }) => void,
-                                             finishAssessment: (finishDate: number) => void,
-                                             assessee: string
+                                             assessed: string
 ): AssessmentSurveyHook => {
     const [question, setQuestion] = useState<QuestionWithCategory>(undefined);
     const [questionTime, setQuestionTime] = useState<number>(new Date().getTime());
@@ -39,20 +38,11 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
     useEffect(
         () => {
             if (assessment) {
-                setQuestion(nextQuestion(assessment, assessee));
+                setQuestion(nextQuestion(assessment, assessed));
                 setQuestionTime(new Date().getTime());
             }
         },
-        [assessment, assessee]
-    );
-
-    useEffect(
-        () => {
-            if (question === null) {
-                finishAssessment(new Date().getTime());
-            }
-        },
-        [question, finishAssessment]
+        [assessment, assessed]
     );
 
     const submit = useCallback(
@@ -83,7 +73,7 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
 
     return {
         category: question?.category,
-        question: question?.question,
+        question: question === null ? null : question?.question,
         finished: assessment && question === null,
         submitYes: async (feedback: string) => submit(true, feedback),
         submitNo: async (feedback: string) => submit(false, feedback),

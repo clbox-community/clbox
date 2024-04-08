@@ -36,6 +36,7 @@ import {
     userAssessmentsCreateHandlerFactory
 } from "./app/user-assessments-create/user-assessments-create-handler.factory";
 import {exportTechSkillsFactory} from "./app/export-tech-skills/export-tech-skills.factory";
+import { userAssessmentsFinishHandlerFactory } from './app/user-assessments-finish/user-assessments-finish-handler.factory';
 
 firebase.initializeApp();
 
@@ -73,10 +74,10 @@ export const userAssessmentsCreateHandler = userAssessmentsCreateHandlerFactory(
     functionBuilder().runWith({}),
     firebase
 );
-// export const userAssessmentsFinishHandler = userAssessmentsFinishHandlerFactory(
-//     functionBuilder().runWith({}),
-//     firebase
-// );
+export const userAssessmentsFinishHandler = userAssessmentsFinishHandlerFactory(
+    functionBuilder().runWith({}),
+    firebase
+);
 export const exportTechSkillsCron = exportTechSkillsFactory(
     functionBuilder().runWith({}),
     functions.config(),

@@ -21,8 +21,8 @@ const AssessmentsPendingView = ({teamId, userId}: ViewProps) => {
             <ul>
                 {assessments?.filter(assessment => !assessment.finished).map(
                     assessment => <li key={assessment.id}>
-                        <Link to={`/assessment/${assessment.id}`}>
-                            Ocena okresowa dla {assessment.user.name}
+                        <Link to={`/assessment/${assessment.assessmentId}/${assessment.userAssessmentId}/${assessment.id}`}>
+                            Ocena okresowa dla {assessment.assessedName}
                             {assessment.deadline && ` w terminie do ` + asLocalDate(assessment.deadline)}
                         </Link>
                     </li>

@@ -1,5 +1,6 @@
 import { UserAssessmentRef } from '../../../../web-app/src/app/features/assessment/model/user-assessment-ref';
 import { Assessment } from '../../../../web-app/src/app/features/assessment/model/assessment';
+import { UserAssessment } from '../../../../web-app/src/app/features/assessment/model/user-assessment';
 
 export const userAssessmentsCreateHandlerFactory = (
     functions: import('firebase-functions').FunctionBuilder,
@@ -8,21 +9,33 @@ export const userAssessmentsCreateHandlerFactory = (
     async (change, context) => {
         const db = firebase.firestore();
         const assessment = change.data() as Assessment;
-        const assessors: string[] = assessment.assessors;
+        const assessors: string[] = assessment.assessors ?? [];
         for (const assessor of assessors) {
-            const userAssessment = await db.collection(`team/${context.params.team}/assessment/${change.id}/result/`).add({} as UserAssessmentRef);
+            const userAssessment: UserAssessment = {
+                ...assessment,
+                assessmentId: change.id,
+                assessor: assessor,
+                askedQuestion: {},
+                questionFeedback: {},
+                questionTime: {},
+                response: {},
+                finished: false
+            };
+            const userAssessmentDoc = await db
+                .collection(`team/${context.params.team}/assessment/${change.id}/result/`)
+                .add(userAssessment);
             const userAssessmentRef: UserAssessmentRef = {
                 assessmentId: change.id,
-                userAssessmentId: userAssessment.id,
+                userAssessmentId: userAssessmentDoc.id,
                 assessedId: assessment.assessed,
                 assessedName: assessment.user.name,
                 deadline: assessment.deadline,
                 finished: false
             };
-            console.log(`Creating user assessment for [data=${JSON.stringify(userAssessmentRef)}]`);
-            const created = await db.collection(`team/${context.params.team}/user/${assessor}/assessment-survey`)
+            console.log(`Creating user assessment for [data=${JSON.stringify(userAssessment)}, ref=${JSON.stringify(userAssessmentRef)}]`);
+            const created = await db.collection(`team/${context.params.team}/user/${assessor}/user-assessment-pending`)
                 .add(userAssessmentRef);
-            console.log(`User assessment created with [id=${created.id}]`);
+            console.log(`User assessment created with [ref=${created.path}, assessment=${userAssessmentDoc.path}]`);
         }
     }
 );
