@@ -35,22 +35,7 @@ function isValidResponse(q: QuestionWithCategory, assessment: WithId & Assessmen
     return q.question.expectedResponses[assessment.user.seniority === 'lead' ? 'seniorPlus' : assessment.user.seniority].indexOf(result.response[q.question.id]) >= 0;
 }
 
-function responseColor(q: QuestionWithCategory, assessment: WithId & Assessment, result: WithId & UserAssessment): string {
-    const asked = result.askedQuestion[q.question.id];
-    const valid = isValidResponse(q, assessment, result);
-
-    if (!asked) {
-        return 'lightgray';
-    } else if (valid) {
-        return isDesiredResponse(q, assessment, result) ? 'green' : 'orange';
-    } else if (!valid) {
-        return 'red';
-    }
-
-    return undefined;
-}
-
-function asSeniorityFilter(seniority: AssessmentUserSeniority) {
+function asSeniority(seniority: AssessmentUserSeniority) {
     switch (seniority) {
         case AssessmentUserSeniority.none:
             return undefined;
@@ -65,7 +50,7 @@ function asSeniorityFilter(seniority: AssessmentUserSeniority) {
     }
 }
 
-function questionSeniorityToFilter(filter: 'junior' | 'regular' | 'senior' | 'seniorPlus'): Seniority[] {
+function asSeniorityGroup(filter: 'junior' | 'regular' | 'senior' | 'seniorPlus'): Seniority[] {
     switch (filter) {
         case 'junior':
             return [Seniority.junior];
@@ -75,14 +60,48 @@ function questionSeniorityToFilter(filter: 'junior' | 'regular' | 'senior' | 'se
             return [Seniority.junior, Seniority.regular, Seniority.senior];
         case 'seniorPlus':
             return [Seniority.junior, Seniority.regular, Seniority.senior, Seniority.seniorPlus];
-
     }
+}
+
+function isQuestionSeniorityGreaterThanUser(q: QuestionWithCategory, assessment: WithId & Assessment) {
+    switch (assessment.user.seniority) {
+        case AssessmentUserSeniority.junior:
+            return [Seniority.junior].indexOf(q.question.seniority);
+        case AssessmentUserSeniority.regular:
+            return [Seniority.junior, Seniority.regular].indexOf(q.question.seniority);
+        case AssessmentUserSeniority.senior:
+            return [Seniority.junior, Seniority.regular, Seniority.senior].indexOf(q.question.seniority);
+        case AssessmentUserSeniority.lead:
+            return [Seniority.junior, Seniority.regular, Seniority.senior, Seniority.seniorPlus].indexOf(q.question.seniority);
+    }
+    return false;
+}
+
+function responseColor(q: QuestionWithCategory, assessment: WithId & Assessment, result: WithId & UserAssessment): string {
+    const asked = result.askedQuestion[q.question.id];
+    const valid = isValidResponse(q, assessment, result);
+
+    if (!asked) {
+        return 'lightgray';
+    } else if (valid) {
+        if (isDesiredResponse(q, assessment, result)) {
+            return 'green';
+        } else if (isQuestionSeniorityGreaterThanUser(q, assessment)) {
+            return 'gray';
+        } else {
+            return 'orange';
+        }
+    } else if (!valid) {
+        return 'red';
+    }
+
+    return undefined;
 }
 
 // Desire response to oczekiwana żeby spełnić pytanie
 // Fail response to ocena spełnienia względem wymagań na bieżącym stanowisku
 function shouldShowQuestion(q: QuestionWithCategory, assessment: WithId & Assessment, results: (WithId & UserAssessment)[], seniorityFilter: 'junior' | 'regular' | 'senior' | 'seniorPlus', onlyFails: boolean) {
-    if (questionSeniorityToFilter(seniorityFilter).indexOf(q.question.seniority) < 0) {
+    if (asSeniorityGroup(seniorityFilter).indexOf(q.question.seniority) < 0) {
         return false;
     }
     if (onlyFails && results.every(result => !result.askedQuestion[q.question.id] || isDesiredResponse(q, assessment, result))) {
@@ -90,6 +109,20 @@ function shouldShowQuestion(q: QuestionWithCategory, assessment: WithId & Assess
     }
     return true;
 }
+
+const ResultRow = styled.tr`
+    &:nth-child(2n) {
+        background-color: rgba(234, 234, 234, 0.57);
+    }
+
+    :hover {
+        background-color: rgba(179, 21, 54, 0.1);
+    }
+`;
+
+const ResultCell = styled.td`
+    padding: 2px;
+`;
 
 export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector>) => {
     const { uuid } = useParams<{ uuid: string }>();
@@ -99,13 +132,18 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
     const [seniorityFilter, setSeniorityFilter] = useState<keyof typeof Seniority | undefined>(Seniority.junior);
     useEffect(() => {
         if (assessment) {
-            setSeniorityFilter(asSeniorityFilter(assessment.user.seniority));
+            setSeniorityFilter(asSeniority(assessment.user.seniority));
         }
     }, [assessment, setSeniorityFilter, results]);
-
     return assessment && <OneColumnLayoutUltraWide>
         <Card>
             <CardContent>
+                <div>
+                    <div style={{fontSize: '1.2em'}}>{assessment.user.name}</div>
+                    <div>Poziom: {assessment.user.seniority}</div>
+                    <div>Zespół: {assessment.user.teams} w {assessment.user.projects.join(', ')}</div>
+                    <div>Oceniający: {assessment.assessors?.join(', ')}</div>
+                </div>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px', fontSize: '0.9em', cursor: 'pointer', color: 'gray', userSelect: 'none' }}>
                     <span onClick={() => setSeniorityFilter('junior')} style={{ fontWeight: seniorityFilter === 'junior' ? 500 : undefined }}>junior</span>
                     &nbsp;|&nbsp;
@@ -140,36 +178,37 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
                     </tr>
                     {questionsWithCategories
                         .filter(q => shouldShowQuestion(q, assessment, results, seniorityFilter, onlyFails))
+                        .sort((a, b) => a.question.seniority.localeCompare(b.question.seniority))
                         .map(q =>
-                            <tr key={q.question.id}>
-                                <td style={{ verticalAlign: 'top' }}>
+                            <ResultRow key={q.question.id}>
+                                <ResultCell style={{ verticalAlign: 'top' }}>
                                     {q.question.id.replace('_', '.')}
-                                </td>
-                                <td style={{ verticalAlign: 'top' }}>
+                                </ResultCell>
+                                <ResultCell style={{ verticalAlign: 'top' }}>
                                     {q.question.text3rd && userInText(q.question.text3rd[assessment.user.textForm], assessment.user.name)}
                                     {!q.question.text3rd && userInText(q.question.text1st[assessment.user.textForm], assessment.user.name)}
-                                </td>
-                                <td style={{ verticalAlign: 'top' }}>
+                                </ResultCell>
+                                <ResultCell style={{ verticalAlign: 'top' }}>
                                     {q.question.seniority}
-                                </td>
+                                </ResultCell>
                                 {results.map(result =>
-                                    <td key={result.assessor}
-                                        style={{
-                                            color: responseColor(q, assessment, result),
-                                            flexBasis: '50px',
-                                            marginRight: '8px',
-                                            cursor: 'pointer',
-                                            verticalAlign: 'top'
-                                        }}
+                                    <ResultCell key={result.assessor}
+                                                style={{
+                                                    color: responseColor(q, assessment, result),
+                                                    flexBasis: '50px',
+                                                    marginRight: '8px',
+                                                    cursor: 'pointer',
+                                                    verticalAlign: 'top'
+                                                }}
                                     >
                                         <span title={`Odpowiedź: ${result.response[q.question.id] ? 'tak/często' : 'nie/rzadko'}`}>
                                             {result.askedQuestion[q.question.id] ? (result.response[q.question.id] ? 'tak' : 'nie') : '-'}
                                             &nbsp;
-                                            {result.response[q.question.id] !== undefined ? (isValidResponse(q, assessment, result) ? '✓' : '⤫') : ''}
+                                            {result.response[q.question.id] !== undefined ? (isDesiredResponse(q, assessment, result) ? '✓' : '⤫') : ''}
                                         </span>
-                                    </td>
+                                    </ResultCell>
                                 )}
-                            </tr>
+                            </ResultRow>
                         )}
                     </tbody>
                 </table>}

@@ -14,6 +14,7 @@ export const useAssessment = (team: string, assessment: string): (WithId & Asses
                     .doc(`/team/${team}/assessment/${assessment}`)
                     .onSnapshot(doc => setResult({
                         id: doc.id,
+                        assessors: doc.data().assessees, // tymczasowy fallback legacy ankiet
                         ...(doc.data() as Assessment)
                     }));
             }
