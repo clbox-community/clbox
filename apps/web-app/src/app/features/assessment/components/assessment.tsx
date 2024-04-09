@@ -54,6 +54,18 @@ const WideTextField = styled(TextField)`
     width: 100%;
 `;
 
+/**
+ * Pytania często nie kończą się ".". Warto te pytania poprawić, a do tego czasu wyświetlać je z kropką po stronie ui.
+ * @param text
+ */
+function normalizeText(text: string): string {
+    if (text.endsWith('.') || text.endsWith('?')) {
+        return text;
+    } else {
+        return text + '.';
+    }
+}
+
 const QuestionSurvey = ({ assessment, category, question, submitYes, submitNo, reset, progress, userId }: {
     assessment,
     category,
@@ -95,19 +107,24 @@ const QuestionSurvey = ({ assessment, category, question, submitYes, submitNo, r
         />
         <CardContent>
             <div style={{ minHeight: '150px' }}>
-                <div>{userInText(assessment.assessed === userId && question.text1st ? question.text1st[assessment.user.textForm ?? 'm'] : question.text3rd[assessment.user.textForm ?? 'm'], assessment.user.name)}</div>
+                <div>{normalizeText(userInText(assessment.assessed === userId && question.text1st ? question.text1st[assessment.user.textForm ?? 'm'] : question.text3rd[assessment.user.textForm ?? 'm'], assessment.user.name))}</div>
                 {question.comment && <div style={{ fontStyle: 'italic', color: 'gray' }}>{question.comment}</div>}
             </div>
         </CardContent>
         <CardActions>
-            <Button variant="outlined" size="small" onClick={() => submitNo(commentFieldRef.current?.value)}>nigdy / w
-                ogóle się nie zgadzam</Button>
-            <Button variant="outlined" size="small" onClick={() => submitNo(commentFieldRef.current?.value)}>rzadko /
-                raczej nie</Button>
-            <Button variant="outlined" size="small" onClick={() => submitYes(commentFieldRef.current?.value)}>często /
-                raczej tak</Button>
-            <Button variant="outlined" size="small" onClick={() => submitYes(commentFieldRef.current?.value)}>zawsze /
-                stanowczo się zgadzam</Button>
+            {/* TODO: to powinny być ładniejsze, dwulinijkowe przyciski i być może jakiś tooltip jak się na nie najedzie z dodatkowymi wskazówkami */}
+            <Button variant="outlined" size="small" onClick={() => submitNo(commentFieldRef.current?.value)}>
+                nigdy / w ogóle się nie zgadzam
+            </Button>
+            <Button variant="outlined" size="small" onClick={() => submitNo(commentFieldRef.current?.value)}>
+                rzadko / raczej nie
+            </Button>
+            <Button variant="outlined" size="small" onClick={() => submitYes(commentFieldRef.current?.value)}>
+                często / raczej tak
+            </Button>
+            <Button variant="outlined" size="small" onClick={() => submitYes(commentFieldRef.current?.value)}>
+                zawsze / stanowczo się zgadzam
+            </Button>
             <Button size="small" color="secondary" style={{ marginLeft: 'auto' }} onClick={() => setExpanded(!expanded)}><HelpOutlineIcon /></Button>
         </CardActions>
         <Collapse in={expanded} timeout="auto" unmountOnExit>
