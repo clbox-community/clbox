@@ -113,17 +113,29 @@ const QuestionSurvey = ({ assessment, category, question, submitYes, submitNo, r
         </CardContent>
         <CardActions>
             {/* TODO: to powinny być ładniejsze, dwulinijkowe przyciski i być może jakiś tooltip jak się na nie najedzie z dodatkowymi wskazówkami */}
-            <Button variant="outlined" size="small" onClick={() => submitNo(commentFieldRef.current?.value)}>
-                nigdy / w ogóle się nie zgadzam
+            <Button variant="outlined" size="small" onClick={() => submitNo(commentFieldRef.current?.value)} style={{width: '200px'}}>
+                <div>
+                    <div>nigdy</div>
+                    <div>w ogóle się nie zgadzam</div>
+                </div>
             </Button>
-            <Button variant="outlined" size="small" onClick={() => submitNo(commentFieldRef.current?.value)}>
-                rzadko / raczej nie
+            <Button variant="outlined" size="small" onClick={() => submitNo(commentFieldRef.current?.value)} style={{width: '200px'}}>
+                <div>
+                    <div>rzadko</div>
+                    <div>raczej nie</div>
+                </div>
             </Button>
-            <Button variant="outlined" size="small" onClick={() => submitYes(commentFieldRef.current?.value)}>
-                często / raczej tak
+            <Button variant="outlined" size="small" onClick={() => submitYes(commentFieldRef.current?.value)} style={{width: '200px'}}>
+                <div>
+                    <div>często</div>
+                    <div>raczej tak</div>
+                </div>
             </Button>
-            <Button variant="outlined" size="small" onClick={() => submitYes(commentFieldRef.current?.value)}>
-                zawsze / stanowczo się zgadzam
+            <Button variant="outlined" size="small" onClick={() => submitYes(commentFieldRef.current?.value)} style={{width: '200px'}}>
+                <div>
+                    <div>zawsze</div>
+                    <div>stanowczo się zgadzam</div>
+                </div>
             </Button>
             <Button size="small" color="secondary" style={{ marginLeft: 'auto' }} onClick={() => setExpanded(!expanded)}><HelpOutlineIcon /></Button>
         </CardActions>
@@ -146,10 +158,10 @@ const QuestionSurvey = ({ assessment, category, question, submitYes, submitNo, r
                     />
                 </div>
             </CardContent>
-            <CardActions style={{ justifyContent: 'flex-end' }}>
-                <span style={{ fontSize: '0.8em', fontStyle: 'italic', color: 'darkred', marginRight: '8px' }}>Resetowanie jest dostępne tylko w czasie beta testów</span>
-                <Button variant="outlined" size="small" onClick={reset}>reset</Button>
-            </CardActions>
+            {/*<CardActions style={{ justifyContent: 'flex-end' }}>*/}
+            {/*    <span style={{ fontSize: '0.8em', fontStyle: 'italic', color: 'darkred', marginRight: '8px' }}>Resetowanie jest dostępne tylko w czasie beta testów</span>*/}
+            {/*    <Button variant="outlined" size="small" onClick={reset}>reset</Button>*/}
+            {/*</CardActions>*/}
         </Collapse>
     </Card>;
 };
