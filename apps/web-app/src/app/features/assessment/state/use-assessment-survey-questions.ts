@@ -1,9 +1,9 @@
-import {AssessmentSurveyHook} from "../model/assessment-survey-hook";
-import {SurveyContext} from "@clbox/assessment-survey";
-import {useCallback, useEffect, useState} from "react";
-import {UserAssessment} from "../model/user-assessment";
-import {QuestionWithCategory} from "./question-with-category";
-import {questionsWithCategories} from "./questions-with-categories";
+import { AssessmentSurveyHook } from '../model/assessment-survey-hook';
+import { SurveyContext } from '@clbox/assessment-survey';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { UserAssessment } from '../model/user-assessment';
+import { QuestionWithCategory } from './question-with-category';
+import { questionsWithCategories } from './questions-with-categories';
 
 function nextQuestion(assessment: UserAssessment, assessed: string) {
     const context: SurveyContext = {
@@ -45,14 +45,30 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
         [assessment, assessed]
     );
 
+    const timeLeft = useMemo(
+        () => {
+            if (assessment && question && questionsWithCategories.indexOf(question) > 5) {
+                const times = Object.keys(assessment.questionTime);
+                const sum = times
+                    .map(key => assessment.questionTime[key])
+                    .reduce((prev, current) => prev + current, 0);
+                return (sum / times.length) * (questionsWithCategories.length - 1 - questionsWithCategories.indexOf(question));
+            }
+        },
+        [assessment, question]
+    );
+
     const submit = useCallback(
-        async (answerValue: unknown, feedback: string) => {
+        async (answerValue: unknown, comment: string, feedback: string) => {
             const time = (new Date().getTime() - questionTime) / 1000;
             const update = {
                 [`askedQuestion.${question.question.id}`]: true,
                 [`response.${question.question.id}`]: answerValue,
-                [`questionTime.${question.question.id}`]: time,
+                [`questionTime.${question.question.id}`]: time
             };
+            if (feedback) {
+                update[`comment.${question.question.id}`] = comment;
+            }
             if (feedback) {
                 update[`questionFeedback.${question.question.id}`] = feedback;
             }
@@ -66,18 +82,23 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
             response: {},
             questionFeedback: {},
             questionTime: {},
-            askedQuestion: {},
+            askedQuestion: {}
         }),
         [updateAssessment]
-    )
+    );
 
     return {
         category: question?.category,
         question: question === null ? null : question?.question,
         finished: assessment && question === null,
-        submitYes: async (feedback: string) => submit(true, feedback),
-        submitNo: async (feedback: string) => submit(false, feedback),
+        submitYes: async (comment: string, feedback: string) => submit(true, comment, feedback),
+        submitNo: async (comment: string, feedback: string) => submit(false, comment, feedback),
         reset: reset,
-        progress: (questionsWithCategories.indexOf(question) / questionsWithCategories.length) * 100
+        progress: {
+            count: questionsWithCategories.length,
+            currentIdx: questionsWithCategories.indexOf(question),
+            percents: (questionsWithCategories.indexOf(question) / questionsWithCategories.length) * 100,
+            timeLeft
+        }
     };
-}
+};

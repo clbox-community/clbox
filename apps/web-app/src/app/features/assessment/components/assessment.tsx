@@ -76,15 +76,15 @@ const QuestionSurvey = ({ assessment, category, question, submitYes, submitNo, r
     progress,
     userId
 }) => {
-    const [expanded, setExpanded] = useState<boolean>(false);
-    const commentFieldRef = useRef<HTMLTextAreaElement>();
+    const [feedbackExpanded, setFeedbackExpanded] = useState<boolean>(false);
+    const feedbackFieldRef = useRef<HTMLTextAreaElement>();
 
     useEffect(
         () => {
-            if (commentFieldRef.current) {
-                commentFieldRef.current.value = '';
+            if (feedbackFieldRef.current) {
+                feedbackFieldRef.current.value = '';
             }
-            setExpanded(false);
+            setFeedbackExpanded(false);
         },
         [question]
     );
@@ -92,7 +92,10 @@ const QuestionSurvey = ({ assessment, category, question, submitYes, submitNo, r
     return <Card>
         <CardHeader
             title={`Ocena okresowa dla ${assessment.user.name}`}
-            subheader={<LinearProgress variant="determinate" value={progress} />}
+            subheader={<div>
+                <div><LinearProgress variant="determinate" value={progress.percents} /></div>
+                <div style={{fontStyle: 'italic', fontSize: '.9em', marginTop: '4px'}}>Pytanie {progress.currentIdx + 1} z {progress.count}. {progress.timeLeft && <>Pozostało ~{Math.floor(progress.timeLeft / 60)} min.</>} Ankietę może przerwać w dowolnym momencie i wrócić do niej później.</div>
+            </div>}
         >
         </CardHeader>
         <CardHeader
@@ -111,51 +114,48 @@ const QuestionSurvey = ({ assessment, category, question, submitYes, submitNo, r
                 {question.comment && <div style={{ fontStyle: 'italic', color: 'gray' }}>{question.comment}</div>}
             </div>
         </CardContent>
+        <CardContent>
+            <span style={{fontStyle: 'italic', color: 'gray'}}>Możesz dodać komentarz, który zostanie zapisany po wybraniu jednej z odpowiedzi.</span>
+            <WideTextField inputRef={feedbackFieldRef} multiline rows={4} />
+        </CardContent>
         <CardActions>
-            {/* TODO: to powinny być ładniejsze, dwulinijkowe przyciski i być może jakiś tooltip jak się na nie najedzie z dodatkowymi wskazówkami */}
-            <Button variant="outlined" size="small" onClick={() => submitNo(commentFieldRef.current?.value)} style={{width: '200px'}}>
+            <Button variant="outlined" size="small" onClick={() => submitNo(feedbackFieldRef.current?.value)} style={{ width: '200px' }}>
                 <div>
                     <div>nigdy</div>
                     <div>w ogóle się nie zgadzam</div>
                 </div>
             </Button>
-            <Button variant="outlined" size="small" onClick={() => submitNo(commentFieldRef.current?.value)} style={{width: '200px'}}>
+            <Button variant="outlined" size="small" onClick={() => submitNo(feedbackFieldRef.current?.value)} style={{ width: '200px' }}>
                 <div>
                     <div>rzadko</div>
                     <div>raczej nie</div>
                 </div>
             </Button>
-            <Button variant="outlined" size="small" onClick={() => submitYes(commentFieldRef.current?.value)} style={{width: '200px'}}>
+            <Button variant="outlined" size="small" onClick={() => submitYes(feedbackFieldRef.current?.value)} style={{ width: '200px' }}>
                 <div>
                     <div>często</div>
                     <div>raczej tak</div>
                 </div>
             </Button>
-            <Button variant="outlined" size="small" onClick={() => submitYes(commentFieldRef.current?.value)} style={{width: '200px'}}>
+            <Button variant="outlined" size="small" onClick={() => submitYes(feedbackFieldRef.current?.value)} style={{ width: '200px' }}>
                 <div>
                     <div>zawsze</div>
                     <div>stanowczo się zgadzam</div>
                 </div>
             </Button>
-            <Button size="small" color="secondary" style={{ marginLeft: 'auto' }} onClick={() => setExpanded(!expanded)}><HelpOutlineIcon /></Button>
+            <Button size="small" color="secondary" style={{ marginLeft: 'auto' }} onClick={() => setFeedbackExpanded(!feedbackExpanded)}><HelpOutlineIcon /></Button>
         </CardActions>
-        <Collapse in={expanded} timeout="auto" unmountOnExit>
+        <Collapse in={feedbackExpanded} timeout="auto" unmountOnExit>
             <CardContent>
                 <div style={{ fontStyle: 'italic' }}>
                     Pytanie jest dla Ciebie niejasne? Nie wiesz, jaką odpowiedź wybrać?
                 </div>
                 <div style={{ fontStyle: 'italic' }}>
-                    Zgłoś feedback w oknie
-                    poniżej, opisz jak je zrozumiałeś i co założyłeś wybierając jedną z odpowiedzi. Twój komentarz
-                    będzie się zawsze pojawiał przy odpowiedzi i zostanie wykorzystany do przygotowania podsumowania
-                    oraz jako wkład do dalszego rozwoju ankiety oceny.
+                    Zgłoś feedback w oknie poniżej, opisz jak je zrozumiałeś i co założyłeś wybierając jedną z odpowiedzi. Twój komentarz będzie się zawsze pojawiał przy odpowiedzi i zostanie
+                    wykorzystany do przygotowania podsumowania oraz jako wkład do dalszego rozwoju ankiety oceny.
                 </div>
                 <div>
-                    <WideTextField
-                        inputRef={commentFieldRef}
-                        multiline
-                        rows={4}
-                    />
+                    <WideTextField inputRef={feedbackFieldRef} multiline rows={4} />
                 </div>
             </CardContent>
             {/*<CardActions style={{ justifyContent: 'flex-end' }}>*/}

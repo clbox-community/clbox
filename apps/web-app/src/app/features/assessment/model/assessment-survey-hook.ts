@@ -1,11 +1,16 @@
-import {Question, Category} from "@clbox/assessment-survey";
+import { Category, Question } from '@clbox/assessment-survey';
 
 export interface AssessmentSurveyHook {
     category: Category;
     question: Question;
     finished: boolean;
-    submitYes: (feedback: string) => Promise<void>;
-    submitNo: (feedback: string) => Promise<void>;
+    submitYes: (comment: string, feedback: string) => Promise<void>;
+    submitNo: (comment: string, feedback: string) => Promise<void>;
     reset: () => Promise<void>;
-    progress: number;
+    progress: {
+        count: number;
+        currentIdx: number;
+        percents: number;
+        timeLeft?: number;
+    };
 }
