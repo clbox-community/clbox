@@ -26,7 +26,7 @@ export interface UserAssessment {
         [id: string]: boolean;
     };
     /** Question comment by question identifier */
-    comments: {
+    comment: {
         [id: string]: string;
     };
     /** Collected feedback for questions by its identifier. Question feedback is optional. */

@@ -5,17 +5,21 @@ import { UserAssessment } from '../model/user-assessment';
 import { QuestionWithCategory } from './question-with-category';
 import { questionsWithCategories } from './questions-with-categories';
 
-function nextQuestion(assessment: UserAssessment, assessed: string) {
+function isQuestionToShow(assessment, question): boolean {
     const context: SurveyContext = {
         user: assessment.user,
         answers: {
             get: (id: string) => assessment.response?.[id.replace('.', '_')]
         }
     };
+    return !question.question.validWhen || question.question.validWhen(context);
+}
+
+function nextQuestion(assessment: UserAssessment, assessed: string) {
+
     for (let idx = 0; idx < questionsWithCategories.length; ++idx) {
         const candidate = questionsWithCategories[idx];
-
-        const valid = !candidate.question.validWhen || candidate.question.validWhen(context);
+        const valid = isQuestionToShow(assessment, candidate);
         const answered = assessment.response?.[candidate.question.id] !== undefined;
         const hasQuestionTextForAssessed = (assessment.assessed === assessed ? candidate.question.text1st : candidate.question.text3rd) !== undefined;
 
@@ -66,8 +70,9 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
                 [`response.${question.question.id}`]: answerValue,
                 [`questionTime.${question.question.id}`]: time
             };
-            if (feedback) {
+            if (comment) {
                 update[`comment.${question.question.id}`] = comment;
+                console.log(comment);
             }
             if (feedback) {
                 update[`questionFeedback.${question.question.id}`] = feedback;
@@ -94,8 +99,8 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
         submitYes: async (comment: string, feedback: string) => submit(true, comment, feedback),
         submitNo: async (comment: string, feedback: string) => submit(false, comment, feedback),
         reset: reset,
-        progress: {
-            count: questionsWithCategories.length,
+        progress: assessment && {
+            count: questionsWithCategories.filter(q => isQuestionToShow(assessment, q)).length,
             currentIdx: questionsWithCategories.indexOf(question),
             percents: (questionsWithCategories.indexOf(question) / questionsWithCategories.length) * 100,
             timeLeft

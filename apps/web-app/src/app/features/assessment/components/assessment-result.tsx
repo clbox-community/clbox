@@ -12,7 +12,7 @@ import { QuestionWithCategory } from '../state/question-with-category';
 import { WithId } from '../model/with-id';
 import { Assessment } from '../model/assessment';
 import { UserAssessment } from '../model/user-assessment';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Seniority } from '@clbox/assessment-survey';
 import { AssessmentUserSeniority } from '../model/assessment-user-seniority';
 
@@ -110,7 +110,16 @@ function shouldShowQuestion(q: QuestionWithCategory, assessment: WithId & Assess
     return true;
 }
 
-const ResultRow = styled.tr`
+const HeaderRow = styled.div`
+    display: flex;
+    flex-direction: row;
+`;
+const HeaderCell = styled.div``;
+
+const ResultRow = styled.div`
+    display: flex;
+    flex-direction: row;
+
     &:nth-child(2n) {
         background-color: rgba(234, 234, 234, 0.57);
     }
@@ -120,9 +129,26 @@ const ResultRow = styled.tr`
     }
 `;
 
-const ResultCell = styled.td`
+const ResultCell = styled.div`
     padding: 2px;
 `;
+
+const Columns = {
+    id: {
+        flexBasis: '100px',
+        fontStyle: 'italic',
+        color: 'gray'
+    },
+    question: {
+        flex: '1'
+    },
+    seniority: {
+        flexBasis: '100px'
+    },
+    result: {
+        flexBasis: '100px'
+    }
+};
 
 export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector>) => {
     const { uuid } = useParams<{ uuid: string }>();
@@ -139,7 +165,7 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
         <Card>
             <CardContent>
                 <div>
-                    <div style={{fontSize: '1.2em'}}>{assessment.user.name}</div>
+                    <div style={{ fontSize: '1.2em' }}>{assessment.user.name}</div>
                     <div>Poziom: {assessment.user.seniority}</div>
                     <div>Zespół: {assessment.user.teams} w {assessment.user.projects.join(', ')}</div>
                     <div>Oceniający: {assessment.assessors?.join(', ')}</div>
@@ -157,61 +183,60 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
                         {onlyFails ? 'Pokaż wszystkie obszary' : 'Pokaż obszary do usprawnienia'}
                     </span>
                 </div>
-                {results && <table>
-                    <tbody>
-                    <tr>
-                        <td>
+                {results && <div>
+                    <HeaderRow>
+                        <HeaderCell style={{ ...Columns.id }}>
                             ID
-                        </td>
-                        <td>
+                        </HeaderCell>
+                        <HeaderCell style={{ ...Columns.question }}>
                             Pytanie
-                        </td>
-                        <td>Poziom</td>
+                        </HeaderCell>
+                        <HeaderCell style={{ ...Columns.seniority }}>Poziom</HeaderCell>
                         {results.map(result =>
-                            <td key={result.assessor}>
-                                {result.assessor?.substring(0, result.assessor?.indexOf('@'))}
-                            </td>
+                            <HeaderCell key={result.assessor} style={{ ...Columns.result }} title={result.assessor?.substring(0, result.assessor?.indexOf('@'))}>
+                                {result.assessor?.substring(0, result.assessor?.indexOf('@')).substring(0, 2)}
+                            </HeaderCell>
                         )}
-                        {/*<td>*/}
-                        {/*    Oczekiwane*/}
-                        {/*</td>*/}
-                    </tr>
+                    </HeaderRow>
                     {questionsWithCategories
                         .filter(q => shouldShowQuestion(q, assessment, results, seniorityFilter, onlyFails))
                         .sort((a, b) => a.question.seniority.localeCompare(b.question.seniority))
                         .map(q =>
-                            <ResultRow key={q.question.id}>
-                                <ResultCell style={{ verticalAlign: 'top' }}>
-                                    {q.question.id.replace('_', '.')}
-                                </ResultCell>
-                                <ResultCell style={{ verticalAlign: 'top' }}>
-                                    {q.question.text3rd && userInText(q.question.text3rd[assessment.user.textForm], assessment.user.name)}
-                                    {!q.question.text3rd && userInText(q.question.text1st[assessment.user.textForm], assessment.user.name)}
-                                </ResultCell>
-                                <ResultCell style={{ verticalAlign: 'top' }}>
-                                    {q.question.seniority}
-                                </ResultCell>
-                                {results.map(result =>
-                                    <ResultCell key={result.assessor}
-                                                style={{
-                                                    color: responseColor(q, assessment, result),
-                                                    flexBasis: '50px',
-                                                    marginRight: '8px',
-                                                    cursor: 'pointer',
-                                                    verticalAlign: 'top'
-                                                }}
-                                    >
+                            <Fragment key={q.question.id}>
+                                <ResultRow>
+                                    <ResultCell style={{ ...Columns.id }}>
+                                        {q.question.id.replace('_', '.')}
+                                    </ResultCell>
+                                    <ResultCell style={{ ...Columns.question }}>
+                                        {q.question.text3rd && userInText(q.question.text3rd[assessment.user.textForm], assessment.user.name)}
+                                        {!q.question.text3rd && userInText(q.question.text1st[assessment.user.textForm], assessment.user.name)}
+                                    </ResultCell>
+                                    <ResultCell style={{ ...Columns.seniority }}>
+                                        {q.question.seniority}
+                                    </ResultCell>
+                                    {results.map(result =>
+                                        <ResultCell key={result.assessor}
+                                                    style={{ ...Columns.result, color: responseColor(q, assessment, result) }}
+                                        >
                                         <span title={`Odpowiedź: ${result.response[q.question.id] ? 'tak/często' : 'nie/rzadko'}`}>
                                             {result.askedQuestion[q.question.id] ? (result.response[q.question.id] ? 'tak' : 'nie') : '-'}
                                             &nbsp;
                                             {result.response[q.question.id] !== undefined ? (isDesiredResponse(q, assessment, result) ? '✓' : '⤫') : ''}
                                         </span>
-                                    </ResultCell>
-                                )}
-                            </ResultRow>
+                                        </ResultCell>
+                                    )}
+                                </ResultRow>
+                                <div style={{marginLeft: Columns.id.flexBasis, fontStyle: 'italic', maxWidth: '80%', fontSize: '.9em'}}>
+                                    {results.filter(r => r.comment?.[q.question.id]).map(r => <div style={{marginBottom: '4px'}} key={r.assessor + '-' + q.question.id}>
+                                        <span style={{color: 'gray'}}>(komentarz do odpowiedzi)</span> {r.assessor}: {r.comment?.[q.question.id]}
+                                    </div>)}
+                                    {results.filter(r => r.questionFeedback?.[q.question.id]).map(r => <div style={{marginBottom: '4px'}} key={r.assessor + '-' + q.question.id}>
+                                        <span style={{color: 'gray'}}>(fedback do pytania)</span> {r.assessor}: {r.questionFeedback?.[q.question.id]}
+                                    </div>)}
+                                </div>
+                            </Fragment>
                         )}
-                    </tbody>
-                </table>}
+                </div>}
             </CardContent>
         </Card>
     </OneColumnLayoutUltraWide>;

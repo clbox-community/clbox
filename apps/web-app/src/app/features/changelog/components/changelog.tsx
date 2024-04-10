@@ -23,6 +23,14 @@ const Layout = styled.div`
 
 const changes = [
     {
+        date: '2024-04-10',
+        items: [
+            {summary: 'Sekcja na komentarz do każdego pytania ankiety oceny okresowej'},
+            {summary: 'Szacowanie czasu potrzebnego do ukończenia ankiety okresowej na podstawie średniego czasu odpowiedzi wcześniejszych pytań'},
+            {summary: 'Ekran podsumowania ankiety oceny '},
+        ]
+    },
+    {
         date: '2024-01-22',
         items: [
             {summary: 'Profil użytkownika wyświetlający dane osobowe przechowane w clbox'}

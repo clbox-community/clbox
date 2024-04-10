@@ -78,6 +78,7 @@ const QuestionSurvey = ({ assessment, category, question, submitYes, submitNo, r
 }) => {
     const [feedbackExpanded, setFeedbackExpanded] = useState<boolean>(false);
     const feedbackFieldRef = useRef<HTMLTextAreaElement>();
+    const commentFieldRef = useRef<HTMLTextAreaElement>();
 
     useEffect(
         () => {
@@ -85,6 +86,14 @@ const QuestionSurvey = ({ assessment, category, question, submitYes, submitNo, r
                 feedbackFieldRef.current.value = '';
             }
             setFeedbackExpanded(false);
+        },
+        [question]
+    );
+    useEffect(
+        () => {
+            if (commentFieldRef.current) {
+                commentFieldRef.current.value = '';
+            }
         },
         [question]
     );
@@ -116,28 +125,28 @@ const QuestionSurvey = ({ assessment, category, question, submitYes, submitNo, r
         </CardContent>
         <CardContent>
             <span style={{fontStyle: 'italic', color: 'gray'}}>Możesz dodać komentarz, który zostanie zapisany po wybraniu jednej z odpowiedzi.</span>
-            <WideTextField inputRef={feedbackFieldRef} multiline rows={4} />
+            <WideTextField inputRef={commentFieldRef} multiline rows={4} />
         </CardContent>
         <CardActions>
-            <Button variant="outlined" size="small" onClick={() => submitNo(feedbackFieldRef.current?.value)} style={{ width: '200px' }}>
+            <Button variant="outlined" size="small" onClick={() => submitNo(commentFieldRef.current?.value, feedbackFieldRef.current?.value)} style={{ width: '200px' }}>
                 <div>
                     <div>nigdy</div>
                     <div>w ogóle się nie zgadzam</div>
                 </div>
             </Button>
-            <Button variant="outlined" size="small" onClick={() => submitNo(feedbackFieldRef.current?.value)} style={{ width: '200px' }}>
+            <Button variant="outlined" size="small" onClick={() => submitNo(commentFieldRef.current?.value, feedbackFieldRef.current?.value)} style={{ width: '200px' }}>
                 <div>
                     <div>rzadko</div>
                     <div>raczej nie</div>
                 </div>
             </Button>
-            <Button variant="outlined" size="small" onClick={() => submitYes(feedbackFieldRef.current?.value)} style={{ width: '200px' }}>
+            <Button variant="outlined" size="small" onClick={() => submitYes(commentFieldRef.current?.value, feedbackFieldRef.current?.value)} style={{ width: '200px' }}>
                 <div>
                     <div>często</div>
                     <div>raczej tak</div>
                 </div>
             </Button>
-            <Button variant="outlined" size="small" onClick={() => submitYes(feedbackFieldRef.current?.value)} style={{ width: '200px' }}>
+            <Button variant="outlined" size="small" onClick={() => submitYes(commentFieldRef.current?.value, feedbackFieldRef.current?.value)} style={{ width: '200px' }}>
                 <div>
                     <div>zawsze</div>
                     <div>stanowczo się zgadzam</div>
