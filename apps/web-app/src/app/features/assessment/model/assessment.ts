@@ -11,7 +11,7 @@ export interface Assessment {
     /** Users chapter leader identifier */
     chapterLeader: string;
     /** Users with permission to view assessment progress and results. Without permission to modify assessment. */
-    accessibleBe: {[key: string]: boolean};
+    accessibleBy: {[key: string]: boolean};
     /** Assessment due date after which responses will not be stored. Assessment may not have deadline and will not be closed automatically. */
     deadline?: number;
     /** Identifiers of user who created assessment */

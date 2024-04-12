@@ -76,7 +76,7 @@ export const AssessmentCreateView = ({userId, teamId}: ConnectedProps<typeof con
                 assessors: assessors,
                 finishedAssessors: {},
                 chapterLeader: assessedUserProfile.chapterLeader,
-                accessibleBe: {
+                accessibleBy: {
                     [userId]: true,
                     [assessedUserProfile.chapterLeader]: true
                 },
