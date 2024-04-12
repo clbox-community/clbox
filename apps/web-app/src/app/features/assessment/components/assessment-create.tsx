@@ -62,7 +62,7 @@ export const AssessmentCreateView = ({userId, teamId}: ConnectedProps<typeof con
                 errors.push('Musisz wybrać osobę ocenianą')
             }
             if (assessors.length === 0) {
-                errors.push('Musisz wybrać osoby oceniane')
+                errors.push('Musisz wybrać osoby oceniające')
             }
             setErrors(errors);
             if (errors.length > 0) {
