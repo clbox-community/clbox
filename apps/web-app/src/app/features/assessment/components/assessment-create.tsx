@@ -50,6 +50,11 @@ export const AssessmentCreateView = ({userId, teamId}: ConnectedProps<typeof con
         }
     }, [users]);
 
+    const setAssessedWithAutoAssessment = useCallback((assessed: string) => {
+        setAssessed(assessed);
+        setAssessors(value => value.indexOf(assessed) < 0 ? [...value, assessed] : value);
+    }, [setAssessed, setAssessors])
+
     const validateAndSubmit = useCallback(
         () => {
             const errors = [];
@@ -66,16 +71,16 @@ export const AssessmentCreateView = ({userId, teamId}: ConnectedProps<typeof con
 
             setLocked(true);
             const assessedUserProfile = users.find(user => user.email === assessed);
-            if (assessors.indexOf(assessedUserProfile.email) < 0) {
-                assessors.push(assessedUserProfile.email);
-            }
             const userAssessment: Assessment = {
                 assessed: assessedUserProfile.email,
                 assessors: assessors,
                 finishedAssessors: {},
-                // chapterLeader: assessedUserProfile.chapterLeader, // TODO: na czas testów wyniki dostaje autor ankiety!
-                chapterLeader: userId, // TODO: na czas testów wyniki dostaje autor ankiety!
-                deadline: new Date().getTime() + 1000 * 60 * 60 * 24 * 30,
+                chapterLeader: assessedUserProfile.chapterLeader,
+                accessibleBe: {
+                    [userId]: true,
+                    [assessedUserProfile.chapterLeader]: true
+                },
+                deadline: new Date().getTime() + 1000 * 60 * 60 * 24 * 14,
                 author: userId,
                 createdAt: new Date().getTime(),
                 user: {
@@ -118,7 +123,7 @@ export const AssessmentCreateView = ({userId, teamId}: ConnectedProps<typeof con
                         multiple={false}
                         label="Oceniany"
                         domain={selectDomain}
-                        onChange={selected => setAssessed(selected[0])}
+                        onChange={selected => setAssessedWithAutoAssessment(selected[0])}
                     />
                 </FormControl>
                 <FormControl fullWidth sx={{marginBottom: '16px'}}>
