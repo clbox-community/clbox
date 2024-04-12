@@ -76,10 +76,7 @@ export const AssessmentCreateView = ({userId, teamId}: ConnectedProps<typeof con
                 assessors: assessors,
                 finishedAssessors: {},
                 chapterLeader: assessedUserProfile.chapterLeader,
-                accessibleBy: {
-                    [userId]: true,
-                    [assessedUserProfile.chapterLeader]: true
-                },
+                accessibleBy: userId === assessedUserProfile.chapterLeader ? [assessedUserProfile.chapterLeader] : [userId, assessedUserProfile.chapterLeader],
                 deadline: new Date().getTime() + 1000 * 60 * 60 * 24 * 14,
                 author: userId,
                 createdAt: new Date().getTime(),
