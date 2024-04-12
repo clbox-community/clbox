@@ -43,7 +43,7 @@ firebase.initializeApp();
 const region = functions.region('europe-west3');
 const functionBuilder: () => FunctionBuilder = () => region
     .runWith({
-        maxInstances: 5,
+        maxInstances: 3,
         memory: '256MB'
     });
 
@@ -64,7 +64,7 @@ export const updateFilterStatsAfterInboxChange = updateFilterStatsAfterInboxChan
 export const updateFilterStatsAfterInboxDelete = updateFilterStatsAfterInboxDeleteFactory(functionBuilder(), functions.config(), firebase);
 export const updateCampaignAfterSurvey = updateCampaignAfterSurveyFactory(functionBuilder(), firebase);
 export const kudosHandler = kudosHandlerFactory(
-    functionBuilder().runWith({memory: '512MB'}),
+    functionBuilder().runWith({memory: '512MB', maxInstances: 5, }),
     functions.config(),
     new PubSub(),
     'pending-user-feedbacks',

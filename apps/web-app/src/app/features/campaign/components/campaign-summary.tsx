@@ -118,6 +118,19 @@ const CampaignSummaryView = ({teamId}: ViewProps) => {
         })();
     }, [teamId, uuid]);
 
+    useEffect(() => {
+        if (campaign && answers) {
+            let text = '';
+            campaign?.surveyTemplate
+                .pages
+                .filter(page => page.type === SurveyPageType.question)
+                .forEach(page => {
+                    text += `${page.text.main}\t${answers.map(a => a.answers[page.id].value).sort((a, b) => a > b ? 1 : -1).join('\t')}\n`;
+                })
+            console.log(text);
+        }
+    }, [campaign, answers]);
+
     return <div style={{maxWidth: '800px', margin: '0 auto'}}>
         {(!campaign || !answers) && <div style={{marginTop: '32px', textAlign: 'center'}}>
             <CircularProgress/>

@@ -116,10 +116,7 @@ const HeaderRow = styled.div`
 `;
 const HeaderCell = styled.div``;
 
-const ResultRow = styled.div`
-    display: flex;
-    flex-direction: row;
-
+const ResultRowWrapper = styled.div`
     &:nth-child(2n) {
         background-color: rgba(234, 234, 234, 0.57);
     }
@@ -127,6 +124,11 @@ const ResultRow = styled.div`
     :hover {
         background-color: rgba(179, 21, 54, 0.1);
     }
+`;
+
+const ResultRow = styled.div`
+    display: flex;
+    flex-direction: row;
 `;
 
 const ResultCell = styled.div`
@@ -202,7 +204,7 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
                         .filter(q => shouldShowQuestion(q, assessment, results, seniorityFilter, onlyFails))
                         .sort((a, b) => a.question.seniority.localeCompare(b.question.seniority))
                         .map(q =>
-                            <Fragment key={q.question.id}>
+                            <ResultRowWrapper key={q.question.id}>
                                 <ResultRow>
                                     <ResultCell style={{ ...Columns.id }}>
                                         {q.question.id.replace('_', '.')}
@@ -226,15 +228,15 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
                                         </ResultCell>
                                     )}
                                 </ResultRow>
-                                <div style={{marginLeft: Columns.id.flexBasis, fontStyle: 'italic', maxWidth: '80%', fontSize: '.9em'}}>
-                                    {results.filter(r => r.comment?.[q.question.id]).map(r => <div style={{marginBottom: '4px'}} key={r.assessor + '-' + q.question.id}>
-                                        <span style={{color: 'gray'}}>(komentarz do odpowiedzi)</span> {r.assessor}: {r.comment?.[q.question.id]}
+                                <div style={{ marginLeft: Columns.id.flexBasis, fontStyle: 'italic', maxWidth: '80%', fontSize: '.9em' }}>
+                                    {results.filter(r => r.comment?.[q.question.id]).map(r => <div style={{ marginBottom: '4px' }} key={r.assessor + '-' + q.question.id}>
+                                        <span style={{ color: 'gray' }}>(komentarz do odpowiedzi)</span> {r.assessor}: {r.comment?.[q.question.id]}
                                     </div>)}
-                                    {results.filter(r => r.questionFeedback?.[q.question.id]).map(r => <div style={{marginBottom: '4px'}} key={r.assessor + '-' + q.question.id}>
-                                        <span style={{color: 'gray'}}>(fedback do pytania)</span> {r.assessor}: {r.questionFeedback?.[q.question.id]}
+                                    {results.filter(r => r.questionFeedback?.[q.question.id]).map(r => <div style={{ marginBottom: '4px' }} key={r.assessor + '-' + q.question.id}>
+                                        <span style={{ color: 'gray' }}>(fedback do pytania)</span> {r.assessor}: {r.questionFeedback?.[q.question.id]}
                                     </div>)}
                                 </div>
-                            </Fragment>
+                            </ResultRowWrapper>
                         )}
                 </div>}
             </CardContent>
