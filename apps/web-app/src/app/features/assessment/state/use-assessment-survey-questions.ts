@@ -9,7 +9,7 @@ function isQuestionToShow(assessment, question): boolean {
     const context: SurveyContext = {
         user: assessment.user,
         answers: {
-            get: (id: string) => assessment.response?.[id.replace('.', '_')]
+            get: (id: string) => assessment.response?.[id.replaceAll('.', '_')]
         }
     };
     return !question.question.validWhen || question.question.validWhen(context);

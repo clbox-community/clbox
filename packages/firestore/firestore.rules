@@ -47,13 +47,19 @@ service cloud.firestore {
     }
     match /team/{team}/assessment/{assessment} {
       allow create: if isAuthentiacted(request);
-      allow read, write: if isAuthentiacted(request) && (resource.data.chapterLeader == authEmail(request) || (resource.data.accessibleBy[authEmail(request)] == true)
+      allow read: if isAuthentiacted(request) && (resource.data.chapterLeader == authEmail(request) || authEmail(request) in resource.data.accessibleBy)
+      allow read, write: if isAuthentiacted(request) && resource.data.chapterLeader == authEmail(request)
+    }
+    match /team/{team}/assessment-archive/{assessment} {
+      allow create: if isAuthentiacted(request);
+      allow read: if isAuthentiacted(request) && (resource.data.chapterLeader == authEmail(request) || authEmail(request) in resource.data.accessibleBy)
+      allow read, write: if isAuthentiacted(request) && resource.data.chapterLeader == authEmail(request)
     }
     match /team/{team}/assessment/{assessment}/result/{userAssessment} {
       allow read, write: if isAuthentiacted(request) && get(/databases/$(database)/documents/team/$(team)/assessment/$(assessment)/result/$(userAssessment)).data.assessor == authEmail(request)
     }
     match /team/{team}/assessment/{assessment}/result/{document=**} {
-      allow read: if isAuthentiacted(request) && (get(/databases/$(database)/documents/team/$(team)/assessment/$(assessment)).data.chapterLeader == authEmail(request) || get(/databases/$(database)/documents/team/$(team)/assessment/$(assessment)).data.accessibleBy[authEmail(request)] == true))
+      allow read: if isAuthentiacted(request) && (get(/databases/$(database)/documents/team/$(team)/assessment/$(assessment)).data.chapterLeader == authEmail(request) || authEmail(request) in get(/databases/$(database)/documents/team/$(team)/assessment/$(assessment)).data.accessibleBy)
     }
     match /team/{team}/user/{user}/data/skills {
       allow write: if isAuthentiacted(request) && user == authEmail(request)

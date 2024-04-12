@@ -103,7 +103,7 @@ const QuestionSurvey = ({ assessment, category, question, submitYes, submitNo, r
             title={`Ocena okresowa dla ${assessment.user.name}`}
             subheader={<div>
                 <div><LinearProgress variant="determinate" value={progress.percents} /></div>
-                <div style={{fontStyle: 'italic', fontSize: '.9em', marginTop: '4px'}}>Pytanie {progress.currentIdx + 1} z {progress.count}. {progress.timeLeft && <>Pozostało ~{Math.floor(progress.timeLeft / 60)} min.</>} Ankietę może przerwać w dowolnym momencie i wrócić do niej później.</div>
+                <div style={{fontStyle: 'italic', fontSize: '.9em', marginTop: '4px'}}>Pytanie {progress.currentIdx + 1} z {progress.count}. {progress.timeLeft && <>Pozostało ~{Math.min(60, Math.floor(progress.timeLeft / 60))} min.</>} Ankietę może przerwać w dowolnym momencie i wrócić do niej później.</div>
             </div>}
         >
         </CardHeader>

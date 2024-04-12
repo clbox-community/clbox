@@ -11,8 +11,8 @@ export function useChapterLeaderActiveAssessments(team: string, user: string) {
         () => {
             return firestore
                 .collection(`/team/${team}/assessment/`)
-                .where('chapterLeader', '==', user)
-                .orderBy('deadline', 'asc')
+                .where('accessibleBy', 'array-contains', user)
+                .orderBy('deadline', 'desc')
                 .onSnapshot(
                     docs => setAssessments(docs.docs.map(
                         doc => ({

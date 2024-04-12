@@ -24,7 +24,7 @@ export const userAssessmentsFinishHandlerFactory = (
             trn.update(
                 db.doc(assessmentDoc),
                 {
-                    [`finishedAssessors.${context.params.assessor.replace('.', '_')}`]: true
+                    [`finishedAssessors.${context.params.assessor.replaceAll('.', '_')}`]: true
                 }
             );
 
