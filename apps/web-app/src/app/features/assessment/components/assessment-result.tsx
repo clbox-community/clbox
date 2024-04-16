@@ -66,13 +66,13 @@ function asSeniorityGroup(filter: 'junior' | 'regular' | 'senior' | 'seniorPlus'
 function isQuestionSeniorityGreaterThanUser(q: QuestionWithCategory, assessment: WithId & Assessment) {
     switch (assessment.user.seniority) {
         case AssessmentUserSeniority.junior:
-            return [Seniority.junior].indexOf(q.question.seniority);
+            return [Seniority.junior].indexOf(q.question.seniority) < 0;
         case AssessmentUserSeniority.regular:
-            return [Seniority.junior, Seniority.regular].indexOf(q.question.seniority);
+            return [Seniority.junior, Seniority.regular].indexOf(q.question.seniority) < 0;
         case AssessmentUserSeniority.senior:
-            return [Seniority.junior, Seniority.regular, Seniority.senior].indexOf(q.question.seniority);
+            return [Seniority.junior, Seniority.regular, Seniority.senior].indexOf(q.question.seniority) < 0;
         case AssessmentUserSeniority.lead:
-            return [Seniority.junior, Seniority.regular, Seniority.senior, Seniority.seniorPlus].indexOf(q.question.seniority);
+            return [Seniority.junior, Seniority.regular, Seniority.senior, Seniority.seniorPlus].indexOf(q.question.seniority) < 0;
     }
     return false;
 }
@@ -299,7 +299,7 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
                                         <span style={{ color: 'rgba(127, 140, 141, 1.0)' }}>(komentarz do odpowiedzi)</span> {r.assessor}: {r.comment?.[q.question.id]}
                                     </div>)}
                                     {results.filter(r => r.questionFeedback?.[q.question.id]).map(r => <div style={{ marginBottom: '4px' }} key={r.assessor + '-' + q.question.id}>
-                                        <span style={{ color: 'rgba(127, 140, 141, 1.0)' }}>(fedback do pytania)</span> {r.assessor}: {r.questionFeedback?.[q.question.id]}
+                                        <span style={{ color: 'rgba(127, 140, 141, 1.0)' }}>(komentarz do pytania)</span> {r.assessor}: {r.questionFeedback?.[q.question.id]}
                                     </div>)}
                                 </div>
                             </ResultRowWrapper>
