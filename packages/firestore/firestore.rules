@@ -39,6 +39,9 @@ service cloud.firestore {
     match /team/{team}/user/{user}/user-assessment-sent/{document=**} {
       allow read,write: if isAuthentiacted(request) && user == authEmail(request)
     }
+    match /team/{team}/user/{user}/skill-roadmap-result/{document=**} {
+      allow read,write: if isAuthentiacted(request) && user == authEmail(request)
+    }
     match /team/{team}/user/{user} {
       allow read: if isAuthentiacted(request) && getTeamUser(team, authEmail(request)).leader == true
     }
