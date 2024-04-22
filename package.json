@@ -58,7 +58,8 @@
         "styled-components": "5.3.6",
         "tslib": "^2.3.0",
         "tsscmp": "1.0.6",
-        "uuid": "9.0.0"
+        "uuid": "9.0.0",
+        "uuid-by-string": "^4.0.0"
     },
     "devDependencies": {
         "@babel/core": "7.12.10",

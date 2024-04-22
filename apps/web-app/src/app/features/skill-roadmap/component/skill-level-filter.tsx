@@ -18,4 +18,5 @@ export const SkillLevelFilter = ({level, onLevelChange}: {
         <span style={{ cursor: 'pointer', fontWeight: level === 5 ? 600 : undefined }}
               onClick={() => onLevelChange(SkillLevel.NeedAssessment)}>*</span>
     </div>;
+
 }
