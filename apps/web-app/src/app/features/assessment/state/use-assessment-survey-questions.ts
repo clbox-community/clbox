@@ -72,7 +72,6 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
             };
             if (comment) {
                 update[`comment.${question.question.id}`] = comment;
-                console.log(comment);
             }
             if (feedback) {
                 update[`questionFeedback.${question.question.id}`] = feedback;

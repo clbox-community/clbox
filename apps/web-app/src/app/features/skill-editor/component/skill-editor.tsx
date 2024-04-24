@@ -23,10 +23,6 @@ const SkillEditorView = ({teamId, userId}: ViewProps) => {
     const [skills, setSkills] = useSkillTree(teamId);
 
     const onSkillChanged = (prev: SkillTreeCategory, next: SkillTreeCategory) => {
-        console.log({
-            prev, next
-        });
-
         const filteredSkill = Object.keys(next)
             .filter(key => key !== 'page')
             .filter(key => key !== 'id')
@@ -45,7 +41,6 @@ const SkillEditorView = ({teamId, userId}: ViewProps) => {
     };
 
     const onSkillAdded = (id) => {
-        console.log(id);
         firestore
             .doc(`/team/${teamId}/skill/tree0`)
             .update({

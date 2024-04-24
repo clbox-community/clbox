@@ -103,7 +103,9 @@ const QuestionSurvey = ({ assessment, category, question, submitYes, submitNo, r
             title={`Ocena okresowa dla ${assessment.user.name}`}
             subheader={<div>
                 <div><LinearProgress variant="determinate" value={progress.percents} /></div>
-                <div style={{fontStyle: 'italic', fontSize: '.9em', marginTop: '4px'}}>Pytanie {progress.currentIdx + 1} z {progress.count}. {progress.timeLeft && <>Pozostało ~{Math.min(60, Math.floor(progress.timeLeft / 60))} min.</>} Ankietę może przerwać w dowolnym momencie i wrócić do niej później.</div>
+                <div style={{ fontStyle: 'italic', fontSize: '.9em', marginTop: '4px' }}>Pytanie {progress.currentIdx + 1} z {progress.count}. {progress.timeLeft && <>Pozostało
+                    ~{Math.min(60, Math.floor(progress.timeLeft / 60))} min.</>} Ankietę może przerwać w dowolnym momencie i wrócić do niej później.
+                </div>
             </div>}
         >
         </CardHeader>
@@ -124,7 +126,7 @@ const QuestionSurvey = ({ assessment, category, question, submitYes, submitNo, r
             </div>
         </CardContent>
         <CardContent>
-            <span style={{fontStyle: 'italic', color: 'gray'}}>Możesz dodać komentarz, który zostanie zapisany po wybraniu jednej z odpowiedzi.</span>
+            <span style={{ fontStyle: 'italic', color: 'gray' }}>Możesz dodać komentarz, który zostanie zapisany po wybraniu jednej z odpowiedzi.</span>
             <WideTextField inputRef={commentFieldRef} multiline rows={4} />
         </CardContent>
         <CardActions>
@@ -178,6 +180,7 @@ const QuestionSurvey = ({ assessment, category, question, submitYes, submitNo, r
 const AssessmentView = ({ teamId, userId }: ViewProps) => {
     const { assessmentId, userAssessmentId, userAssessmentRefId } = useParams<{ assessmentId: string, userAssessmentId: string, userAssessmentRefId: string }>();
     const navigate = useNavigate();
+    const [splashShown, setSplashShown] = useState(false);
 
     const [assessment, updateAssessment, finishAssessment] = useUserAssessment(teamId, userId, assessmentId, userAssessmentId, userAssessmentRefId);
     const {
@@ -192,9 +195,7 @@ const AssessmentView = ({ teamId, userId }: ViewProps) => {
     useEffect(
         () => {
             if (assessment && question === null) {
-                if (assessment) {
-                    finishAssessment();
-                }
+                finishAssessment();
                 navigate({
                     pathname: '..',
                     search: 'finished'
@@ -219,6 +220,41 @@ const AssessmentView = ({ teamId, userId }: ViewProps) => {
     } else if (!category || !question) {
         return <OneColumnLayoutWide>
             <LoadingQuestion></LoadingQuestion>
+        </OneColumnLayoutWide>;
+    } else if (!splashShown) {
+        return <OneColumnLayoutWide>
+            <Card>
+                <CardContent>
+                    <p>Kilka wskazówek przed rozpoczęciem ankiety:</p>
+                    <ul>
+                        <li>Ankieta służy do testowania i zbierania opinii. Testujemy i ulepszamy pytania, więc spodziewaj się błędów i niespójności.</li>
+                        <li>Na tym etapie ankieta nie służy do oceny.</li>
+                        <li>Wyniki tej ankiety są przydatne do tworzenia celów. CL pomoże Ci ją omówić uwzględniając motywację konkretnych pytań i wskazówki.</li>
+                        <li>Pamiętaj, że nie można cofnąć odpowiedzi na pytania.</li>
+                        <li>Jeśli chcesz dodać komentarz, zrób to przed wyborem odpowiedzi, ponieważ wybór wysyła odpowiedź.</li>
+                        <li>Jeśli chcesz dodać opinię do pytania, kliknij przycisk (?) i dodaj ją przed wyborem odpowiedzi, ponieważ wybór wysyła odpowiedź.</li>
+                        <li>W swoich odpowiedziach skup się na faktach, a nie na ich ocenie czy analizie co, kto powinien robić. Po prostu zaznacz, jak jest. Na przykład, jeśli zadanie w zespole nie
+                            jest wykonywane, zaznacz to, a CL oceni, czy to w ogóle wpływa na ocenę względem zespołu, projektu czy planów rozwojowych.
+                        </li>
+                        <li>Każde pytanie oceniane jest pod względem odpowiedzi oczekiwanej na koniec ścieżki rozwoju lidera w Consdata oraz czy jest to odpowiedź oczekiwana/spodziewana na bieżącym
+                            poziomie ocenianego.
+                        </li>
+                        <li>Pamiętaj, że przyciski mają dwa wiersze. Jeśli "zawsze i nigdy" nie brzmi dobrze, zastanów się, czy "zdecydowanie tak, nie" nie pasuje lepiej.</li>
+                        <li>Nie trzeba nadmiernie analizować pytań. Odpowiadaj na nie szybko, opierając się na pierwszych myślach.</li>
+                        <li>Liczba komentarzy do pytań powinna zmierzać do zera. Jeśli czujesz potrzebę dodania komentarza, możesz dać feedback do pytania, że nie jest wystarczająco precyzyjne.</li>
+                        <li>Jeśli masz uwagi, koniecznie je zbierz i zgłoś. Jest to okres testowania, więc nie ma konsekwencji dla Twojej oceny. Problemy merytoryczne mogą wpłynąć na jakość oceny, gdy
+                            ankieta zostanie wprowadzona do oceny rocznej.
+                        </li>
+                        <li>Ważne jest, aby uczciwie i szczerze dokonywać autooceny. Obszary do poprawy nie wpłyną na bieżącą ocenę, ale cele z nich wynikające będą postrzegane jako sukces w usprawnianiu podejścia w ocenie rocznej.</li>
+                        <li>Zawsze możesz przerwać ankietę i wrócić do niej później. Twoje zapisane odpowiedzi są trwałe.</li>
+                    </ul>
+                </CardContent>
+                <CardActions>
+                    <Button variant="text" size="small" onClick={() => setSplashShown(true)}>
+                        Przejdź do ankiety
+                    </Button>
+                </CardActions>
+            </Card>
         </OneColumnLayoutWide>;
     } else {
         return <OneColumnLayoutWide>

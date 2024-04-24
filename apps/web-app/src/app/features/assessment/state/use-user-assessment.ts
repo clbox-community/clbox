@@ -52,6 +52,11 @@ export const useUserAssessment = (team: string, user: string, assessmentId: stri
                         finished: true,
                         finishedDate: new Date().getTime()
                     } as UserAssessmentRef);
+                } else {
+                    trn.update(
+                        pendingDoc,
+                        { finished: true }
+                    );
                 }
             });
         },
