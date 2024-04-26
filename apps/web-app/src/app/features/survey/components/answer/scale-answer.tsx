@@ -96,7 +96,7 @@ export const ScaleAnswer = ({answers, selected, defaultValue}: ScaleAnswerProps)
 
     return <ScaleWrapper>
         <StyledSlider
-            withvalue={`${withValue}`}
+            withvalue={withValue + ''}
             lastindex={answers.params.max.value - 1}
             defaultValue={defaultValue}
             marks={scale}

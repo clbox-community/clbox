@@ -1,11 +1,10 @@
-import {SurveyPageAnswer} from '../components/survey-question-page';
-import {Survey} from '../model/survey';
-import {SurveyQuestionAnswered, SurveyQuestionAnswerType} from '../model/survey-question-answered';
-import {SurveyPage} from './survey-page';
-import {SurveyPageAnswerType} from "../components/survey-page-answer-type";
-import {SurveyQuestionData} from "./survey-question-data";
+import { SurveyPageAnswer } from '../components/survey-question-page';
+import { SurveyQuestionAnswered, SurveyQuestionAnswerType } from '../model/survey-question-answered';
+import { SurveyPage } from './survey-page';
+import { SurveyPageAnswerType } from '../components/survey-page-answer-type';
+import { SurveyQuestionData } from './survey-question-data';
 
-export function asSurveyAnswer(surveyId: string, answer: SurveyPageAnswer, survey: Survey, question: SurveyPage<SurveyQuestionData>): SurveyQuestionAnswered {
+export function asSurveyAnswer(surveyId: string, answer: SurveyPageAnswer, question: SurveyPage<SurveyQuestionData>): SurveyQuestionAnswered {
     return {
         surveyId: surveyId,
         dateUtc: new Date().toISOString(),

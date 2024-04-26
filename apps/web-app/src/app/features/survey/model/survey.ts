@@ -1,4 +1,5 @@
-import {SurveyPage} from './survey-page';
+import { SurveyPage } from './survey-page';
+import { SurveyQuestionData } from './survey-question-data';
 
 export interface Survey {
     title: string;
@@ -9,6 +10,6 @@ export interface Survey {
     campaign: string;
     flow: 'wizard' | 'onepage';
     withBackNavigation: boolean;
-    pages: SurveyPage[];
+    pages: SurveyPage<SurveyQuestionData>[];
     finishPage?: any;
 }

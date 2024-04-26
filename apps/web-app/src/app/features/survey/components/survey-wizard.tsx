@@ -4,22 +4,19 @@ import CardContent from '@mui/material/CardContent';
 import CircularProgress from '@mui/material/CircularProgress';
 import LinearProgress from '@mui/material/LinearProgress';
 import Tooltip from '@mui/material/Tooltip';
-import Typography from "@mui/material/Typography";
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {connect, ConnectedProps} from 'react-redux';
-import {useParams} from 'react-router';
+import Typography from '@mui/material/Typography';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import {AppState} from '../../../state/app-state';
-import {firebaseApp} from '../../firebase/firebase.app';
-import {asSurveyAnswer} from '../model/as-survey-answer';
-import {Survey} from '../model/survey';
-import {SurveyPage, SurveyPageType} from '../model/survey-page';
-import {SurveyQuestionAnswered, SurveyQuestionAnswerType} from '../model/survey-question-answered';
-import {SurveyQuestionData} from '../model/survey-question-data';
-import {SurveyTextData} from '../model/survey-text-data';
-import {SurveyPageAnswerType} from "./survey-page-answer-type";
-import {SurveyPageAnswer, SurveyQuestionPage} from './survey-question-page';
-import {SurveyTextPage} from './survey-text-page';
+import { firebaseApp } from '../../firebase/firebase.app';
+import { asSurveyAnswer } from '../model/as-survey-answer';
+import { Survey } from '../model/survey';
+import { SurveyPage, SurveyPageType } from '../model/survey-page';
+import { SurveyQuestionAnswered, SurveyQuestionAnswerType } from '../model/survey-question-answered';
+import { SurveyQuestionData } from '../model/survey-question-data';
+import { SurveyTextData } from '../model/survey-text-data';
+import { SurveyPageAnswerType } from './survey-page-answer-type';
+import { SurveyPageAnswer, SurveyQuestionPage } from './survey-question-page';
+import { SurveyTextPage } from './survey-text-page';
 
 const WizardWrapper = styled.div`
     max-width: 1200px;
@@ -36,23 +33,9 @@ const SpinnerWrapper = styled.div`
     justify-content: center;
 `;
 
-function fetchSurveyCallback(team: string, uuid: string, setSurvey: (value: (((prevState: Survey) => Survey) | Survey)) => void) {
-    const abort = new AbortController();
-    firebaseApp.firestore()
-        .collection(`team/${team}/survey`)
-        .doc(uuid)
-        .get()
-        .then(survey => {
-            if (!abort.signal.aborted) {
-                setSurvey(survey?.data() as Survey ?? null);
-            }
-        });
-    return () => abort.abort();
-}
-
 interface SurveyWizardStepProps {
     survey: Survey,
-    page: SurveyPage,
+    page: SurveyPage<SurveyQuestionData>,
     previousAnswer: SurveyPageAnswer,
     onAnswer: (answer?: SurveyPageAnswer) => void,
     onBack: () => void;
@@ -87,30 +70,18 @@ const SurveyWizardStep = ({survey, page, previousAnswer, onAnswer, onBack}: Surv
     }
 }
 
-const SurveyWizardView = ({teamId}: ViewProps) => {
-    const {uuid, ...params} = useParams<{ uuid: string, team?: string }>();
+const SurveyWizardView = ({survey, team, uuid: surveyUuid}: ViewProps) => {
 
-    const team = teamId ?? params.team;
-    if (!team) {
-        throw new Error(`Can't render SurveyWizard without team id`);
-    }
-
-    const [survey, setSurvey] = useState<Survey>(undefined);
-
-    const [page, setPage] = useState<SurveyPage>(undefined);
+    const [page, setPage] = useState<SurveyPage<SurveyQuestionData>>(undefined);
     const [answers, setAnswers] = useState<Record<string, SurveyQuestionAnswered>>({});
     const [finished, setFinished] = useState<boolean>(false);
 
     useEffect(() => survey && setPage(survey.pages[0]), [survey]);
-    useEffect(() => {
-        if (uuid && team) {
-            return fetchSurveyCallback(team, uuid, setSurvey);
-        }
-    }, [uuid, team]);
+
 
     const onAnswer = useCallback((answer: SurveyPageAnswer) => {
         const currentQuestionIndex = survey.pages.indexOf(page);
-        const surveyAnswer = answer !== undefined ? asSurveyAnswer(uuid, answer, survey, page as SurveyPage<SurveyQuestionData>) : undefined;
+        const surveyAnswer = answer !== undefined ? asSurveyAnswer(surveyUuid, answer, page) : undefined;
 
         if (currentQuestionIndex + 1 >= survey.pages.length) {
             setFinished(true);
@@ -134,7 +105,7 @@ const SurveyWizardView = ({teamId}: ViewProps) => {
                     .then(() => {
                         firebaseApp.firestore()
                             .collection(`team/${team}/survey`)
-                            .doc(uuid)
+                            .doc(surveyUuid)
                             .delete();
                     });
             }
@@ -227,15 +198,10 @@ const SurveyWizardView = ({teamId}: ViewProps) => {
     </WizardWrapper>;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface,@typescript-eslint/no-unused-vars
-interface ViewProps extends ConnectedProps<typeof connector> {
+interface ViewProps {
+    survey: Survey
+    team: string
+    uuid: string
 }
 
-const connector = connect(
-    (state: AppState) => ({
-        teamId: state.team.current?.id
-    }),
-    {}
-);
-
-export const SurveyWizard = connector(SurveyWizardView);
+export const SurveyWizard = SurveyWizardView;

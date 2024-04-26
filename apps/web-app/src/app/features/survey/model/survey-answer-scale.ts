@@ -13,4 +13,5 @@ export interface SurveyAnswerScale {
         text: string,
         tooltip?: string
     }>;
+    default?: number;
 }

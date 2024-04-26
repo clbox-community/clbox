@@ -23,6 +23,12 @@ const Layout = styled.div`
 
 const changes = [
     {
+        date: '2024-04-26',
+        items: [
+            {summary: 'Możliwość tworzenia ankiet zawierających wszystkie pytania na jednej stronie (np. do głosowania nad skill tree)'},
+        ]
+    },
+    {
         date: '2024-04-10',
         items: [
             {summary: 'Sekcja na komentarz do każdego pytania ankiety oceny okresowej'},
