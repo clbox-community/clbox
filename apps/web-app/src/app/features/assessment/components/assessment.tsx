@@ -15,7 +15,6 @@ import Collapse from '@mui/material/Collapse';
 import styled from 'styled-components';
 import TextField from '@mui/material/TextField';
 import LinearProgress from '@mui/material/LinearProgress';
-import { userInText } from './user-In-text';
 import { useAssessmentSurveyQuestions } from '../state/use-assessment-survey-questions';
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router-dom';
@@ -121,7 +120,7 @@ const QuestionSurvey = ({ assessment, category, question, submitYes, submitNo, r
         />
         <CardContent>
             <div style={{ minHeight: '150px' }}>
-                <div>{normalizeText(userInText(assessment.assessed === userId && question.text1st ? question.text1st[assessment.user.textForm ?? 'm'] : question.text3rd[assessment.user.textForm ?? 'm'], assessment.user.name))}</div>
+                <div>{normalizeText(assessment.assessed === userId && question.text1st ? question.text1st[assessment.user.textForm ?? 'm'] : question.text3rd[assessment.user.textForm ?? 'm'])}</div>
                 {question.comment && <div style={{ fontStyle: 'italic', color: 'gray' }}>{question.comment}</div>}
             </div>
         </CardContent>
@@ -241,7 +240,7 @@ const AssessmentView = ({ teamId, userId }: ViewProps) => {
                         </li>
                         <li>Pamiętaj, że przyciski mają dwa wiersze. Jeśli "zawsze i nigdy" nie brzmi dobrze, zastanów się, czy "zdecydowanie tak, nie" nie pasuje lepiej.</li>
                         <li>Nie trzeba nadmiernie analizować pytań. Odpowiadaj na nie szybko, opierając się na pierwszych myślach.</li>
-                        <li>Liczba komentarzy do pytań powinna zmierzać do zera. Jeśli czujesz potrzebę dodania komentarza, możesz dać feedback do pytania, że nie jest wystarczająco precyzyjne.</li>
+                        <li>Jeśli czujesz potrzebę dodania komentarza do odpowiedzi, być może pytanie jest za mało precyzyjne i możesz to napisać w feedbacku do pytania.</li>
                         <li>Jeśli masz uwagi, koniecznie je zbierz i zgłoś. Jest to okres testowania, więc nie ma konsekwencji dla Twojej oceny. Problemy merytoryczne mogą wpłynąć na jakość oceny, gdy
                             ankieta zostanie wprowadzona do oceny rocznej.
                         </li>

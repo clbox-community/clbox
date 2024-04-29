@@ -6,7 +6,6 @@ import { connect, ConnectedProps } from 'react-redux';
 import { AppState } from '../../../state/app-state';
 import { questionsWithCategories } from '../state/questions-with-categories';
 import { useAssessment } from '../state/use-assessment';
-import { userInText } from './user-In-text';
 import styled from 'styled-components';
 import { QuestionWithCategory } from '../state/question-with-category';
 import { WithId } from '../model/with-id';
@@ -276,8 +275,8 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
                                         {q.question.id.replace('_', '.')}
                                     </ResultCell>
                                     <ResultCell style={{ ...Columns.question }}>
-                                        {q.question.text3rd && userInText(q.question.text3rd[assessment.user.textForm], assessment.user.name)}
-                                        {!q.question.text3rd && userInText(q.question.text1st[assessment.user.textForm], assessment.user.name)}
+                                        {q.question.text3rd && q.question.text3rd[assessment.user.textForm]}
+                                        {!q.question.text3rd && q.question.text1st[assessment.user.textForm]}
                                     </ResultCell>
                                     <ResultCell style={{ ...Columns.seniority }}>
                                         {q.question.seniority}
