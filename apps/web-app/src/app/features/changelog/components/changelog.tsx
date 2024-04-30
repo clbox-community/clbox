@@ -23,6 +23,12 @@ const Layout = styled.div`
 
 const changes = [
     {
+        date: 'XXX',
+        items: [
+            {summary: 'Możliwość powrotu do poprzednich pytań w ankiecie oceny okresowej'},
+        ]
+    },
+    {
         date: '2024-04-29',
         items: [
             {summary: 'Lista ankiet domyślnie ukrywa wszystkie ankiety starsze niż 3 miesiące.'},

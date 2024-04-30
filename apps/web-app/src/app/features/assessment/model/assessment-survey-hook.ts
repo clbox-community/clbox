@@ -4,9 +4,14 @@ export interface AssessmentSurveyHook {
     category: Category;
     question: Question;
     finished: boolean;
-    submitYes: (comment: string, feedback: string) => Promise<void>;
-    submitNo: (comment: string, feedback: string) => Promise<void>;
+    submitAnswer: (value: number, comment: string, feedback: string) => Promise<void>;
     reset: () => Promise<void>;
+    navigation: {
+        back: () => Promise<void>;
+        isBackAvailable: boolean;
+        forward: () => Promise<void>;
+        isForwardAvailable: boolean;
+    };
     progress: {
         count: number;
         currentIdx: number;

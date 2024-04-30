@@ -37,4 +37,6 @@ export interface UserAssessment {
     questionTime: {
         [id: string]: number; // time between question presentation to answer in seconds
     }
+    /** Current user question */
+    currentQuestion?: string;
 }

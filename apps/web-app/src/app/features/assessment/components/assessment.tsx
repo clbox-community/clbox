@@ -10,15 +10,19 @@ import CardHeader from '@mui/material/CardHeader';
 import Button from '@mui/material/Button';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import CardActions from '@mui/material/CardActions';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import Collapse from '@mui/material/Collapse';
 import styled from 'styled-components';
 import TextField from '@mui/material/TextField';
 import LinearProgress from '@mui/material/LinearProgress';
 import { useAssessmentSurveyQuestions } from '../state/use-assessment-survey-questions';
 import { useParams } from 'react-router';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useUserAssessment } from '../state/use-user-assessment';
+import { AssessmentSplash } from './assessment-splash';
+import { ArrowBackIos } from '@mui/icons-material';
+import { WithId } from '../model/with-id';
+import { UserAssessment } from '../model/user-assessment';
 
 const LoadingAssessment = () => <Card>
     <CardContent style={{ textAlign: 'center' }}>
@@ -65,12 +69,11 @@ function normalizeText(text: string): string {
     }
 }
 
-const QuestionSurvey = ({ assessment, category, question, submitYes, submitNo, reset, progress, userId }: {
-    assessment,
+const QuestionSurvey = ({ assessment, category, question, submitAnswer, reset, progress, userId }: {
+    assessment: WithId & UserAssessment,
     category,
     question,
-    submitYes,
-    submitNo,
+    submitAnswer,
     reset,
     progress,
     userId
@@ -82,7 +85,7 @@ const QuestionSurvey = ({ assessment, category, question, submitYes, submitNo, r
     useEffect(
         () => {
             if (feedbackFieldRef.current) {
-                feedbackFieldRef.current.value = '';
+                feedbackFieldRef.current.value = assessment.questionFeedback[question.id] ?? '';
             }
             setFeedbackExpanded(false);
         },
@@ -91,10 +94,10 @@ const QuestionSurvey = ({ assessment, category, question, submitYes, submitNo, r
     useEffect(
         () => {
             if (commentFieldRef.current) {
-                commentFieldRef.current.value = '';
+                commentFieldRef.current.value = assessment.comment[question.id] ?? '';
             }
         },
-        [question]
+        [question, assessment]
     );
 
     return <Card>
@@ -129,25 +132,25 @@ const QuestionSurvey = ({ assessment, category, question, submitYes, submitNo, r
             <WideTextField inputRef={commentFieldRef} multiline rows={4} />
         </CardContent>
         <CardActions>
-            <Button variant="outlined" size="small" onClick={() => submitNo(commentFieldRef.current?.value, feedbackFieldRef.current?.value)} style={{ width: '200px' }}>
+            <Button variant="outlined" size="small" onClick={() => submitAnswer(1, commentFieldRef.current?.value, feedbackFieldRef.current?.value)} style={{ width: '200px' }}>
                 <div>
                     <div>nigdy</div>
                     <div>w ogóle się nie zgadzam</div>
                 </div>
             </Button>
-            <Button variant="outlined" size="small" onClick={() => submitNo(commentFieldRef.current?.value, feedbackFieldRef.current?.value)} style={{ width: '200px' }}>
+            <Button variant="outlined" size="small" onClick={() => submitAnswer(2, commentFieldRef.current?.value, feedbackFieldRef.current?.value)} style={{ width: '200px' }}>
                 <div>
                     <div>rzadko</div>
                     <div>raczej nie</div>
                 </div>
             </Button>
-            <Button variant="outlined" size="small" onClick={() => submitYes(commentFieldRef.current?.value, feedbackFieldRef.current?.value)} style={{ width: '200px' }}>
+            <Button variant="outlined" size="small" onClick={() => submitAnswer(3, commentFieldRef.current?.value, feedbackFieldRef.current?.value)} style={{ width: '200px' }}>
                 <div>
                     <div>często</div>
                     <div>raczej tak</div>
                 </div>
             </Button>
-            <Button variant="outlined" size="small" onClick={() => submitYes(commentFieldRef.current?.value, feedbackFieldRef.current?.value)} style={{ width: '200px' }}>
+            <Button variant="outlined" size="small" onClick={() => submitAnswer(4, commentFieldRef.current?.value, feedbackFieldRef.current?.value)} style={{ width: '200px' }}>
                 <div>
                     <div>zawsze</div>
                     <div>stanowczo się zgadzam</div>
@@ -168,40 +171,47 @@ const QuestionSurvey = ({ assessment, category, question, submitYes, submitNo, r
                     <WideTextField inputRef={feedbackFieldRef} multiline rows={4} />
                 </div>
             </CardContent>
-            {/*<CardActions style={{ justifyContent: 'flex-end' }}>*/}
-            {/*    <span style={{ fontSize: '0.8em', fontStyle: 'italic', color: 'darkred', marginRight: '8px' }}>Resetowanie jest dostępne tylko w czasie beta testów</span>*/}
-            {/*    <Button variant="outlined" size="small" onClick={reset}>reset</Button>*/}
-            {/*</CardActions>*/}
         </Collapse>
+        <CardActions style={{ justifyContent: 'flex-end' }}>
+            <span style={{ fontSize: '0.8em', fontStyle: 'italic', color: 'darkred', marginRight: '8px' }}>Resetowanie jest dostępne tylko w czasie beta testów</span>
+            <Button variant="outlined" size="small" onClick={reset}>reset</Button>
+        </CardActions>
     </Card>;
 };
 
 const AssessmentView = ({ teamId, userId }: ViewProps) => {
+    const [searchParams] = useSearchParams();
     const { assessmentId, userAssessmentId, userAssessmentRefId } = useParams<{ assessmentId: string, userAssessmentId: string, userAssessmentRefId: string }>();
     const navigate = useNavigate();
-    const [splashShown, setSplashShown] = useState(false);
+    const [splashShown, setSplashShown] = useState(searchParams.has('skipSplash'));
 
     const [assessment, updateAssessment, finishAssessment] = useUserAssessment(teamId, userId, assessmentId, userAssessmentId, userAssessmentRefId);
     const {
         category,
         question,
-        submitYes,
-        submitNo,
+        submitAnswer,
         reset,
-        progress
-    } = useAssessmentSurveyQuestions(assessment, updateAssessment, userId);
+        progress,
+        navigation
+    } = useAssessmentSurveyQuestions(assessment, updateAssessment, finishAssessment, userId);
 
     useEffect(
         () => {
-            if (assessment && question === null) {
-                finishAssessment();
+            if (assessment?.finished) {
                 navigate({
                     pathname: '..',
                     search: 'finished'
                 });
             }
+            // if (assessment && question === null) {
+            //     finishAssessment();
+            //     navigate({
+            //         pathname: '..',
+            //         search: 'finished'
+            //     });
+            // }
         },
-        [assessment, question, navigate, finishAssessment]
+        [assessment, navigate]
     );
 
     if (assessment === undefined) {
@@ -222,53 +232,34 @@ const AssessmentView = ({ teamId, userId }: ViewProps) => {
         </OneColumnLayoutWide>;
     } else if (!splashShown) {
         return <OneColumnLayoutWide>
-            <Card>
-                <CardContent>
-                    <p>Kilka wskazówek przed rozpoczęciem ankiety:</p>
-                    <ul>
-                        <li>Ankieta służy do testowania i zbierania opinii. Testujemy i ulepszamy pytania, więc spodziewaj się błędów i niespójności.</li>
-                        <li>Na tym etapie ankieta nie służy do oceny.</li>
-                        <li>Wyniki tej ankiety są przydatne do tworzenia celów. CL pomoże Ci ją omówić uwzględniając motywację konkretnych pytań i wskazówki.</li>
-                        <li>Pamiętaj, że nie można cofnąć odpowiedzi na pytania.</li>
-                        <li>Jeśli chcesz dodać komentarz, zrób to przed wyborem odpowiedzi, ponieważ wybór wysyła odpowiedź.</li>
-                        <li>Jeśli chcesz dodać opinię do pytania, kliknij przycisk (?) i dodaj ją przed wyborem odpowiedzi, ponieważ wybór wysyła odpowiedź.</li>
-                        <li>W swoich odpowiedziach skup się na faktach, a nie na ich ocenie czy analizie co, kto powinien robić. Po prostu zaznacz, jak jest. Na przykład, jeśli zadanie w zespole nie
-                            jest wykonywane, zaznacz to, a CL oceni, czy to w ogóle wpływa na ocenę względem zespołu, projektu czy planów rozwojowych.
-                        </li>
-                        <li>Każde pytanie oceniane jest pod względem odpowiedzi oczekiwanej na koniec ścieżki rozwoju lidera w Consdata oraz czy jest to odpowiedź oczekiwana/spodziewana na bieżącym
-                            poziomie ocenianego.
-                        </li>
-                        <li>Pamiętaj, że przyciski mają dwa wiersze. Jeśli "zawsze i nigdy" nie brzmi dobrze, zastanów się, czy "zdecydowanie tak, nie" nie pasuje lepiej.</li>
-                        <li>Nie trzeba nadmiernie analizować pytań. Odpowiadaj na nie szybko, opierając się na pierwszych myślach.</li>
-                        <li>Jeśli czujesz potrzebę dodania komentarza do odpowiedzi, być może pytanie jest za mało precyzyjne i możesz to napisać w feedbacku do pytania.</li>
-                        <li>Jeśli masz uwagi, koniecznie je zbierz i zgłoś. Jest to okres testowania, więc nie ma konsekwencji dla Twojej oceny. Problemy merytoryczne mogą wpłynąć na jakość oceny, gdy
-                            ankieta zostanie wprowadzona do oceny rocznej.
-                        </li>
-                        <li>Ważne jest, aby uczciwie i szczerze dokonywać autooceny. Obszary do poprawy nie wpłyną na bieżącą ocenę, ale cele z nich wynikające będą postrzegane jako sukces w usprawnianiu podejścia w ocenie rocznej.</li>
-                        <li>Zawsze możesz przerwać ankietę i wrócić do niej później. Twoje zapisane odpowiedzi są trwałe.</li>
-                    </ul>
-                </CardContent>
-                <CardActions>
-                    <Button variant="text" size="small" onClick={() => setSplashShown(true)}>
-                        Przejdź do ankiety
-                    </Button>
-                </CardActions>
-            </Card>
+            <AssessmentSplash confirm={() => setSplashShown(true)}></AssessmentSplash>
         </OneColumnLayoutWide>;
     } else {
         return <OneColumnLayoutWide>
             <QuestionSurvey assessment={assessment}
                             category={category}
                             question={question}
-                            submitYes={submitYes}
-                            submitNo={submitNo}
+                            submitAnswer={submitAnswer}
                             reset={reset}
                             progress={progress}
                             userId={userId}
             />
+            <SurveyFooter backAvailable={navigation.isBackAvailable} back={navigation.back} />
         </OneColumnLayoutWide>;
     }
 };
+
+const SurveyFooter: FC<{ backAvailable: boolean, back: () => void }> = ({ backAvailable, back }) => {
+    return <div style={{ marginTop: 16 }}>
+        {backAvailable && <BackButton onClick={back}>
+            <ArrowBackIos /> <span>wróć do poprzedniego pytania</span>
+        </BackButton>}
+    </div>;
+};
+
+const BackButton = styled(Button)`
+    height: 24px;
+`;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface,@typescript-eslint/no-unused-vars
 interface ViewProps extends ConnectedProps<typeof connector> {

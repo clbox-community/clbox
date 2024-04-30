@@ -6,9 +6,11 @@ import { UserAssessmentRef } from '../model/user-assessment-ref';
 
 const firestore = firebaseApp.firestore();
 
-export const useUserAssessment = (team: string, user: string, assessmentId: string, userAssessmentId: string, userAssessmentRefId: string): [WithId & UserAssessment, (update: {
-    [key: string]: unknown
-}) => void, (() => void)] => {
+export const useUserAssessment = (team: string, user: string, assessmentId: string, userAssessmentId: string, userAssessmentRefId: string): [
+        WithId & UserAssessment,
+    (update: { [key: string]: unknown }) => Promise<void>,
+    () => Promise<void>
+] => {
     const [assessment, setAssessment] = useState<WithId & UserAssessment | undefined>();
     useEffect(
         () => {
