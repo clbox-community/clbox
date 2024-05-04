@@ -3,6 +3,7 @@
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
     "sourceRoot": "apps/web-app/src",
     "projectType": "application",
+    "tags": [],
     "generators": {},
     "targets": {
         "build": {
@@ -13,10 +14,7 @@
                 "main": "apps/web-app/src/main.tsx",
                 "polyfills": "apps/web-app/src/polyfills.ts",
                 "tsConfig": "apps/web-app/tsconfig.app.json",
-                "assets": [
-                    "apps/web-app/src/favicon.ico",
-                    "apps/web-app/src/assets"
-                ],
+                "assets": ["apps/web-app/src/favicon.ico", "apps/web-app/src/assets"],
                 "styles": [],
                 "scripts": [],
                 "webpackConfig": "@nx/react/plugins/webpack"
@@ -78,11 +76,9 @@
         "test": {
             "executor": "@nx/jest:jest",
             "options": {
-                "jestConfig": "apps/web-app/jest.config.ts",
-                "passWithNoTests": true
+                "jestConfig": "apps/web-app/jest.config.ts"
             },
             "outputs": ["{workspaceRoot}/coverage/apps/web-app"]
         }
-    },
-    "tags": []
+    }
 }
