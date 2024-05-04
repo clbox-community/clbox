@@ -54,3 +54,6 @@ keys.json
 libs/skill-roadmap
 libs/assessment-survey
 tools/
+
+.nx/cache
+.env.local
