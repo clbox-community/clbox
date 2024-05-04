@@ -27,7 +27,7 @@ module.exports = composePlugins(
                         'node': '18'
                     }
                 },
-                join(__dirname, '../../dist/apps/backend/package.json') // __dirname + '/../../package.json'
+                join(__dirname, '../../dist/apps/backend/package.json')
             )
         )
         return config;
