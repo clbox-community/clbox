@@ -25,6 +25,10 @@ export interface UserAssessment {
     response: {
         [id: string]: boolean;
     };
+    /** Question responses selected value by question identifier. */
+    responseValue: {
+        [id: string]: number;
+    };
     /** Question comment by question identifier */
     comment: {
         [id: string]: string;

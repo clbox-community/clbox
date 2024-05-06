@@ -69,14 +69,15 @@ function normalizeText(text: string): string {
     }
 }
 
-const QuestionSurvey = ({ assessment, category, question, submitAnswer, reset, progress, userId }: {
+const QuestionSurvey = ({ assessment, category, question, submitAnswer, reset, progress, userId, debug }: {
     assessment: WithId & UserAssessment,
     category,
     question,
     submitAnswer,
     reset,
     progress,
-    userId
+    userId,
+    debug: boolean
 }) => {
     const [feedbackExpanded, setFeedbackExpanded] = useState<boolean>(false);
     const feedbackFieldRef = useRef<HTMLTextAreaElement>();
@@ -127,30 +128,31 @@ const QuestionSurvey = ({ assessment, category, question, submitAnswer, reset, p
                 {question.comment && <div style={{ fontStyle: 'italic', color: 'gray' }}>{question.comment}</div>}
             </div>
         </CardContent>
+        {/*TODO #bringback: musimy przechować konkretne wartości 1,2,3,4 żeby potrafić pokazać użytkownikowi co wybrał odpowiadając na pytanie do którego powraca*/}
         <CardContent>
             <span style={{ fontStyle: 'italic', color: 'gray' }}>Możesz dodać komentarz, który zostanie zapisany po wybraniu jednej z odpowiedzi.</span>
             <WideTextField inputRef={commentFieldRef} multiline rows={4} />
         </CardContent>
         <CardActions>
-            <Button variant="outlined" size="small" onClick={() => submitAnswer(1, commentFieldRef.current?.value, feedbackFieldRef.current?.value)} style={{ width: '200px' }}>
+            <Button variant="outlined" size="small" onClick={() => submitAnswer(1, commentFieldRef.current?.value, feedbackFieldRef.current?.value)} style={{ width: '200px', borderWidth: assessment.responseValue[question.id] === 1 ? 3 : undefined}}>
                 <div>
                     <div>nigdy</div>
                     <div>w ogóle się nie zgadzam</div>
                 </div>
             </Button>
-            <Button variant="outlined" size="small" onClick={() => submitAnswer(2, commentFieldRef.current?.value, feedbackFieldRef.current?.value)} style={{ width: '200px' }}>
+            <Button variant="outlined" size="small" onClick={() => submitAnswer(2, commentFieldRef.current?.value, feedbackFieldRef.current?.value)} style={{ width: '200px', borderWidth: assessment.responseValue[question.id] === 2 ? 3 : undefined }}>
                 <div>
                     <div>rzadko</div>
                     <div>raczej nie</div>
                 </div>
             </Button>
-            <Button variant="outlined" size="small" onClick={() => submitAnswer(3, commentFieldRef.current?.value, feedbackFieldRef.current?.value)} style={{ width: '200px' }}>
+            <Button variant="outlined" size="small" onClick={() => submitAnswer(3, commentFieldRef.current?.value, feedbackFieldRef.current?.value)} style={{ width: '200px', borderWidth: assessment.responseValue[question.id] === 3 ? 3 : undefined }}>
                 <div>
                     <div>często</div>
                     <div>raczej tak</div>
                 </div>
             </Button>
-            <Button variant="outlined" size="small" onClick={() => submitAnswer(4, commentFieldRef.current?.value, feedbackFieldRef.current?.value)} style={{ width: '200px' }}>
+            <Button variant="outlined" size="small" onClick={() => submitAnswer(4, commentFieldRef.current?.value, feedbackFieldRef.current?.value)} style={{ width: '200px', borderWidth: assessment.responseValue[question.id] === 4 ? 3 : undefined }}>
                 <div>
                     <div>zawsze</div>
                     <div>stanowczo się zgadzam</div>
@@ -172,10 +174,10 @@ const QuestionSurvey = ({ assessment, category, question, submitAnswer, reset, p
                 </div>
             </CardContent>
         </Collapse>
-        <CardActions style={{ justifyContent: 'flex-end' }}>
+        {debug && <CardActions style={{ justifyContent: 'flex-end' }}>
             <span style={{ fontSize: '0.8em', fontStyle: 'italic', color: 'darkred', marginRight: '8px' }}>Resetowanie jest dostępne tylko w czasie beta testów</span>
             <Button variant="outlined" size="small" onClick={reset}>reset</Button>
-        </CardActions>
+        </CardActions>}
     </Card>;
 };
 
@@ -184,6 +186,7 @@ const AssessmentView = ({ teamId, userId }: ViewProps) => {
     const { assessmentId, userAssessmentId, userAssessmentRefId } = useParams<{ assessmentId: string, userAssessmentId: string, userAssessmentRefId: string }>();
     const navigate = useNavigate();
     const [splashShown, setSplashShown] = useState(searchParams.has('skipSplash'));
+    const debug = searchParams.has('debug');
 
     const [assessment, updateAssessment, finishAssessment] = useUserAssessment(teamId, userId, assessmentId, userAssessmentId, userAssessmentRefId);
     const {
@@ -203,13 +206,6 @@ const AssessmentView = ({ teamId, userId }: ViewProps) => {
                     search: 'finished'
                 });
             }
-            // if (assessment && question === null) {
-            //     finishAssessment();
-            //     navigate({
-            //         pathname: '..',
-            //         search: 'finished'
-            //     });
-            // }
         },
         [assessment, navigate]
     );
@@ -243,6 +239,7 @@ const AssessmentView = ({ teamId, userId }: ViewProps) => {
                             reset={reset}
                             progress={progress}
                             userId={userId}
+                            debug={debug}
             />
             <SurveyFooter backAvailable={navigation.isBackAvailable} back={navigation.back} />
         </OneColumnLayoutWide>;

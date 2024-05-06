@@ -12,6 +12,7 @@ export const useUserAssessment = (team: string, user: string, assessmentId: stri
     () => Promise<void>
 ] => {
     const [assessment, setAssessment] = useState<WithId & UserAssessment | undefined>();
+
     useEffect(
         () => {
             if (team && user && assessmentId && userAssessmentId) {
@@ -28,6 +29,7 @@ export const useUserAssessment = (team: string, user: string, assessmentId: stri
         },
         [team, user, assessmentId, userAssessmentId]
     );
+
     const updateAssessment = useCallback(
         async (update: { [key: string]: unknown }) => {
             if (team && user && assessmentId && userAssessmentId) {
@@ -40,6 +42,7 @@ export const useUserAssessment = (team: string, user: string, assessmentId: stri
         },
         [team, user, assessmentId, userAssessmentId]
     );
+
     const finishAssessment = useCallback(
         async () => {
             await firestore.runTransaction(async (trn) => {
@@ -64,5 +67,6 @@ export const useUserAssessment = (team: string, user: string, assessmentId: stri
         },
         [team, user, userAssessmentRefId]
     );
+
     return [assessment, updateAssessment, finishAssessment];
 };
