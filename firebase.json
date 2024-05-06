@@ -35,8 +35,8 @@
         ]
     },
     "functions": {
-        "predeploy": "npm run -- build:functions",
-        "source": "dist/apps/functions"
+        "predeploy": "npm run -- build:backend",
+        "source": "dist/apps/backend"
     },
     "firestore": {
         "rules": "packages/firestore/firestore.rules"

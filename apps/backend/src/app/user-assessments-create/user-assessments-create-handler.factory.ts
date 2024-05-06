@@ -18,6 +18,7 @@ export const userAssessmentsCreateHandlerFactory = (
                 askedQuestion: {},
                 questionFeedback: {},
                 questionTime: {},
+                comment: {},
                 response: {},
                 finished: false
             };

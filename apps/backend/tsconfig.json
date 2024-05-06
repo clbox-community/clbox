@@ -1,12 +1,7 @@
 {
     "extends": "../../tsconfig.base.json",
-    "compilerOptions": {
-        "types": ["node", "jest"],
-        "target": "ES6",
-        "module": "commonjs"
-    },
-    "include": [],
     "files": [],
+    "include": [],
     "references": [
         {
             "path": "./tsconfig.app.json"
@@ -14,5 +9,8 @@
         {
             "path": "./tsconfig.spec.json"
         }
-    ]
+    ],
+    "compilerOptions": {
+        "esModuleInterop": true
+    }
 }
