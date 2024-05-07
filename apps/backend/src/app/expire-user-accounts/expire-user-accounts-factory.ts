@@ -51,10 +51,11 @@ export const expireUserAccountsFactory = (
                                 const existingUserData = existingUserDoc.data();
 
                                 const removedUserDoc = firestore.collection(`team/${team}/removed-users/`).doc(existingUserDoc.id);
-                                await trn.delete(userDoc)
+                                const removeUserDocSnapshot = await trn.get(removedUserDoc);
 
-                                if (!(await trn.get(removedUserDoc)).exists) {
-                                    await trn.create(removedUserDoc, existingUserData);
+                                trn.delete(userDoc)
+                                if (!removeUserDocSnapshot.exists) {
+                                    trn.create(removedUserDoc, existingUserData);
                                 } else {
                                     console.log(`Removed user document already exists for user: ${user.id}, skipping creation`);
                                 }
