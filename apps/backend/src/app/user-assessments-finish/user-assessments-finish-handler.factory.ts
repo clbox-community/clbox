@@ -10,27 +10,33 @@ export const userAssessmentsFinishHandlerFactory = (
 
         const userAssessmentRef = snapshot.data() as UserAssessmentRef;
         await db.runTransaction(async (trn) => {
-            const resultDoc = `/team/${context.params.team}/assessment/${userAssessmentRef.assessmentId}/result/${userAssessmentRef.userAssessmentId}`;
-            console.log(`Update ${resultDoc} with finished state`);
+            const resultDocPath = `/team/${context.params.team}/assessment/${userAssessmentRef.assessmentId}/result/${userAssessmentRef.userAssessmentId}`;
+            const assessmentDocPath = `/team/${context.params.team}/assessment/${userAssessmentRef.assessmentId}`;
+            const pendingDocPath = `/team/${context.params.team}/user/${context.params.assessor}/user-assessment-pending/${context.params.id}`;
+
+            const resultDoc = db.doc(resultDocPath);
+            const assessmentDoc = db.doc(assessmentDocPath);
+            const pendingDoc = db.doc(pendingDocPath);
+
+            console.log(`Update ${resultDocPath} with finished state`);
             trn.update(
-                db.doc(resultDoc),
+                resultDoc,
                 {
                     finished: true,
                     finishedDate: userAssessmentRef.finishedDate ?? new Date().getTime()
                 }
             );
-            const assessmentDoc = `/team/${context.params.team}/assessment/${userAssessmentRef.assessmentId}`;
-            console.log(`Update ${assessmentDoc} with finished assessors: ${context.params.assessor}`);
+
+            console.log(`Update ${assessmentDocPath} with finished assessors: ${context.params.assessor}`);
             trn.update(
-                db.doc(assessmentDoc),
+                assessmentDoc,
                 {
                     [`finishedAssessors.${context.params.assessor.replaceAll('.', '_')}`]: true
                 }
             );
 
-            const pendingDoc = `/team/${context.params.team}/user/${context.params.assessor}/user-assessment-pending/${context.params.id}`;
-            console.log(`Delete ${pendingDoc}`);
-            trn.delete(db.doc(pendingDoc));
+            console.log(`Delete ${pendingDocPath}`);
+            trn.delete(pendingDoc);
         });
     }
 );
