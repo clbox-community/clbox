@@ -1,17 +1,17 @@
-import {connect, ConnectedProps} from "react-redux";
-import {OneColumnLayoutWide} from "../../layout/one-column-layout-wide";
-import {AppState} from "../../../state/app-state";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import {FormControl, InputLabel} from "@mui/material";
-import React, {useCallback, useMemo, useState} from "react";
-import {useUserProfiles} from "../../user/firestore/use-user-profiles";
-import {SelectFromDomain} from "../../skill-editor/component/select-from-domain";
-import Button from "@mui/material/Button";
-import {AssessmentUserSeniorityOfString} from "../model/assessment-user-seniority";
-import {Assessment} from "../model/assessment";
-import {firebaseApp} from "../../firebase/firebase.app";
-import {useNavigate} from "react-router-dom";
+import { connect, ConnectedProps } from 'react-redux';
+import { OneColumnLayoutWide } from '../../layout/one-column-layout-wide';
+import { AppState } from '../../../state/app-state';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import { FormControl, InputLabel } from '@mui/material';
+import React, { useCallback, useMemo, useState } from 'react';
+import { useUserProfiles } from '../../user/firestore/use-user-profiles';
+import { SelectFromDomain } from '../../skill-editor/component/select-from-domain';
+import Button from '@mui/material/Button';
+import { AssessmentUserSeniorityOfString } from '../model/assessment-user-seniority';
+import { Assessment } from '../model/assessment';
+import { firebaseApp } from '../../firebase/firebase.app';
+import { useNavigate } from 'react-router-dom';
 
 const firestore = firebaseApp.firestore();
 
@@ -31,7 +31,7 @@ const firestore = firebaseApp.firestore();
 //     </FormControl>;
 // }
 
-export const AssessmentCreateView = ({userId, teamId}: ConnectedProps<typeof connector>) => {
+export const AssessmentCreateView = ({ userId, teamId }: ConnectedProps<typeof connector>) => {
     const navigate = useNavigate();
     const users = useUserProfiles(teamId);
     const [locekd, setLocked] = useState<boolean>(false);
@@ -41,10 +41,12 @@ export const AssessmentCreateView = ({userId, teamId}: ConnectedProps<typeof con
 
     const selectDomain = useMemo(() => {
         if (users) {
-            return users.map(user => ({
-                id: user.email,
-                label: user.display_name
-            }));
+            return users
+                .sort((a, b) => a.display_name.localeCompare(b.display_name))
+                .map(user => ({
+                    id: user.email,
+                    label: user.display_name
+                }));
         } else {
             return [];
         }
@@ -53,16 +55,16 @@ export const AssessmentCreateView = ({userId, teamId}: ConnectedProps<typeof con
     const setAssessedWithAutoAssessment = useCallback((assessed: string) => {
         setAssessed(assessed);
         setAssessors(value => value.indexOf(assessed) < 0 ? [...value, assessed] : value);
-    }, [setAssessed, setAssessors])
+    }, [setAssessed, setAssessors]);
 
     const validateAndSubmit = useCallback(
         () => {
             const errors = [];
             if (!assessed) {
-                errors.push('Musisz wybrać osobę ocenianą')
+                errors.push('Musisz wybrać osobę ocenianą');
             }
             if (assessors.length === 0) {
-                errors.push('Musisz wybrać osoby oceniające')
+                errors.push('Musisz wybrać osoby oceniające');
             }
             setErrors(errors);
             if (errors.length > 0) {
@@ -87,7 +89,7 @@ export const AssessmentCreateView = ({userId, teamId}: ConnectedProps<typeof con
                     teams: assessedUserProfile.teams,
                     seniority: AssessmentUserSeniorityOfString(assessedUserProfile.seniority),
                     textForm: assessedUserProfile.textForm === 'm' ? 'm' : 'f'
-                },
+                }
             };
 
             firestore.collection(`/team/${teamId}/assessment/`)
@@ -110,10 +112,10 @@ export const AssessmentCreateView = ({userId, teamId}: ConnectedProps<typeof con
                 Loading...
             </CardContent>}
             {users && <CardContent>
-                {errors?.length > 0 && <div style={{marginBottom: '16px'}}>
-                    {errors.map(error => <div style={{color: '#b31536'}} key={error}>{error}</div>)}
+                {errors?.length > 0 && <div style={{ marginBottom: '16px' }}>
+                    {errors.map(error => <div style={{ color: '#b31536' }} key={error}>{error}</div>)}
                 </div>}
-                <FormControl fullWidth sx={{marginBottom: '16px'}}>
+                <FormControl fullWidth sx={{ marginBottom: '16px' }}>
                     <InputLabel>Oceniany</InputLabel>
                     <SelectFromDomain
                         disabled={locekd}
@@ -124,7 +126,7 @@ export const AssessmentCreateView = ({userId, teamId}: ConnectedProps<typeof con
                         onChange={selected => setAssessedWithAutoAssessment(selected[0])}
                     />
                 </FormControl>
-                <FormControl fullWidth sx={{marginBottom: '16px'}}>
+                <FormControl fullWidth sx={{ marginBottom: '16px' }}>
                     <InputLabel>Lista oceniających</InputLabel>
                     <SelectFromDomain
                         disabled={locekd}
@@ -139,7 +141,7 @@ export const AssessmentCreateView = ({userId, teamId}: ConnectedProps<typeof con
             </CardContent>}
         </Card>
     </OneColumnLayoutWide>;
-}
+};
 
 const connector = connect(
     (state: AppState) => ({
