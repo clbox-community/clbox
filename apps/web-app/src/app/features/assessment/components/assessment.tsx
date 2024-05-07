@@ -100,7 +100,18 @@ const QuestionSurvey = ({ assessment, category, question, submitAnswer, reset, p
         },
         [question, assessment]
     );
-    const prevResponse = assessment.responseValue[question.id] ?? (assessment.response[question.id] ? 3 : 2);
+    const prevResponse = (() => {
+        if (assessment.responseValue[question.id]) {
+            return assessment.responseValue[question.id];
+        }
+        if (assessment.response[question.id] === true) {
+            return 3;
+        }
+        if (assessment.response[question.id] === false) {
+            return 2;
+        }
+        return undefined;
+    })();
 
     return <Card>
         {debug && <>
