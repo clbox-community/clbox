@@ -20,7 +20,17 @@ export const useUserAssessment = (team: string, user: string, assessmentId: stri
                     .doc(`/team/${team}/assessment/${assessmentId}/result/${userAssessmentId}`)
                     .onSnapshot(doc => {
                         if (doc.exists) {
-                            setAssessment({ id: doc.id, ...doc.data() as UserAssessment });
+                            const data = doc.data() as UserAssessment;
+                            setAssessment({
+                                id: doc.id,
+                                ...data,
+                                askedQuestion: data.askedQuestion ?? {},
+                                response: data.response ?? {},
+                                responseValue: data.responseValue ?? {},
+                                questionTime: data.questionTime ?? {},
+                                comment: data.comment ?? {},
+                                questionFeedback: data.questionFeedback ?? {}
+                            });
                         } else {
                             setAssessment(null);
                         }

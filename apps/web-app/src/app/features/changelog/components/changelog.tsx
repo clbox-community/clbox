@@ -23,7 +23,7 @@ const Layout = styled.div`
 
 const changes = [
     {
-        date: 'XXX',
+        date: '2024-05-07',
         items: [
             {summary: 'Możliwość powrotu do poprzednich pytań w ankiecie oceny okresowej'},
         ]

@@ -20,7 +20,7 @@ import { useParams } from 'react-router';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useUserAssessment } from '../state/use-user-assessment';
 import { AssessmentSplash } from './assessment-splash';
-import { ArrowBackIos } from '@mui/icons-material';
+import { ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
 import { WithId } from '../model/with-id';
 import { UserAssessment } from '../model/user-assessment';
 
@@ -90,24 +90,33 @@ const QuestionSurvey = ({ assessment, category, question, submitAnswer, reset, p
             }
             setFeedbackExpanded(false);
         },
-        [question]
+        [question, assessment]
     );
     useEffect(
         () => {
             if (commentFieldRef.current) {
-                commentFieldRef.current.value = assessment.comment[question.id] ?? '';
+                commentFieldRef.current.value = assessment.comment?.[question.id] ?? '';
             }
         },
         [question, assessment]
     );
 
     return <Card>
+        {debug && <>
+            <div style={{margin: 16, padding: 8, border: '1px dashed darkred', fontSize: '0.8em'}}>
+                {assessment && <>
+                    <div>Bieżące pytanie: {assessment.currentQuestion}</div>
+                    <div>Pytania z odpowiedziami: {Object.keys(assessment.response).sort().map(i => i === assessment.currentQuestion ? `*${i}*` : i).join(', ')}</div>
+                </>}
+            </div>
+        </>}
         <CardHeader
             title={`Ocena okresowa dla ${assessment.user.name}`}
             subheader={<div>
                 <div><LinearProgress variant="determinate" value={progress.percents} /></div>
-                <div style={{ fontStyle: 'italic', fontSize: '.9em', marginTop: '4px' }}>Pytanie {progress.currentIdx + 1} z {progress.count}. {progress.timeLeft && <>Pozostało
-                    ~{Math.min(60, Math.floor(progress.timeLeft / 60))} min.</>} Ankietę może przerwać w dowolnym momencie i wrócić do niej później.
+                <div style={{ fontStyle: 'italic', fontSize: '.9em', marginTop: '4px' }}>
+                    Pytanie {progress.currentIdx + 1} z {progress.count}. Ankietę może przerwać w dowolnym momencie i wrócić do niej później.
+                    {/*{progress.timeLeft && <>Pozostało ~{Math.min(60, Math.floor(progress.timeLeft / 60))} min.</>}*/}
                 </div>
             </div>}
         >
@@ -128,7 +137,6 @@ const QuestionSurvey = ({ assessment, category, question, submitAnswer, reset, p
                 {question.comment && <div style={{ fontStyle: 'italic', color: 'gray' }}>{question.comment}</div>}
             </div>
         </CardContent>
-        {/*TODO #bringback: musimy przechować konkretne wartości 1,2,3,4 żeby potrafić pokazać użytkownikowi co wybrał odpowiadając na pytanie do którego powraca*/}
         <CardContent>
             <span style={{ fontStyle: 'italic', color: 'gray' }}>Możesz dodać komentarz, który zostanie zapisany po wybraniu jednej z odpowiedzi.</span>
             <WideTextField inputRef={commentFieldRef} multiline rows={4} />
@@ -187,6 +195,7 @@ const AssessmentView = ({ teamId, userId }: ViewProps) => {
     const navigate = useNavigate();
     const [splashShown, setSplashShown] = useState(searchParams.has('skipSplash'));
     const debug = searchParams.has('debug');
+    const demo = searchParams.has('demo');
 
     const [assessment, updateAssessment, finishAssessment] = useUserAssessment(teamId, userId, assessmentId, userAssessmentId, userAssessmentRefId);
     const {
@@ -196,7 +205,7 @@ const AssessmentView = ({ teamId, userId }: ViewProps) => {
         reset,
         progress,
         navigation
-    } = useAssessmentSurveyQuestions(assessment, updateAssessment, finishAssessment, userId);
+    } = useAssessmentSurveyQuestions(assessment, updateAssessment, finishAssessment, demo);
 
     useEffect(
         () => {
@@ -218,7 +227,7 @@ const AssessmentView = ({ teamId, userId }: ViewProps) => {
         return <OneColumnLayoutWide>
             <NotFound id={`${assessmentId}/${userAssessmentId}`}></NotFound>
         </OneColumnLayoutWide>;
-    } else if (assessment.finished || (assessment && question === null)) {
+    } else if (assessment.finished || (assessment && question === null) || assessment?.currentQuestion === 'finished') {
         return <OneColumnLayoutWide>
             <Finished></Finished>
         </OneColumnLayoutWide>;
@@ -241,16 +250,23 @@ const AssessmentView = ({ teamId, userId }: ViewProps) => {
                             userId={userId}
                             debug={debug}
             />
-            <SurveyFooter backAvailable={navigation.isBackAvailable} back={navigation.back} />
+            <SurveyFooter backAvailable={navigation.isBackAvailable} back={navigation.back} forwardAvailable={navigation.isForwardAvailable} forward={navigation.forward} />
         </OneColumnLayoutWide>;
     }
 };
 
-const SurveyFooter: FC<{ backAvailable: boolean, back: () => void }> = ({ backAvailable, back }) => {
-    return <div style={{ marginTop: 16 }}>
-        {backAvailable && <BackButton onClick={back}>
-            <ArrowBackIos /> <span>wróć do poprzedniego pytania</span>
-        </BackButton>}
+const SurveyFooter: FC<{ backAvailable: boolean, back: () => void, forwardAvailable: boolean, forward: () => void }> = ({ backAvailable, back, forwardAvailable, forward }) => {
+    return <div style={{ marginTop: 16, display: 'flex', flexDirection: 'row' }}>
+        <div style={{flex: 1}}>
+            {backAvailable && <BackButton onClick={back}>
+                <ArrowBackIos /> <span>wróć do poprzedniego pytania</span>
+            </BackButton>}
+        </div>
+        <div style={{flex: 1, display: 'flex', justifyContent: 'flex-end'}}>
+            {forwardAvailable && <BackButton onClick={forward}>
+                <span>przejdź do pytania bez odpowiedzi</span> <ArrowForwardIos />
+            </BackButton>}
+        </div>
     </div>;
 };
 

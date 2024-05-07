@@ -1,50 +1,89 @@
 import { AssessmentSurveyHook } from '../model/assessment-survey-hook';
-import { SurveyContext, SurveyUser } from '@clbox/assessment-survey';
+import { SurveyContext, SurveyContextUser } from '@clbox/assessment-survey';
 import { useCallback, useMemo } from 'react';
 import { UserAssessment } from '../model/user-assessment';
 import { useAssessmentQuestions } from './use-assessment-questions';
 import { QuestionWithCategory } from './question-with-category';
 
-function isQuestionToShow(user: SurveyUser, responses: { [key: string]: boolean }, question: QuestionWithCategory): boolean {
+function isQuestionToShow(user: SurveyContextUser, assessed: string, assessor: string, responses: { [key: string]: boolean }, question: QuestionWithCategory): boolean {
+    const questionForm = assessed === assessor ? 'text1st' : 'text3rd';
     const context: SurveyContext = {
         user: user,
         answers: {
             get: (id: string) => responses[id.replaceAll('.', '_')]
         }
     };
-    return !question.question.validWhen || question.question.validWhen(context);
+
+    const hasQuestionText = () => {
+        return question.question[questionForm] !== undefined;
+    };
+    const isValid = () => {
+        return !question.question.validWhen || question.question.validWhen(context);
+    };
+
+    return hasQuestionText() && isValid();
 }
 
+
+function findNextUnansweredQuestion(questions: QuestionWithCategory[], assessment: UserAssessment) {
+    return questions.find(
+        questionToCheck =>
+            assessment.response[questionToCheck.question.id] === undefined && isQuestionToShow(assessment.user, assessment.assessed, assessment.assessor, assessment.response, questionToCheck)
+    );
+}
 
 export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
                                              updateAssessment: (assessment: Partial<UserAssessment>) => Promise<void>,
                                              finishAssessment: () => Promise<void>,
-                                             assessed: string
+                                             demo = false
 ): AssessmentSurveyHook => {
-    const questions = useAssessmentQuestions();
-    const question = useMemo(
-        () => questions.find(q => q.question.id === assessment?.currentQuestion) ?? questions[0],
-        [questions, assessment?.currentQuestion]
+    const questions = useAssessmentQuestions(demo);
+    const question: QuestionWithCategory | undefined = useMemo(
+        () => {
+            if (assessment && questions) {
+                return questions.find(q => q.question.id === assessment?.currentQuestion) ?? findNextUnansweredQuestion(questions, assessment);
+            }
+        },
+        [questions, assessment]
+    );
+    const hasForwardQuestion = useMemo(
+        () => {
+            if (assessment && question) {
+                const ffQuestion = findNextUnansweredQuestion(questions, assessment);
+                return ffQuestion && questions.findIndex(q => q.question.id === ffQuestion.question.id) > questions.findIndex(q => q.question.id === question.question.id);
+            }
+        },
+        [assessment, questions, question]
     );
 
-    /// Chcemy resetować questionTime po każdej zmianie assessment lub question.
+    /// Chcemy resetować questionTime po każdej zmianie assessment lub question
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const questionTime = useMemo(() => new Date().getTime(), [assessment, question]);
 
-    // todo #bringback filter out questions without valid form (3rd, 1st) for current user
-
     const back = useCallback(
         async () => {
-            const currentQuestionIdx = questions.findIndex(q => q.question.id === assessment.currentQuestion) ?? 0;
+            const currentQuestionIdx = Math.max(questions.findIndex(q => q.question.id === assessment.currentQuestion), 0);
             const prevQuestion = questions
                 .filter((_, idx) => idx < currentQuestionIdx)
                 .reverse()
-                .find((questionToCheck) => isQuestionToShow(assessment.user, assessment?.response ?? {}, questionToCheck));
+                .find((questionToCheck) => isQuestionToShow(assessment.user, assessment.assessed, assessment.assessor, assessment?.response ?? {}, questionToCheck));
             await updateAssessment({
                 currentQuestion: prevQuestion?.question.id ?? questions[0].question.id
             });
         },
-        [questions, updateAssessment, assessment?.currentQuestion, assessment?.user, assessment?.response]
+        [questions, updateAssessment, assessment]
+    );
+
+    const forward = useCallback(
+        async () => {
+            const nextQuestion = findNextUnansweredQuestion(questions, assessment);
+            if (nextQuestion) {
+                await updateAssessment({
+                    currentQuestion: nextQuestion.question.id
+                });
+            }
+        },
+        [updateAssessment, assessment, questions]
     );
 
     const submitAnswer = useCallback(
@@ -68,7 +107,7 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
                 questions
                     .filter(q => assessment.askedQuestion[q.question.id])
                     .forEach(questionToCheck => {
-                        const isValidNow = isQuestionToShow(assessment.user, updatedAssessment.response, questionToCheck);
+                        const isValidNow = isQuestionToShow(assessment.user, assessment.assessed, assessment.assessor, updatedAssessment.response, questionToCheck);
                         if (!isValidNow) {
                             delete updatedAssessment.askedQuestion[questionToCheck.question.id];
                             delete updatedAssessment.response[questionToCheck.question.id];
@@ -80,11 +119,11 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
                     });
             }
 
-            const currentQuestionIdx = questions.findIndex(q => q.question.id === assessment.currentQuestion) ?? 0;
+            const currentQuestionIdx = Math.max(questions.findIndex(q => q.question.id === assessment.currentQuestion), 0);
             const nextQuestion = questions
                 .filter((_, idx) => idx > currentQuestionIdx)
-                .find((questionToCheck, questionToCheckIdx) => isQuestionToShow(assessment.user, updatedAssessment.response, questionToCheck));
-            updatedAssessment.currentQuestion = nextQuestion.question.id ?? '';
+                .find((questionToCheck, questionToCheckIdx) => isQuestionToShow(assessment.user, assessment.assessed, assessment.assessor, updatedAssessment.response, questionToCheck));
+            updatedAssessment.currentQuestion = nextQuestion?.question.id ?? 'finished';
 
             await updateAssessment(updatedAssessment);
             if (!nextQuestion) {
@@ -102,7 +141,7 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
             questionFeedback: {},
             questionTime: {},
             askedQuestion: {},
-            currentQuestion: questions[0].question.id
+            currentQuestion: ''
         }),
         [questions, updateAssessment]
     );
@@ -110,7 +149,7 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
     const timeLeft = useMemo(
         () => {
             if (assessment && question) {
-                const availableQuestions = questions.filter(q => isQuestionToShow(assessment.user, assessment.response, question));
+                const availableQuestions = questions.filter(q => isQuestionToShow(assessment.user, assessment.assessed, assessment.assessor, assessment.response, question));
                 if (availableQuestions.indexOf(question) > 5) {
                     const times = Object.keys(assessment.questionTime);
                     const sum = times
@@ -130,11 +169,10 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
         submitAnswer: async (value: number, comment: string, feedback: string) => submitAnswer(value, comment, feedback),
         reset: reset,
         navigation: assessment && {
-            isBackAvailable: questions.indexOf(question) > 0,
+            isBackAvailable: questions.findIndex(q => q.question.id === question?.question.id) > 0,
             back,
-            isForwardAvailable: question ? assessment.response[question.question.id] !== undefined : false,
-            forward: async () => {
-            }
+            isForwardAvailable: hasForwardQuestion,
+            forward
         },
         progress: assessment && {
             count: questions.length,
