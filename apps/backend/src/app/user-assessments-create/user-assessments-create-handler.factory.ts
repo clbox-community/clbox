@@ -20,6 +20,7 @@ export const userAssessmentsCreateHandlerFactory = (
                 questionTime: {},
                 comment: {},
                 response: {},
+                responseValue: {},
                 finished: false
             };
             const userAssessmentDoc = await db

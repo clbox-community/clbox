@@ -58,7 +58,6 @@ export const userFeedbackStats = userFeedbackStatsFactory(functionBuilder(), fir
 export const createUser = createUserFactory(functionBuilder(), firebase);
 export const expireUserAccounts = expireUserAccountsFactory(functionBuilder(), firebase);
 export const getChapterStats = getChapterStatsFactory(functionBuilder(), firebase);
-// export const getTeamSkills = getTeamSkillsFactory(functionBuilder(), firebase);
 export const updateFilterStatsAfterInboxCreate = updateFilterStatsAfterInboxCreateFactory(functionBuilder(), functions.config(), firebase);
 export const updateFilterStatsAfterInboxChange = updateFilterStatsAfterInboxChangeFactory(functionBuilder(), functions.config(), firebase);
 export const updateFilterStatsAfterInboxDelete = updateFilterStatsAfterInboxDeleteFactory(functionBuilder(), functions.config(), firebase);
