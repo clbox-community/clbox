@@ -11,7 +11,6 @@ export const AssessmentSplash: FC<{confirm: () => void}> = ({ confirm }) => <Car
             <li>Ankieta służy do testowania i zbierania opinii. Testujemy i ulepszamy pytania, więc spodziewaj się błędów i niespójności.</li>
             <li>Na tym etapie ankieta nie służy do oceny.</li>
             <li>Wyniki tej ankiety są przydatne do tworzenia celów. CL pomoże Ci ją omówić uwzględniając motywację konkretnych pytań i wskazówki.</li>
-            <li>Pamiętaj, że nie można cofnąć odpowiedzi na pytania.</li>
             <li>Jeśli chcesz dodać komentarz, zrób to przed wyborem odpowiedzi, ponieważ wybór wysyła odpowiedź.</li>
             <li>Jeśli chcesz dodać opinię do pytania, kliknij przycisk (?) i dodaj ją przed wyborem odpowiedzi, ponieważ wybór wysyła odpowiedź.</li>
             <li>W swoich odpowiedziach skup się na faktach, a nie na ich ocenie czy analizie co, kto powinien robić. Po prostu zaznacz, jak jest. Na przykład, jeśli zadanie w zespole nie
@@ -28,6 +27,7 @@ export const AssessmentSplash: FC<{confirm: () => void}> = ({ confirm }) => <Car
             </li>
             <li>Ważne jest, aby uczciwie i szczerze dokonywać autooceny. Obszary do poprawy nie wpłyną na bieżącą ocenę, ale cele z nich wynikające będą postrzegane jako sukces w usprawnianiu podejścia w ocenie rocznej.</li>
             <li>Zawsze możesz przerwać ankietę i wrócić do niej później. Twoje zapisane odpowiedzi są trwałe.</li>
+            <li>Docelowo liczba pytań w ankiecie będzie zmniejszała się z każdą kolejną oceną okresową. Po ocenie CL może oznaczyć pytania dla których odpowiedź jest już znana i potwierdzona, co sprawi że przyszłe ankiety nie będą ich już zawierały. Pierwsze ankiety są największe żeby ustalić stan wyjściowy.</li>
         </ul>
     </CardContent>
     <CardActions>
