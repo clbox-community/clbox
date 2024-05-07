@@ -100,10 +100,11 @@ const QuestionSurvey = ({ assessment, category, question, submitAnswer, reset, p
         },
         [question, assessment]
     );
+    const prevResponse = assessment.responseValue[question.id] ?? (assessment.response[question.id] ? 3 : 2);
 
     return <Card>
         {debug && <>
-            <div style={{margin: 16, padding: 8, border: '1px dashed darkred', fontSize: '0.8em'}}>
+            <div style={{ margin: 16, padding: 8, border: '1px dashed darkred', fontSize: '0.8em' }}>
                 {assessment && <>
                     <div>Bieżące pytanie: {assessment.currentQuestion}</div>
                     <div>Pytania z odpowiedziami: {Object.keys(assessment.response).sort().map(i => i === assessment.currentQuestion ? `*${i}*` : i).join(', ')}</div>
@@ -142,25 +143,29 @@ const QuestionSurvey = ({ assessment, category, question, submitAnswer, reset, p
             <WideTextField inputRef={commentFieldRef} multiline rows={4} />
         </CardContent>
         <CardActions>
-            <Button variant="outlined" size="small" onClick={() => submitAnswer(1, commentFieldRef.current?.value, feedbackFieldRef.current?.value)} style={{ width: '200px', borderWidth: assessment.responseValue[question.id] === 1 ? 3 : undefined}}>
+            <Button variant="outlined" size="small" onClick={() => submitAnswer(1, commentFieldRef.current?.value, feedbackFieldRef.current?.value)}
+                    style={{ width: '200px', borderWidth: prevResponse === 1 ? 3 : undefined }}>
                 <div>
                     <div>nigdy</div>
                     <div>w ogóle się nie zgadzam</div>
                 </div>
             </Button>
-            <Button variant="outlined" size="small" onClick={() => submitAnswer(2, commentFieldRef.current?.value, feedbackFieldRef.current?.value)} style={{ width: '200px', borderWidth: assessment.responseValue[question.id] === 2 ? 3 : undefined }}>
+            <Button variant="outlined" size="small" onClick={() => submitAnswer(2, commentFieldRef.current?.value, feedbackFieldRef.current?.value)}
+                    style={{ width: '200px', borderWidth: prevResponse === 2 ? 3 : undefined }}>
                 <div>
                     <div>rzadko</div>
                     <div>raczej nie</div>
                 </div>
             </Button>
-            <Button variant="outlined" size="small" onClick={() => submitAnswer(3, commentFieldRef.current?.value, feedbackFieldRef.current?.value)} style={{ width: '200px', borderWidth: assessment.responseValue[question.id] === 3 ? 3 : undefined }}>
+            <Button variant="outlined" size="small" onClick={() => submitAnswer(3, commentFieldRef.current?.value, feedbackFieldRef.current?.value)}
+                    style={{ width: '200px', borderWidth: prevResponse === 3 ? 3 : undefined }}>
                 <div>
                     <div>często</div>
                     <div>raczej tak</div>
                 </div>
             </Button>
-            <Button variant="outlined" size="small" onClick={() => submitAnswer(4, commentFieldRef.current?.value, feedbackFieldRef.current?.value)} style={{ width: '200px', borderWidth: assessment.responseValue[question.id] === 4 ? 3 : undefined }}>
+            <Button variant="outlined" size="small" onClick={() => submitAnswer(4, commentFieldRef.current?.value, feedbackFieldRef.current?.value)}
+                    style={{ width: '200px', borderWidth: prevResponse === 4 ? 3 : undefined }}>
                 <div>
                     <div>zawsze</div>
                     <div>stanowczo się zgadzam</div>
@@ -257,12 +262,12 @@ const AssessmentView = ({ teamId, userId }: ViewProps) => {
 
 const SurveyFooter: FC<{ backAvailable: boolean, back: () => void, forwardAvailable: boolean, forward: () => void }> = ({ backAvailable, back, forwardAvailable, forward }) => {
     return <div style={{ marginTop: 16, display: 'flex', flexDirection: 'row' }}>
-        <div style={{flex: 1}}>
+        <div style={{ flex: 1 }}>
             {backAvailable && <BackButton onClick={back}>
                 <ArrowBackIos /> <span>wróć do poprzedniego pytania</span>
             </BackButton>}
         </div>
-        <div style={{flex: 1, display: 'flex', justifyContent: 'flex-end'}}>
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
             {forwardAvailable && <BackButton onClick={forward}>
                 <span>przejdź do pytania bez odpowiedzi</span> <ArrowForwardIos />
             </BackButton>}
