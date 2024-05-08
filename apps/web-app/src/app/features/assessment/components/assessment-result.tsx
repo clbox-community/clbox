@@ -3,8 +3,6 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import { useAssessmentResults } from '../state/use-assessment-results';
 import { connect, ConnectedProps } from 'react-redux';
-import { AppState } from '../../../state/app-state';
-import { questionsWithCategories } from '../state/questions-with-categories';
 import { useAssessment } from '../state/use-assessment';
 import styled from 'styled-components';
 import { QuestionWithCategory } from '../state/question-with-category';
@@ -12,8 +10,11 @@ import { WithId } from '../model/with-id';
 import { Assessment } from '../model/assessment';
 import { UserAssessment } from '../model/user-assessment';
 import { useEffect, useState } from 'react';
-import { Seniority } from '@clbox/assessment-survey';
+import { Category, Question, Seniority } from '@clbox/assessment-survey';
 import { AssessmentUserSeniority } from '../model/assessment-user-seniority';
+import { useAssessmentQuestions } from '../state/use-assessment-questions';
+import { useAssessmentQuestionCategories } from '../state/use-assessment-question-categories';
+import { AppState } from '../../../state/app-state';
 
 export const OneColumnLayoutUltraWide = styled.div`
     width: 90%;
@@ -23,15 +24,15 @@ export const OneColumnLayoutUltraWide = styled.div`
 /**
  * Checks if user response matches desired response
  */
-function isDesiredResponse(q: QuestionWithCategory, assessment: WithId & Assessment, result: WithId & UserAssessment) {
-    return q.question.expectedResponses['seniorPlus'].indexOf(result.response[q.question.id]) >= 0;
+function isDesiredResponse(q: Question, assessment: WithId & Assessment, result: WithId & UserAssessment) {
+    return q.expectedResponses['seniorPlus'].indexOf(result.response[q.id]) >= 0;
 }
 
 /**
  * Checks if user has valid response based on seniority.
  */
-function isValidResponse(q: QuestionWithCategory, assessment: WithId & Assessment, result: WithId & UserAssessment): boolean {
-    return q.question.expectedResponses[assessment.user.seniority === 'lead' ? 'seniorPlus' : assessment.user.seniority].indexOf(result.response[q.question.id]) >= 0;
+function isValidResponse(q: Question, assessment: WithId & Assessment, result: WithId & UserAssessment): boolean {
+    return q.expectedResponses[assessment.user.seniority === 'lead' ? 'seniorPlus' : assessment.user.seniority].indexOf(result.response[q.id]) >= 0;
 }
 
 function asSeniority(seniority: AssessmentUserSeniority) {
@@ -62,22 +63,22 @@ function asSeniorityGroup(filter: 'junior' | 'regular' | 'senior' | 'seniorPlus'
     }
 }
 
-function isQuestionSeniorityGreaterThanUser(q: QuestionWithCategory, assessment: WithId & Assessment) {
+function isQuestionSeniorityGreaterThanUser(q: Question, assessment: WithId & Assessment) {
     switch (assessment.user.seniority) {
         case AssessmentUserSeniority.junior:
-            return [Seniority.junior].indexOf(q.question.seniority) < 0;
+            return [Seniority.junior].indexOf(q.seniority) < 0;
         case AssessmentUserSeniority.regular:
-            return [Seniority.junior, Seniority.regular].indexOf(q.question.seniority) < 0;
+            return [Seniority.junior, Seniority.regular].indexOf(q.seniority) < 0;
         case AssessmentUserSeniority.senior:
-            return [Seniority.junior, Seniority.regular, Seniority.senior].indexOf(q.question.seniority) < 0;
+            return [Seniority.junior, Seniority.regular, Seniority.senior].indexOf(q.seniority) < 0;
         case AssessmentUserSeniority.lead:
-            return [Seniority.junior, Seniority.regular, Seniority.senior, Seniority.seniorPlus].indexOf(q.question.seniority) < 0;
+            return [Seniority.junior, Seniority.regular, Seniority.senior, Seniority.seniorPlus].indexOf(q.seniority) < 0;
     }
     return false;
 }
 
-function responseColor(q: QuestionWithCategory, assessment: WithId & Assessment, result: WithId & UserAssessment): string {
-    const asked = result.askedQuestion[q.question.id];
+function responseColor(q: Question, assessment: WithId & Assessment, result: WithId & UserAssessment): string {
+    const asked = result.askedQuestion[q.id];
     const valid = isValidResponse(q, assessment, result);
 
     if (!asked) {
@@ -99,19 +100,26 @@ function responseColor(q: QuestionWithCategory, assessment: WithId & Assessment,
 
 // Desire response to oczekiwana żeby spełnić pytanie
 // Fail response to ocena spełnienia względem wymagań na bieżącym stanowisku
-function shouldShowQuestion(q: QuestionWithCategory, assessment: WithId & Assessment, results: (WithId & UserAssessment)[], seniorityFilter: 'junior' | 'regular' | 'senior' | 'seniorPlus', onlyFails: boolean) {
-    if (asSeniorityGroup(seniorityFilter).indexOf(q.question.seniority) < 0) {
+function shouldShowQuestion(q: Question, assessment: WithId & Assessment, results: (WithId & UserAssessment)[], seniorityFilter: 'junior' | 'regular' | 'senior' | 'seniorPlus', onlyFails: boolean) {
+    if (asSeniorityGroup(seniorityFilter).indexOf(q.seniority) < 0) {
         return false;
     }
-    if (onlyFails && (results.every(result => !result.askedQuestion[q.question.id] || isDesiredResponse(q, assessment, result)))) {
+    if (onlyFails && (results.every(result => !result.askedQuestion[q.id] || isDesiredResponse(q, assessment, result)))) {
         return false;
     }
     return true;
 }
 
+function hasAnyVisibleQuestion(category: Category, assessment: WithId & Assessment, results: (WithId & UserAssessment)[], seniorityFilter: 'junior' | 'regular' | 'senior' | 'seniorPlus', onlyFails: boolean) {
+    return category.questions.some(q => shouldShowQuestion(q, assessment, results, seniorityFilter, onlyFails));
+}
+
 const HeaderRow = styled.div`
     display: flex;
     flex-direction: row;
+    font-size: 0.9em;
+    color: dimgray;
+    font-style: italic;
 `;
 const HeaderCell = styled.div``;
 
@@ -121,7 +129,7 @@ const ResultRowWrapper = styled.div`
     }
 
     :hover {
-        background-color: rgba(179, 21, 54, 0.1);
+        outline: 1px solid rgba(84, 83, 83, 0.57);
     }
 `;
 
@@ -158,42 +166,58 @@ const HeaderLabel = styled.span`
     margin-right: 16px;
 `;
 
-const UserSeniorityReport = ({ seniority, assessment, results }: { seniority: Seniority, assessment: WithId & Assessment, results: (WithId & UserAssessment)[] }) => {
+const CategoryRow = styled.div`
+    margin-bottom: 24px;
+`;
+
+const UserSeniorityReport = ({ questions, seniority, assessment, results }: {
+    questions: QuestionWithCategory[],
+    seniority: Seniority,
+    assessment: WithId & Assessment,
+    results: (WithId & UserAssessment)[]
+}) => {
     const stats = {
         desired: 0,
         notDesiredButAcceptable: 0,
         notValid: 0,
         count: 0,
-        wasAsked: 0,
+        wasAsked: 0
     };
-    questionsWithCategories
+    questions
         .filter(q => q.question.seniority === seniority)
         .forEach(q => {
-            const wasAsked = results.map(result => result.askedQuestion[q.question.id]).some(answer => answer)
-            const isDesired = results.filter(result => result.askedQuestion[q.question.id]).map(result => isDesiredResponse(q, assessment, result)).every(answer => answer);
-            const isValid = results.filter(result => result.askedQuestion[q.question.id]).map(result => isValidResponse(q, assessment, result)).every(answer => answer);
+            const wasAsked = results.map(result => result.askedQuestion[q.question.id]).some(answer => answer);
+            const isDesired = results.filter(result => result.askedQuestion[q.question.id]).map(result => isDesiredResponse(q.question, assessment, result)).every(answer => answer);
+            const isValid = results.filter(result => result.askedQuestion[q.question.id]).map(result => isValidResponse(q.question, assessment, result)).every(answer => answer);
             stats.count++;
             if (!wasAsked) {
                 stats.wasAsked++;
             } else if (isDesired) {
                 stats.desired++;
             } else if (isValid) {
-                stats.notDesiredButAcceptable++
+                stats.notDesiredButAcceptable++;
             } else {
                 stats.notValid++;
             }
         });
     const barLength = 265;
     return <>
-        <span title={Math.floor((stats.desired / stats.count) * 100) + '%'} style={{display: 'inline-block', width: ((stats.desired / stats.count) * barLength), height: '8px', backgroundColor: 'rgba(39, 174, 96, 1.0)'}}></span>
-        <span title={Math.floor((stats.notDesiredButAcceptable / stats.count) * 100) + '%'} style={{display: 'inline-block', width: ((stats.notDesiredButAcceptable / stats.count) * barLength), height: '8px', backgroundColor: 'rgba(230, 126, 34, 1.0)'}}></span>
-        <span title={Math.floor((stats.notValid / stats.count) * 100) + '%'} style={{display: 'inline-block', width: ((stats.notValid / stats.count) * barLength), height: '8px', backgroundColor: 'rgba(192, 57, 43, 1.0)'}}></span>
-        <span title={Math.floor((stats.wasAsked / stats.count) * 100) + '%'} style={{display: 'inline-block', width: ((stats.wasAsked / stats.count) * barLength), height: '8px', backgroundColor: 'rgba(127, 140, 141, 1.0)'}}></span>
+        <span title={Math.floor((stats.desired / stats.count) * 100) + '%'}
+              style={{ display: 'inline-block', width: ((stats.desired / stats.count) * barLength), height: '8px', backgroundColor: 'rgba(39, 174, 96, 1.0)' }}></span>
+        <span title={Math.floor((stats.notDesiredButAcceptable / stats.count) * 100) + '%'}
+              style={{ display: 'inline-block', width: ((stats.notDesiredButAcceptable / stats.count) * barLength), height: '8px', backgroundColor: 'rgba(230, 126, 34, 1.0)' }}></span>
+        <span title={Math.floor((stats.notValid / stats.count) * 100) + '%'}
+              style={{ display: 'inline-block', width: ((stats.notValid / stats.count) * barLength), height: '8px', backgroundColor: 'rgba(192, 57, 43, 1.0)' }}></span>
+        <span title={Math.floor((stats.wasAsked / stats.count) * 100) + '%'}
+              style={{ display: 'inline-block', width: ((stats.wasAsked / stats.count) * barLength), height: '8px', backgroundColor: 'rgba(127, 140, 141, 1.0)' }}></span>
     </>;
 };
 
 export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector>) => {
     const { uuid } = useParams<{ uuid: string }>();
+    // todo: remove allQuestions, replace with questionCategories? or leave it as is for report? or use useAsAq directly in report?
+    const allQuestions = useAssessmentQuestions();
+    const questionCategories = useAssessmentQuestionCategories();
     const assessment = useAssessment(teamId, uuid);
     const results = useAssessmentResults(teamId, uuid);
     const [onlyFails, setOnlyFails] = useState<boolean>(true);
@@ -217,23 +241,23 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
                         <div><HeaderLabel>Chapter leader</HeaderLabel>{assessment.chapterLeader}</div>
                         <div><HeaderLabel>Wyniki widoczne dla</HeaderLabel>{assessment.accessibleBy?.join(', ')}</div>
                     </div>
-                    <div style={{flex: 1}}></div>
+                    <div style={{ flex: 1 }}></div>
                     <div style={{ marginLeft: '32px' }}>
-                        <div style={{display: 'flex', alignItems: 'center'}}>
-                            <HeaderLabel onClick={() => setSeniorityFilter('junior')} style={{width: '80px', cursor: 'pointer'}}>Junior</HeaderLabel>
-                            <UserSeniorityReport seniority={Seniority.junior} assessment={assessment} results={results} />
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <HeaderLabel onClick={() => setSeniorityFilter('junior')} style={{ width: '80px', cursor: 'pointer' }}>Junior</HeaderLabel>
+                            <UserSeniorityReport questions={allQuestions} seniority={Seniority.junior} assessment={assessment} results={results} />
                         </div>
-                        <div style={{display: 'flex', alignItems: 'center'}}>
-                            <HeaderLabel onClick={() => setSeniorityFilter('regular')} style={{width: '80px', cursor: 'pointer'}}>Regular</HeaderLabel>
-                            <UserSeniorityReport seniority={Seniority.regular} assessment={assessment} results={results} />
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <HeaderLabel onClick={() => setSeniorityFilter('regular')} style={{ width: '80px', cursor: 'pointer' }}>Regular</HeaderLabel>
+                            <UserSeniorityReport questions={allQuestions} seniority={Seniority.regular} assessment={assessment} results={results} />
                         </div>
-                        <div style={{display: 'flex', alignItems: 'center'}}>
-                            <HeaderLabel onClick={() => setSeniorityFilter('senior')} style={{width: '80px', cursor: 'pointer'}}>Senior</HeaderLabel>
-                            <UserSeniorityReport seniority={Seniority.senior} assessment={assessment} results={results} />
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <HeaderLabel onClick={() => setSeniorityFilter('senior')} style={{ width: '80px', cursor: 'pointer' }}>Senior</HeaderLabel>
+                            <UserSeniorityReport questions={allQuestions} seniority={Seniority.senior} assessment={assessment} results={results} />
                         </div>
-                        <div style={{display: 'flex', alignItems: 'center'}}>
-                            <HeaderLabel onClick={() => setSeniorityFilter('seniorPlus')} style={{width: '80px', cursor: 'pointer'}}>Lead</HeaderLabel>
-                            <UserSeniorityReport seniority={Seniority.seniorPlus} assessment={assessment} results={results} />
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <HeaderLabel onClick={() => setSeniorityFilter('seniorPlus')} style={{ width: '80px', cursor: 'pointer' }}>Lead</HeaderLabel>
+                            <UserSeniorityReport questions={allQuestions} seniority={Seniority.seniorPlus} assessment={assessment} results={results} />
                         </div>
                     </div>
                 </div>
@@ -251,58 +275,78 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
                     </span>
                 </div>
                 {results && <div>
-                    <HeaderRow>
-                        <HeaderCell style={{ ...Columns.id }}>
-                            ID
-                        </HeaderCell>
-                        <HeaderCell style={{ ...Columns.question }}>
-                            Pytanie
-                        </HeaderCell>
-                        <HeaderCell style={{ ...Columns.seniority }}>Poziom</HeaderCell>
-                        {results.map(result =>
-                            <HeaderCell key={result.assessor} style={{ ...Columns.result }} title={result.assessor?.substring(0, result.assessor?.indexOf('@'))}>
-                                {result.assessor?.substring(0, result.assessor?.indexOf('@')).substring(0, 4)}
-                            </HeaderCell>
-                        )}
-                    </HeaderRow>
-                    {questionsWithCategories
-                        .filter(q => shouldShowQuestion(q, assessment, results, seniorityFilter, onlyFails))
-                        .sort((a, b) => a.question.seniority.localeCompare(b.question.seniority))
-                        .map(q =>
-                            <ResultRowWrapper key={q.question.id}>
-                                <ResultRow>
-                                    <ResultCell style={{ ...Columns.id }}>
-                                        {q.question.id.replace('_', '.')}
-                                    </ResultCell>
-                                    <ResultCell style={{ ...Columns.question }}>
-                                        {q.question.text3rd && q.question.text3rd[assessment.user.textForm]}
-                                        {!q.question.text3rd && q.question.text1st[assessment.user.textForm]}
-                                    </ResultCell>
-                                    <ResultCell style={{ ...Columns.seniority }}>
-                                        {q.question.seniority}
-                                    </ResultCell>
-                                    {results.map(result =>
-                                        <ResultCell key={result.assessor}
-                                                    style={{ ...Columns.result, color: responseColor(q, assessment, result) }}
-                                        >
-                                        <span title={`Odpowiedź: ${result.response[q.question.id] ? 'tak/często' : 'nie/rzadko'}`}>
-                                            {result.askedQuestion[q.question.id] ? (result.response[q.question.id] ? 'tak' : 'nie') : '-'}
-                                            &nbsp;
-                                            {result.response[q.question.id] !== undefined ? (isDesiredResponse(q, assessment, result) ? '✓' : '⤫') : ''}
-                                        </span>
-                                        </ResultCell>
-                                    )}
-                                </ResultRow>
-                                <div style={{ marginLeft: Columns.id.flexBasis, fontStyle: 'italic', maxWidth: '80%', fontSize: '.9em' }}>
-                                    {results.filter(r => r.comment?.[q.question.id]).map(r => <div style={{ marginBottom: '4px' }} key={r.assessor + '-' + q.question.id}>
-                                        <span style={{ color: 'rgba(127, 140, 141, 1.0)' }}>(komentarz do odpowiedzi)</span> {r.assessor}: {r.comment?.[q.question.id]}
-                                    </div>)}
-                                    {results.filter(r => r.questionFeedback?.[q.question.id]).map(r => <div style={{ marginBottom: '4px' }} key={r.assessor + '-' + q.question.id}>
-                                        <span style={{ color: 'rgba(127, 140, 141, 1.0)' }}>(komentarz do pytania)</span> {r.assessor}: {r.questionFeedback?.[q.question.id]}
-                                    </div>)}
+                    <div>
+                        {questionCategories
+                            .filter(category => hasAnyVisibleQuestion(category, assessment, results, seniorityFilter, onlyFails))
+                            .map(category => <CategoryRow key={category.id}>
+                                <div style={{ marginBottom: '8px' }}>
+                                    <div style={{ fontSize: '1.1em', fontWeight: '500' }}>{category.name}</div>
+                                    <div style={{ fontSize: '.9em', fontStyle: 'italic', color: 'dimgray' }}>{category.description}</div>
+                                    <div style={{ fontSize: '.9em', fontStyle: 'italic', color: 'dimgray' }}>{category.comment}</div>
+                                    {category.todo &&
+                                        <div style={{ fontSize: '.9em', fontStyle: 'italic', color: 'rgb(192, 57, 43)' }}>Uważaj, kategoria wymaga znanych usprawnień: {category.todo}</div>}
                                 </div>
-                            </ResultRowWrapper>
-                        )}
+                                <HeaderRow>
+                                    <HeaderCell style={{ ...Columns.id }}>
+                                        ID
+                                    </HeaderCell>
+                                    <HeaderCell style={{ ...Columns.question }}>
+                                        Pytanie
+                                    </HeaderCell>
+                                    <HeaderCell style={{ ...Columns.seniority }}>Poziom</HeaderCell>
+                                    {results.map(result =>
+                                        <HeaderCell key={result.assessor} style={{ ...Columns.result }} title={result.assessor?.substring(0, result.assessor?.indexOf('@'))}>
+                                            {result.assessor?.substring(0, result.assessor?.indexOf('@')).substring(0, 4)}
+                                        </HeaderCell>
+                                    )}
+                                </HeaderRow>
+                                <div>
+                                    {category.questions
+                                        .filter(q => shouldShowQuestion(q, assessment, results, seniorityFilter, onlyFails))
+                                        .sort((a, b) => a.seniority.localeCompare(b.seniority))
+                                        .map(q =>
+                                            <ResultRowWrapper key={q.id}>
+                                                <ResultRow>
+                                                    <ResultCell style={{ ...Columns.id }}>
+                                                        {q.id.replace('_', '.')}
+                                                    </ResultCell>
+                                                    <ResultCell style={{ ...Columns.question }}>
+                                                        {q.text3rd && q.text3rd[assessment.user.textForm]}
+                                                        {!q.text3rd && q.text1st[assessment.user.textForm]}
+                                                    </ResultCell>
+                                                    <ResultCell style={{ ...Columns.seniority }}>
+                                                        {q.seniority}
+                                                    </ResultCell>
+                                                    {results.map(result =>
+                                                        <ResultCell key={result.assessor}
+                                                                    style={{ ...Columns.result, color: responseColor(q, assessment, result) }}
+                                                        >
+                                                            <span title={`Odpowiedź: ${result.response[q.id] ? 'tak/często' : 'nie/rzadko'}`}>
+                                                                {result.askedQuestion[q.id] ? (result.response[q.id] ? 'tak' : 'nie') : '-'}
+                                                                &nbsp;
+                                                                {result.response[q.id] !== undefined ? (isDesiredResponse(q, assessment, result) ? '✓' : '⤫') : ''}
+                                                            </span>
+                                                        </ResultCell>
+                                                    )}
+                                                </ResultRow>
+                                                <div style={{ marginLeft: Columns.id.flexBasis, fontStyle: 'italic', maxWidth: '80%', fontSize: '.9em', color: 'dimgray' }}>
+                                                    {q.comment && <div>{q.comment}</div>}
+                                                    {q.motivation && <div>{q.motivation}</div>}
+                                                    {q.todo && <div style={{ color: 'rgb(192, 57, 43)' }}>Uważaj, pytanie wymaga znanych usprawnień: {q.todo}</div>}
+                                                </div>
+                                                <div style={{ marginLeft: Columns.id.flexBasis, fontStyle: 'italic', maxWidth: '80%', fontSize: '.9em', color: 'rgba(39, 174, 96, 1.0)' }}>
+                                                    {results.filter(r => r.comment?.[q.id]).map(r => <div style={{ marginBottom: '4px' }} key={r.assessor + '-' + q.id}>
+                                                        <span style={{ color: 'rgba(127, 140, 141, 1.0)' }}>(komentarz do odpowiedzi)</span> {r.assessor}: {r.comment?.[q.id]}
+                                                    </div>)}
+                                                    {results.filter(r => r.questionFeedback?.[q.id]).map(r => <div style={{ marginBottom: '4px' }} key={r.assessor + '-' + q.id}>
+                                                        <span style={{ color: 'rgba(127, 140, 141, 1.0)' }}>(komentarz do pytania)</span> {r.assessor}: {r.questionFeedback?.[q.id]}
+                                                    </div>)}
+                                                </div>
+                                            </ResultRowWrapper>
+                                        )}
+                                </div>
+                            </CategoryRow>)}
+                    </div>
                 </div>}
             </CardContent>
         </Card>
