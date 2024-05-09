@@ -27,6 +27,5 @@ export async function userList(bottoken: unknown): Promise<SlackUserIndex | void
         }),
         {} as SlackUserIndex
       )
-    )
-    .catch(error => console.log(`Can't fetch slack user list [%o]`, error));
+    );
 }
