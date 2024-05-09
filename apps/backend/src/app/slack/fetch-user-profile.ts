@@ -24,5 +24,5 @@ export async function userProfile(email: string, bottoken: unknown) {
         }
         console.log(`New cache entry for user list [email=${email}, cache.ttl=${userProfileCache[email].ttl}]`);
     }
-    return userProfileCache[email];
+    return userProfileCache[email].result;
 }
