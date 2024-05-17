@@ -5,12 +5,14 @@ import { UserAssessment } from '../model/user-assessment';
 import { useAssessmentQuestions } from './use-assessment-questions';
 import { QuestionWithCategory } from './question-with-category';
 
-function isQuestionToShow(user: SurveyContextUser, assessed: string, assessor: string, responses: { [key: string]: boolean }, question: QuestionWithCategory): boolean {
-    const questionForm = assessed === assessor ? 'text1st' : 'text3rd';
+function isQuestionToShow(assessment: UserAssessment, question: QuestionWithCategory): boolean {
+    const questionForm = assessment.assessed === assessment.assessor ? 'text1st' : 'text3rd';
+    const n = (id: string) => id.replaceAll('.', '_');
     const context: SurveyContext = {
-        user: user,
+        user: assessment.user,
         answers: {
-            get: (id: string) => responses[id.replaceAll('.', '_')]
+            get: (id: string) => assessment.response?.[n(id)],
+            value: (id: string) => assessment.responseValue?.[n(id)]
         }
     };
 
@@ -28,7 +30,7 @@ function isQuestionToShow(user: SurveyContextUser, assessed: string, assessor: s
 function findNextUnansweredQuestion(questions: QuestionWithCategory[], assessment: UserAssessment) {
     return questions.find(
         questionToCheck =>
-            assessment.response[questionToCheck.question.id] === undefined && isQuestionToShow(assessment.user, assessment.assessed, assessment.assessor, assessment.response, questionToCheck)
+            assessment.response[questionToCheck.question.id] === undefined && isQuestionToShow(assessment, questionToCheck)
     );
 }
 
@@ -66,7 +68,7 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
             const prevQuestion = questions
                 .filter((_, idx) => idx < currentQuestionIdx)
                 .reverse()
-                .find((questionToCheck) => isQuestionToShow(assessment.user, assessment.assessed, assessment.assessor, assessment?.response ?? {}, questionToCheck));
+                .find((questionToCheck) => isQuestionToShow(assessment, questionToCheck));
             await updateAssessment({
                 currentQuestion: prevQuestion?.question.id ?? questions[0].question.id
             });
@@ -107,7 +109,7 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
                 questions
                     .filter(q => assessment.askedQuestion[q.question.id])
                     .forEach(questionToCheck => {
-                        const isValidNow = isQuestionToShow(assessment.user, assessment.assessed, assessment.assessor, updatedAssessment.response, questionToCheck);
+                        const isValidNow = isQuestionToShow(assessment, questionToCheck);
                         if (!isValidNow) {
                             delete updatedAssessment.askedQuestion[questionToCheck.question.id];
                             delete updatedAssessment.response[questionToCheck.question.id];
@@ -122,7 +124,7 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
             const currentQuestionIdx = Math.max(questions.findIndex(q => q.question.id === assessment.currentQuestion), 0);
             const nextQuestion = questions
                 .filter((_, idx) => idx > currentQuestionIdx)
-                .find((questionToCheck, questionToCheckIdx) => isQuestionToShow(assessment.user, assessment.assessed, assessment.assessor, updatedAssessment.response, questionToCheck));
+                .find((questionToCheck, questionToCheckIdx) => isQuestionToShow(assessment, questionToCheck));
             updatedAssessment.currentQuestion = nextQuestion?.question.id ?? 'finished';
 
             await updateAssessment(updatedAssessment);
@@ -143,13 +145,13 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
             askedQuestion: {},
             currentQuestion: ''
         }),
-        [questions, updateAssessment]
+        [updateAssessment]
     );
 
     const timeLeft = useMemo(
         () => {
             if (assessment && question) {
-                const availableQuestions = questions.filter(q => isQuestionToShow(assessment.user, assessment.assessed, assessment.assessor, assessment.response, question));
+                const availableQuestions = questions.filter(q => isQuestionToShow(assessment, question));
                 if (availableQuestions.indexOf(question) > 5) {
                     const times = Object.keys(assessment.questionTime);
                     const sum = times
