@@ -10,7 +10,7 @@ import CardHeader from '@mui/material/CardHeader';
 import Button from '@mui/material/Button';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import CardActions from '@mui/material/CardActions';
-import React, { FC, useEffect, useRef, useState } from 'react';
+import React, { FC, MutableRefObject, useEffect, useRef, useState } from 'react';
 import Collapse from '@mui/material/Collapse';
 import styled from 'styled-components';
 import TextField from '@mui/material/TextField';
@@ -23,6 +23,7 @@ import { AssessmentSplash } from './assessment-splash';
 import { ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
 import { WithId } from '../model/with-id';
 import { UserAssessment } from '../model/user-assessment';
+import { Question, QuestionType } from '@clbox/assessment-survey';
 
 const LoadingAssessment = () => <Card>
     <CardContent style={{ textAlign: 'center' }}>
@@ -69,6 +70,40 @@ function normalizeText(text: string): string {
     }
 }
 
+const ScaleAnswers: FC<{question: Question, submitAnswer, prevResponse: number, commentRef: MutableRefObject<HTMLTextAreaElement>, feedbackRef: MutableRefObject<HTMLTextAreaElement>}> = ({question, submitAnswer, prevResponse, commentRef, feedbackRef}) => {
+    const type = question.type ?? QuestionType.Frequency;
+    return <>
+        <Button variant="outlined" size="small" onClick={() => submitAnswer(1, commentRef.current?.value, feedbackRef.current?.value)}
+                style={{ width: '200px', height: '50px', borderWidth: prevResponse === 1 ? 3 : undefined }}>
+            <div>
+                {type === QuestionType.Frequency && <div>nigdy</div>}
+                {type === QuestionType.Correctness && <div>w ogóle się nie zgadzam</div>}
+            </div>
+        </Button>
+        <Button variant="outlined" size="small" onClick={() => submitAnswer(2, commentRef.current?.value, feedbackRef.current?.value)}
+                style={{ width: '200px', height: '50px', borderWidth: prevResponse === 2 ? 3 : undefined }}>
+            <div>
+                {type === QuestionType.Frequency && <div>rzadko</div>}
+                {type === QuestionType.Correctness && <div>raczej nie</div>}
+            </div>
+        </Button>
+        <Button variant="outlined" size="small" onClick={() => submitAnswer(3, commentRef.current?.value, feedbackRef.current?.value)}
+                style={{ width: '200px', height: '50px', borderWidth: prevResponse === 3 ? 3 : undefined }}>
+            <div>
+                {type === QuestionType.Frequency && <div>często</div>}
+                {type === QuestionType.Correctness && <div>raczej tak</div>}
+            </div>
+        </Button>
+        <Button variant="outlined" size="small" onClick={() => submitAnswer(4, commentRef.current?.value, feedbackRef.current?.value)}
+                style={{ width: '200px', height: '50px', borderWidth: prevResponse === 4 ? 3 : undefined }}>
+            <div>
+                {type === QuestionType.Frequency && <div>zawsze</div>}
+                {type === QuestionType.Correctness && <div>stanowczo się zgadzam</div>}
+            </div>
+        </Button>
+    </>;
+}
+
 const QuestionSurvey = ({ assessment, category, question, submitAnswer, reset, progress, userId, debug }: {
     assessment: WithId & UserAssessment,
     category,
@@ -85,18 +120,10 @@ const QuestionSurvey = ({ assessment, category, question, submitAnswer, reset, p
 
     useEffect(
         () => {
-            if (feedbackFieldRef.current) {
-                feedbackFieldRef.current.value = assessment.questionFeedback[question.id] ?? '';
-            }
-            setFeedbackExpanded(false);
-        },
-        [question, assessment]
-    );
-    useEffect(
-        () => {
             if (commentFieldRef.current) {
                 commentFieldRef.current.value = assessment.comment?.[question.id] ?? '';
             }
+            setFeedbackExpanded(false);
         },
         [question, assessment]
     );
@@ -117,8 +144,8 @@ const QuestionSurvey = ({ assessment, category, question, submitAnswer, reset, p
         {debug && <>
             <div style={{ margin: 16, padding: 8, border: '1px dashed darkred', fontSize: '0.8em' }}>
                 {assessment && <>
-                    <div>Bieżące pytanie: {assessment.currentQuestion}</div>
-                    <div>Pytania z odpowiedziami: {Object.keys(assessment.response).sort().map(i => i === assessment.currentQuestion ? `*${i}*` : i).join(', ')}</div>
+                    <div>Bieżące pytanie: {assessment.currentQuestion.replaceAll('_0', '.')}</div>
+                    <div>Pytania z odpowiedziami: {Object.keys(assessment.response).sort().map(i => i === assessment.currentQuestion ? `*${i}*` : i).map(i => i.replaceAll('_0', '.')).join(', ')}</div>
                 </>}
             </div>
         </>}
@@ -138,7 +165,7 @@ const QuestionSurvey = ({ assessment, category, question, submitAnswer, reset, p
             titleTypographyProps={{
                 fontSize: '1.2em'
             }}
-            subheader={`${category.description ?? ''} (pytanie ${question.id.replace('_', '.')})`}
+            subheader={`${category.description ?? ''} (pytanie ${question.id.replaceAll('_', '.')})`}
             subheaderTypographyProps={{
                 fontSize: '0.9em'
             }}
@@ -154,34 +181,7 @@ const QuestionSurvey = ({ assessment, category, question, submitAnswer, reset, p
             <WideTextField inputRef={commentFieldRef} multiline rows={4} />
         </CardContent>
         <CardActions>
-            <Button variant="outlined" size="small" onClick={() => submitAnswer(1, commentFieldRef.current?.value, feedbackFieldRef.current?.value)}
-                    style={{ width: '200px', borderWidth: prevResponse === 1 ? 3 : undefined }}>
-                <div>
-                    <div>nigdy</div>
-                    <div>w ogóle się nie zgadzam</div>
-                </div>
-            </Button>
-            <Button variant="outlined" size="small" onClick={() => submitAnswer(2, commentFieldRef.current?.value, feedbackFieldRef.current?.value)}
-                    style={{ width: '200px', borderWidth: prevResponse === 2 ? 3 : undefined }}>
-                <div>
-                    <div>rzadko</div>
-                    <div>raczej nie</div>
-                </div>
-            </Button>
-            <Button variant="outlined" size="small" onClick={() => submitAnswer(3, commentFieldRef.current?.value, feedbackFieldRef.current?.value)}
-                    style={{ width: '200px', borderWidth: prevResponse === 3 ? 3 : undefined }}>
-                <div>
-                    <div>często</div>
-                    <div>raczej tak</div>
-                </div>
-            </Button>
-            <Button variant="outlined" size="small" onClick={() => submitAnswer(4, commentFieldRef.current?.value, feedbackFieldRef.current?.value)}
-                    style={{ width: '200px', borderWidth: prevResponse === 4 ? 3 : undefined }}>
-                <div>
-                    <div>zawsze</div>
-                    <div>stanowczo się zgadzam</div>
-                </div>
-            </Button>
+            <ScaleAnswers question={question} submitAnswer={submitAnswer} prevResponse={prevResponse} commentRef={commentFieldRef} feedbackRef={feedbackFieldRef} />
             <Button size="small" color="secondary" style={{ marginLeft: 'auto' }} onClick={() => setFeedbackExpanded(!feedbackExpanded)}><HelpOutlineIcon /></Button>
         </CardActions>
         <Collapse in={feedbackExpanded} timeout="auto" unmountOnExit>
@@ -194,7 +194,7 @@ const QuestionSurvey = ({ assessment, category, question, submitAnswer, reset, p
                     wykorzystany do przygotowania podsumowania oraz jako wkład do dalszego rozwoju ankiety oceny.
                 </div>
                 <div>
-                    <WideTextField inputRef={feedbackFieldRef} multiline rows={4} />
+                    <WideTextField inputRef={feedbackFieldRef} multiline rows={4} defaultValue={assessment.questionFeedback?.[question.id] ?? ''} />
                 </div>
             </CardContent>
         </Collapse>

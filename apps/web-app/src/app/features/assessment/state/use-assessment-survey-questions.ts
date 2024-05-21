@@ -1,5 +1,5 @@
 import { AssessmentSurveyHook } from '../model/assessment-survey-hook';
-import { SurveyContext, SurveyContextUser } from '@clbox/assessment-survey';
+import { SurveyContext } from '@clbox/assessment-survey';
 import { useCallback, useMemo } from 'react';
 import { UserAssessment } from '../model/user-assessment';
 import { useAssessmentQuestions } from './use-assessment-questions';
@@ -16,12 +16,8 @@ function isQuestionToShow(assessment: UserAssessment, question: QuestionWithCate
         }
     };
 
-    const hasQuestionText = () => {
-        return question.question[questionForm] !== undefined;
-    };
-    const isValid = () => {
-        return !question.question.validWhen || question.question.validWhen(context);
-    };
+    const hasQuestionText = () => question.question[questionForm] !== undefined;
+    const isValid = () => !question.question.validWhen || question.question.validWhen(context);
 
     return hasQuestionText() && isValid();
 }
@@ -104,12 +100,12 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
                 updatedAssessment.questionFeedback[question.question.id] = feedback;
             }
 
-            const isAnswerDifferentThanBefore = assessment.responseValue[question.question.id] !== undefined && assessment.responseValue[question.question.id] !== answerValue;
+            const isAnswerDifferentThanBefore = updatedAssessment.responseValue[question.question.id] !== undefined && updatedAssessment.responseValue[question.question.id] !== answerValue;
             if (isAnswerDifferentThanBefore) {
                 questions
-                    .filter(q => assessment.askedQuestion[q.question.id])
+                    .filter(q => updatedAssessment.askedQuestion[q.question.id])
                     .forEach(questionToCheck => {
-                        const isValidNow = isQuestionToShow(assessment, questionToCheck);
+                        const isValidNow = isQuestionToShow(updatedAssessment, questionToCheck);
                         if (!isValidNow) {
                             delete updatedAssessment.askedQuestion[questionToCheck.question.id];
                             delete updatedAssessment.response[questionToCheck.question.id];
@@ -121,10 +117,10 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
                     });
             }
 
-            const currentQuestionIdx = Math.max(questions.findIndex(q => q.question.id === assessment.currentQuestion), 0);
+            const currentQuestionIdx = Math.max(questions.findIndex(q => q.question.id === updatedAssessment.currentQuestion), 0);
             const nextQuestion = questions
                 .filter((_, idx) => idx > currentQuestionIdx)
-                .find((questionToCheck, questionToCheckIdx) => isQuestionToShow(assessment, questionToCheck));
+                .find((questionToCheck, questionToCheckIdx) => isQuestionToShow(updatedAssessment, questionToCheck));
             updatedAssessment.currentQuestion = nextQuestion?.question.id ?? 'finished';
 
             await updateAssessment(updatedAssessment);

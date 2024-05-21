@@ -23,6 +23,12 @@ const Layout = styled.div`
 
 const changes = [
     {
+        date: '2024-05-21',
+        items: [
+            {summary: 'Ankieta oceny okresowej pokazuje tylko jeden zestaw odpowiedzi zależnie od typu pytania.'},
+        ]
+    },
+    {
         date: '2024-05-08',
         items: [
             {summary: 'Usprawnienia ekrany wyników oceny okresowej: grupowanie odpowiedzi w kategorie, wyświetlanie komentarzy i motywacji pytań oraz opisów kategorii.'},
