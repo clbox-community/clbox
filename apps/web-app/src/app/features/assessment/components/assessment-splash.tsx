@@ -19,8 +19,8 @@ export const AssessmentSplash: FC<{confirm: () => void}> = ({ confirm }) => <Car
             <li>Każde pytanie oceniane jest pod względem odpowiedzi oczekiwanej na koniec ścieżki rozwoju lidera w Consdata oraz czy jest to odpowiedź oczekiwana/spodziewana na bieżącym
                 poziomie ocenianego.
             </li>
-            <li>Pamiętaj, że przyciski mają dwa wiersze. Jeśli "zawsze i nigdy" nie brzmi dobrze, zastanów się, czy "zdecydowanie tak, nie" nie pasuje lepiej.</li>
             <li>Nie trzeba nadmiernie analizować pytań. Odpowiadaj na nie szybko, opierając się na pierwszych myślach.</li>
+            <li>Gdy nie potrafisz ocenić czy oceniana osoba coś robi zastanów się czy zauważasz, że tego nie robi. Oceń, czy potrafisz znaleźć sytuacje, w których widać, że coś nie jest robione.</li>
             <li>Jeśli czujesz potrzebę dodania komentarza do odpowiedzi, być może pytanie jest za mało precyzyjne i możesz to napisać w feedbacku do pytania.</li>
             <li>Jeśli masz uwagi, koniecznie je zbierz i zgłoś. Jest to okres testowania, więc nie ma konsekwencji dla Twojej oceny. Problemy merytoryczne mogą wpłynąć na jakość oceny, gdy
                 ankieta zostanie wprowadzona do oceny rocznej.
