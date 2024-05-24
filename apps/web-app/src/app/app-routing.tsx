@@ -26,6 +26,7 @@ import { ProfilePage } from './features/profile/components/profile-page';
 import { AssessmentResult } from './features/assessment/components/assessment-result';
 import { UserProfilePage } from './features/profile/components/user-profile-page';
 import { SurveyRoot } from './features/survey/components/survey-root';
+import { SkillsSurvey } from './features/skill-survey/component/skills-survey';
 
 export const AppRoutingAuthenticated = () => <Routes>
     <Route path="/s/:team/:uuid" element={<SurveyRoot />} />
@@ -42,7 +43,7 @@ export const AppRoutingAuthenticated = () => <Routes>
     </Route>
     <Route path="/campaign/:uuid" element={<CampaignSummary />} />
     <Route path="skill">
-        <Route path="survey" element={<SurveyRoot />} />
+        <Route path="survey" element={<SkillsSurvey />} />
         <Route path="browser" element={<SkillsBrowser />} />
         <Route path="editor" element={<SkillEditor />} />
         <Route path="chapter" element={<SkillChapterUsers />} />
