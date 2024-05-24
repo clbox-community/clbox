@@ -6,6 +6,7 @@ import {useUserSkills} from "../../skill/firestore/use-user-skills";
 import {useSkillTree} from "../../skill/firestore/use-skill-tree";
 import React, {FC} from "react";
 import {useUser} from "../../user/firestore/use-user";
+import { SkillMeter } from './skill-meter';
 
 export const SkillChapterView = ({teamId}: ViewProps) => {
     const {user: userId} = useParams<{ user: string }>()
@@ -71,19 +72,6 @@ const SkillRow = styled.div`
         outline: 1px solid #f1f1f1;
     }
 `;
-
-const SkillMeter: FC<{ value: number }> = ({value}) => {
-    const valueNumber = value ?? 0;
-    const progressColor = valueNumber > 0 ? (valueNumber > 1 ? '#91e4bc' : '#d4e491') : 'lightgray';
-    return <div style={{
-        paddingRight: '4px',
-        backgroundColor: progressColor,
-        width: `${20 + 20 * valueNumber}px`,
-        textAlign: 'right'
-    }}>
-        {valueNumber}
-    </div>;
-}
 
 const TwoColumns = styled.div`
     display: flex;

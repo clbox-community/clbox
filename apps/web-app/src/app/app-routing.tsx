@@ -27,6 +27,7 @@ import { AssessmentResult } from './features/assessment/components/assessment-re
 import { UserProfilePage } from './features/profile/components/user-profile-page';
 import { SurveyRoot } from './features/survey/components/survey-root';
 import { SkillsSurvey } from './features/skill-survey/component/skills-survey';
+import { SkillChapterAll } from './features/skill-chapter/components/skill-chapter-all';
 
 export const AppRoutingAuthenticated = () => <Routes>
     <Route path="/s/:team/:uuid" element={<SurveyRoot />} />
@@ -47,6 +48,7 @@ export const AppRoutingAuthenticated = () => <Routes>
         <Route path="browser" element={<SkillsBrowser />} />
         <Route path="editor" element={<SkillEditor />} />
         <Route path="chapter" element={<SkillChapterUsers />} />
+        <Route path="chapter/all" element={<SkillChapterAll />} />
         <Route path="chapter/:user" element={<SkillChapterUser />} />
         <Route path="team" element={<SkillTeam />} />
         <Route path="roadmap" element={<SkillRoadmap />} />

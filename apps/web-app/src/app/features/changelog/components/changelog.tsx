@@ -23,6 +23,12 @@ const Layout = styled.div`
 
 const changes = [
     {
+        date: '2024-05-24',
+        items: [
+            {summary: 'Tabelka podsumowania kompetencji w chapterze'},
+        ]
+    },
+    {
         date: '2024-05-21',
         items: [
             {summary: 'Ankieta oceny okresowej pokazuje tylko jeden zestaw odpowiedzi zależnie od typu pytania.'},
