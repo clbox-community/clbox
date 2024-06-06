@@ -45,7 +45,7 @@ const labelOfLevel = (level: SkillLevel) => {
 };
 
 const TopicRow: React.FC<{ topic: RoadmapSkillTopic, categoryResults: CategoryResults }> = ({ topic, categoryResults }) => {
-    const [expanded, setExpanded] = useState(true);
+    const [expanded, setExpanded] = useState(false);
     return <div>
         <TopicRowHeader>
             <FormControlLabel
@@ -59,7 +59,8 @@ const TopicRow: React.FC<{ topic: RoadmapSkillTopic, categoryResults: CategoryRe
             </div>
         </TopicRowHeader>
         {expanded && <TopicRowBody>
-            <ReactMarkdown>{topic.summary}</ReactMarkdown>
+            {topic.summary && <ReactMarkdown>{topic.summary}</ReactMarkdown>}
+            {topic.docs && <ReactMarkdown>{topic.docs}</ReactMarkdown>}
             {topic.links?.length > 0 && <Fragment>
                 {topic.links.map(link => <div key={link.title}>
                     ✓ <a href={link.href}>{link.title}</a>
