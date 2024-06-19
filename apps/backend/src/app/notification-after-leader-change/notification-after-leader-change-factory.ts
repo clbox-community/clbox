@@ -8,11 +8,16 @@ export const notificationAfterLeaderChangeFactory = (
     async (change, context) => {
         if (change.after.data().chapterLeader !== change.before.data().chapterLeader) {
             console.log(`Notify user after chapter leader change [user=${context.params.user}, newLeader=${change.after.data().chapterLeader}]`);
-            const slackUser = await userProfile(context.params.user, config.slack.bottoken);
-            await sendSlackMessage(config.slack.bottoken, {
-                channel: `@${slackUser.name}`,
-                text: `Your chapter leader was changed to ${change.after.data().chapterLeader}.`
-            });
+            const slackToken = config.slack.bottoken;
+            if (slackToken) {
+                const slackUser = await userProfile(context.params.user, slackToken);
+                await sendSlackMessage(slackToken, {
+                    channel: `@${slackUser.name}`,
+                    text: `Your chapter leader was changed to ${change.after.data().chapterLeader}.`
+                });
+            } else {
+                console.warn('Notification skipped due to missing slack configuration');
+            }
         }
     }
 );

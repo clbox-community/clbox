@@ -56,4 +56,4 @@ libs/assessment-survey
 tools/
 
 .nx/cache
-.env.local
+/*.local.env
