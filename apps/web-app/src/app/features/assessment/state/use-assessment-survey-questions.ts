@@ -1,5 +1,5 @@
 import { AssessmentSurveyHook } from '../model/assessment-survey-hook';
-import { SurveyContext } from '@clbox/assessment-survey';
+import { boolAnswerBasedOnQuestion, hasBoolAnswerBasedOnQuestion, SurveyContext } from '@clbox/assessment-survey';
 import { useCallback, useMemo } from 'react';
 import { UserAssessment } from '../model/user-assessment';
 import { useAssessmentQuestions } from './use-assessment-questions';
@@ -11,7 +11,7 @@ function isQuestionToShow(assessment: UserAssessment, question: QuestionWithCate
     const context: SurveyContext = {
         user: assessment.user,
         answers: {
-            get: (id: string) => assessment.response?.[n(id)],
+            get: (id: string) => hasBoolAnswerBasedOnQuestion(question.question) ? boolAnswerBasedOnQuestion(question.question, assessment.responseValue?.[n(id)]) : undefined,
             value: (id: string) => assessment.responseValue?.[n(id)]
         }
     };
@@ -26,7 +26,7 @@ function isQuestionToShow(assessment: UserAssessment, question: QuestionWithCate
 function findNextUnansweredQuestion(questions: QuestionWithCategory[], assessment: UserAssessment) {
     return questions.find(
         questionToCheck =>
-            assessment.response[questionToCheck.question.id] === undefined && isQuestionToShow(assessment, questionToCheck)
+            assessment.responseValue[questionToCheck.question.id] === undefined && isQuestionToShow(assessment, questionToCheck)
     );
 }
 
@@ -90,7 +90,6 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
 
             const updatedAssessment: UserAssessment = JSON.parse(JSON.stringify(assessment));
             updatedAssessment.askedQuestion[question.question.id] = true;
-            updatedAssessment.response[question.question.id] = answerValue > 2;
             updatedAssessment.responseValue[question.question.id] = answerValue;
             updatedAssessment.questionTime[question.question.id] = time;
             if (comment) {
@@ -108,7 +107,6 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
                         const isValidNow = isQuestionToShow(updatedAssessment, questionToCheck);
                         if (!isValidNow) {
                             delete updatedAssessment.askedQuestion[questionToCheck.question.id];
-                            delete updatedAssessment.response[questionToCheck.question.id];
                             delete updatedAssessment.responseValue[questionToCheck.question.id];
                             delete updatedAssessment.questionTime[questionToCheck.question.id];
                             delete updatedAssessment.comment[questionToCheck.question.id];
@@ -123,6 +121,8 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
                 .find((questionToCheck, questionToCheckIdx) => isQuestionToShow(updatedAssessment, questionToCheck));
             updatedAssessment.currentQuestion = nextQuestion?.question.id ?? 'finished';
 
+            console.log(updatedAssessment)
+
             await updateAssessment(updatedAssessment);
             if (!nextQuestion) {
                 await finishAssessment();
@@ -133,7 +133,6 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
 
     const reset = useCallback(
         async () => updateAssessment({
-            response: {},
             responseValue: {},
             comment: {},
             questionFeedback: {},

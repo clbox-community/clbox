@@ -34,7 +34,7 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
-.local.env
+.dev.local.env
 .firebaserc
 .firebase
 firebase-debug.log
