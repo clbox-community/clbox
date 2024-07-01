@@ -10,7 +10,7 @@ import { WithId } from '../model/with-id';
 import { Assessment } from '../model/assessment';
 import { UserAssessment } from '../model/user-assessment';
 import { useEffect, useState } from 'react';
-import { Category, Question, Seniority } from '@clbox/assessment-survey';
+import { boolAnswerBasedOnQuestion, Category, hasBoolAnswerBasedOnQuestion, labelBasedOnQuestion, Question, Seniority, summaryAnswerBasedOnQuestion } from '@clbox/assessment-survey';
 import { AssessmentUserSeniority } from '../model/assessment-user-seniority';
 import { useAssessmentQuestions } from '../state/use-assessment-questions';
 import { useAssessmentQuestionCategories } from '../state/use-assessment-question-categories';
@@ -25,14 +25,22 @@ export const OneColumnLayoutUltraWide = styled.div`
  * Checks if user response matches desired response
  */
 function isDesiredResponse(q: Question, assessment: WithId & Assessment, result: WithId & UserAssessment) {
-    return q.expectedResponses['seniorPlus'].indexOf(result.response[q.id]) >= 0;
+    if (hasBoolAnswerBasedOnQuestion(q)) {
+        return q.expectedResponses['seniorPlus'].includes(boolAnswerBasedOnQuestion(q, result.responseValue[q.id]));
+    } else {
+        return q.expectedResponses['seniorPlus'].includes(result.responseValue[q.id]);
+    }
 }
 
 /**
  * Checks if user has valid response based on seniority.
  */
 function isValidResponse(q: Question, assessment: WithId & Assessment, result: WithId & UserAssessment): boolean {
-    return q.expectedResponses[assessment.user.seniority === 'lead' ? 'seniorPlus' : assessment.user.seniority].indexOf(result.response[q.id]) >= 0;
+    if (hasBoolAnswerBasedOnQuestion(q)) {
+        return q.expectedResponses[assessment.user.seniority === 'lead' ? 'seniorPlus' : assessment.user.seniority].includes(boolAnswerBasedOnQuestion(q, result.responseValue[q.id]));
+    } else {
+        return q.expectedResponses[assessment.user.seniority === 'lead' ? 'seniorPlus' : assessment.user.seniority].includes(result.responseValue[q.id]);
+    }
 }
 
 function asSeniority(seniority: AssessmentUserSeniority) {
@@ -144,7 +152,7 @@ const ResultCell = styled.div`
 
 const Columns = {
     id: {
-        flexBasis: '100px',
+        flexBasis: '150px',
         fontStyle: 'italic',
         color: 'rgba(127, 140, 141, 1.0)'
     },
@@ -321,10 +329,10 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
                                                         <ResultCell key={result.assessor}
                                                                     style={{ ...Columns.result, color: responseColor(q, assessment, result) }}
                                                         >
-                                                            <span title={`Odpowiedź: ${result.response[q.id] ? 'tak/często' : 'nie/rzadko'}`}>
-                                                                {result.askedQuestion[q.id] ? (result.response[q.id] ? 'tak' : 'nie') : '-'}
+                                                            <span title={`Odpowiedź: ${labelBasedOnQuestion(q, result.responseValue[q.id])}`}>
+                                                                {result.askedQuestion[q.id] ? (summaryAnswerBasedOnQuestion(q, result.responseValue[q.id])) : '-'}
                                                                 &nbsp;
-                                                                {result.response[q.id] !== undefined ? (isDesiredResponse(q, assessment, result) ? '✓' : '⤫') : ''}
+                                                                {result.responseValue[q.id] !== undefined ? (isDesiredResponse(q, assessment, result) ? '✓' : '⤫') : ''}
                                                             </span>
                                                         </ResultCell>
                                                     )}

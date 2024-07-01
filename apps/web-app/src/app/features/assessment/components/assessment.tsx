@@ -70,39 +70,61 @@ function normalizeText(text: string): string {
     }
 }
 
-const ScaleAnswers: FC<{question: Question, submitAnswer, prevResponse: number, commentRef: MutableRefObject<HTMLTextAreaElement>, feedbackRef: MutableRefObject<HTMLTextAreaElement>}> = ({question, submitAnswer, prevResponse, commentRef, feedbackRef}) => {
-    const type = question.type ?? QuestionType.Frequency;
-    return <>
-        <Button variant="outlined" size="small" onClick={() => submitAnswer(1, commentRef.current?.value, feedbackRef.current?.value)}
-                style={{ width: '200px', height: '50px', borderWidth: prevResponse === 1 ? 3 : undefined }}>
-            <div>
-                {type === QuestionType.Frequency && <div>nigdy</div>}
-                {type === QuestionType.Correctness && <div>w ogóle się nie zgadzam</div>}
-            </div>
-        </Button>
-        <Button variant="outlined" size="small" onClick={() => submitAnswer(2, commentRef.current?.value, feedbackRef.current?.value)}
-                style={{ width: '200px', height: '50px', borderWidth: prevResponse === 2 ? 3 : undefined }}>
-            <div>
-                {type === QuestionType.Frequency && <div>rzadko</div>}
-                {type === QuestionType.Correctness && <div>raczej nie</div>}
-            </div>
-        </Button>
-        <Button variant="outlined" size="small" onClick={() => submitAnswer(3, commentRef.current?.value, feedbackRef.current?.value)}
-                style={{ width: '200px', height: '50px', borderWidth: prevResponse === 3 ? 3 : undefined }}>
-            <div>
-                {type === QuestionType.Frequency && <div>często</div>}
-                {type === QuestionType.Correctness && <div>raczej tak</div>}
-            </div>
-        </Button>
-        <Button variant="outlined" size="small" onClick={() => submitAnswer(4, commentRef.current?.value, feedbackRef.current?.value)}
-                style={{ width: '200px', height: '50px', borderWidth: prevResponse === 4 ? 3 : undefined }}>
-            <div>
-                {type === QuestionType.Frequency && <div>zawsze</div>}
-                {type === QuestionType.Correctness && <div>stanowczo się zgadzam</div>}
-            </div>
-        </Button>
-    </>;
+function scaleOptions(question: Question): {value: number, text: string, comment?: string}[] {
+    if (question.type === QuestionType.Frequency) {
+        return [
+            { value: 1, text: 'nigdy' },
+            { value: 2, text: 'rzadko' },
+            { value: 3, text: 'często' },
+            { value: 4, text: 'zawsze' }
+        ];
+    } else if (question.type === QuestionType.Correctness) {
+        return [
+            { value: 1, text: 'w ogóle się nie zgadzam' },
+            { value: 2, text: 'raczej nie' },
+            { value: 3, text: 'raczej tak' },
+            { value: 4, text: 'stanowczo się zgadzam' }
+        ];
+    } else if (question.type === QuestionType.Scale) {
+        const conf = question.questionData as {
+            scale: {
+                values: { value: number, label: string, comment: string }[]
+            }
+        };
+        return conf.scale.values.map(c => ({
+            value: c.value, text: c.label, comment: c.comment
+        }));
+    }
+    throw new Error(`Unknown question type [question=${question.id}, type=${question.type}]`);
 }
+
+const ScaleAnswers: FC<{ question: Question, submitAnswer, prevResponse: number, commentRef: MutableRefObject<HTMLTextAreaElement>, feedbackRef: MutableRefObject<HTMLTextAreaElement> }> = ({
+                                                                                                                                                                                                 question,
+                                                                                                                                                                                                 submitAnswer,
+                                                                                                                                                                                                 prevResponse,
+                                                                                                                                                                                                 commentRef,
+                                                                                                                                                                                                 feedbackRef
+                                                                                                                                                                                             }) => {
+    const type = question.type ?? QuestionType.Frequency;
+    const options = scaleOptions(question);
+    return <div>
+        <div>
+            {options.map(question => <React.Fragment key={`scale-value-${question.value}`}>
+                <Button variant="outlined" size="small" onClick={() => submitAnswer(question.value, commentRef.current?.value, feedbackRef.current?.value)}
+                        style={{ width: '200px', height: '50px', borderWidth: prevResponse === question.value ? 3 : undefined }}>
+                    <div>
+                        {question.text}
+                    </div>
+                </Button>
+            </React.Fragment>)}
+        </div>
+        <div style={{padding: '16px', fontSize: '0.8em', color: 'gray', fontStyle: 'italic'}}>
+            {options.filter(q => q.comment).map(question => <div key={`scale-text-${question.comment}`}>
+                {question.comment && <div>{question.value} - {question.comment}</div>}
+            </div>)}
+        </div>
+    </div>;
+};
 
 const QuestionSurvey = ({ assessment, category, question, submitAnswer, reset, progress, userId, debug }: {
     assessment: WithId & UserAssessment,
@@ -131,12 +153,6 @@ const QuestionSurvey = ({ assessment, category, question, submitAnswer, reset, p
         if (assessment.responseValue[question.id]) {
             return assessment.responseValue[question.id];
         }
-        if (assessment.response[question.id] === true) {
-            return 3;
-        }
-        if (assessment.response[question.id] === false) {
-            return 2;
-        }
         return undefined;
     })();
 
@@ -145,7 +161,7 @@ const QuestionSurvey = ({ assessment, category, question, submitAnswer, reset, p
             <div style={{ margin: 16, padding: 8, border: '1px dashed darkred', fontSize: '0.8em' }}>
                 {assessment && <>
                     <div>Bieżące pytanie: {assessment.currentQuestion.replaceAll('_0', '.')}</div>
-                    <div>Pytania z odpowiedziami: {Object.keys(assessment.response).sort().map(i => i === assessment.currentQuestion ? `*${i}*` : i).map(i => i.replaceAll('_0', '.')).join(', ')}</div>
+                    <div>Pytania z odpowiedziami: {Object.keys(assessment.responseValue).sort().map(i => i === assessment.currentQuestion ? `*${i}*` : i).map(i => i.replaceAll('_0', '.')).join(', ')}</div>
                 </>}
             </div>
         </>}

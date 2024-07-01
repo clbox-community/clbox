@@ -1,4 +1,5 @@
 import {AssessmentUserDetails} from "./assessment-user-details";
+import { QuestionType } from '@clbox/assessment-survey';
 
 export interface UserAssessment {
     /** Identifier of source assessment based on which user assessment survey was created */
@@ -20,10 +21,6 @@ export interface UserAssessment {
     /** Collection of presented question identifiers. Some questions may be skipped and this map allows to verify that. */
     askedQuestion: {
         [id: string]: boolean; // true when question was presented, false or no row if question was skipped
-    };
-    /** Question responses by question identifier. */
-    response: {
-        [id: string]: boolean;
     };
     /** Question responses selected value by question identifier. */
     responseValue: {

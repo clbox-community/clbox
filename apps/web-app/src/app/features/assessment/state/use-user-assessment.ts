@@ -3,8 +3,10 @@ import { firebaseApp } from '../../firebase/firebase.app';
 import { useCallback, useEffect, useState } from 'react';
 import { WithId } from '../model/with-id';
 import { UserAssessmentRef } from '../model/user-assessment-ref';
+import { guessResponseValues } from '@clbox/assessment-survey';
 
 const firestore = firebaseApp.firestore();
+
 
 export const useUserAssessment = (team: string, user: string, assessmentId: string, userAssessmentId: string, userAssessmentRefId: string): [
         WithId & UserAssessment,
@@ -25,8 +27,7 @@ export const useUserAssessment = (team: string, user: string, assessmentId: stri
                                 id: doc.id,
                                 ...data,
                                 askedQuestion: data.askedQuestion ?? {},
-                                response: data.response ?? {},
-                                responseValue: data.responseValue ?? {},
+                                responseValue: guessResponseValues(data),
                                 questionTime: data.questionTime ?? {},
                                 comment: data.comment ?? {},
                                 questionFeedback: data.questionFeedback ?? {}
