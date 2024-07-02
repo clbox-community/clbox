@@ -23,6 +23,12 @@ const Layout = styled.div`
 
 const changes = [
     {
+        date: '2024-07-02',
+        items: [
+            {summary: 'Ankieta oceny okresowej wspiera nawigację do poprzedniego/kolejnego pytani bez konieczności wybierania jeszcze raz tej samej odpowiedzi'},
+        ]
+    },
+    {
         date: '2024-05-24',
         items: [
             {summary: 'Tabelka podsumowania kompetencji w chapterze'},
