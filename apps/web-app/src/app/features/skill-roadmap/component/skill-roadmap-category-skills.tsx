@@ -1,7 +1,7 @@
 import { connect, ConnectedProps } from 'react-redux';
 import { AppState } from '../../../state/app-state';
 import { useParams } from 'react-router';
-import React, { Fragment, PropsWithChildren, useState } from 'react';
+import React, { Fragment, PropsWithChildren, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import ReactMarkdown from 'react-markdown';
 import Checkbox from '@mui/material/Checkbox';
@@ -53,6 +53,7 @@ const TopicRow: React.FC<{ topic: RoadmapSkillTopic, categoryResults: CategoryRe
                                    sx={{ '& .MuiSvgIcon-root': { fontSize: 20 } }} />}
                 label={<span style={{ fontSize: '0.9em' }}>{topic.title}</span>} />
             <div style={{ fontSize: '0.8em', fontStyle: 'italic', display: 'flex' }}>
+                {topic.labels && <span style={{ color: 'gray', marginRight: '6px' }}>{topic.labels?.join(', ')}</span>}
                 {(topic.summary || topic.links?.length > 0) && <div style={{ color: 'gray', cursor: 'pointer' }}
                                                                     onClick={() => setExpanded(prev => !prev)}>{expanded ? '(zwiń)' : '(więcej)'}</div>}
                 <div style={{ width: '70px', textAlign: 'right' }}>poziom {labelOfLevel(topic.level)}</div>
@@ -116,8 +117,39 @@ export const SkillRoadmapAreaSkillView = ({ team, user }: ViewProps) => {
         return prev;
     });
 
+    const labelFilter = params.get('label');
+    const changeLabelFilter = (label: string) => setParams(prev => {
+        if (labelFilter === label) {
+            prev.delete('label');
+        } else {
+            prev.set('label', label);
+        }
+        return prev;
+    });
+
     const category = SkillsRoadmap.find(
         category => category.slug === categoryId || category.uuid === categoryId
+    );
+
+    const labels = useMemo(
+        () => {
+            if (category) {
+                const labels = [];
+                category.items.forEach(topic => {
+                    topic.items.forEach(skill => {
+                        skill.labels?.forEach(label => {
+                            if (!labels.includes(label)) {
+                                labels.push(label);
+                            }
+                        })
+                    })
+                })
+                return labels;
+            } else {
+                return [];
+            }
+        },
+        [category]
     );
 
     const categoryResults = useCategoryResult(team, user, categoryId);
@@ -133,41 +165,52 @@ export const SkillRoadmapAreaSkillView = ({ team, user }: ViewProps) => {
             </div>
         </Layout>;
     } else {
-        return <Layout>
-            <div style={{ fontSize: '1.4em' }}>
-                {category.title}
-            </div>
-            <div style={{ fontSize: '0.9em', fontStyle: 'italic', marginBottom: '16px' }}>
-                {category.details && <div>
-                    {category.details}
-                </div>}
-                {category.links && category.links.length > 0 && <div>
-                    {
-                        category.links.map(link => <div key={link.href}>
-                            - <a href={link.href}>{link.title}</a>{link.details && ' - ' + link.details}
-                        </div>)
-                    }
-                </div>}
-            </div>
-            <div style={{ fontSize: '0.9em', fontStyle: 'italic', color: 'gray' }}>
-                <div>Wskazówki pomagające meytorycznie określić poziom 1, 2, 3, 3+ są na wiki.</div>
-                <div><a href="https://wiki.consdata.pl/pages/viewpage.action?pageId=289182962">https://wiki.consdata.pl/pages/viewpage.action?pageId=289182962</a></div>
-            </div>
-            <SkillLevelFilter level={levelFilter} onLevelChange={level => changeFilter(level)} />
-            {
-                category.items && category.items
-                    .filter(item => item.items.some(skill => skill.level <= levelFilter))
-                    .map(section => <SectionRow key={section.title} section={section}>
-                        {section.items && <div style={{ marginLeft: '16px' }}>
-                            <FormGroup>
-                                {section.items
-                                    .filter(topic => levelFilter === undefined || levelFilter >= topic.level)
-                                    .map(topic => <TopicRow topic={topic} key={topic.title} categoryResults={categoryResults} />)}
-                            </FormGroup>
+        return <WideLayout>
+            <TwoColumns>
+                <div style={{fontStyle: 'italic', fontSize: '0.9em', marginTop: 34}}>
+                    {labels.map(label => <div key={label}>
+                        <span style={{cursor: 'pointer', fontWeight: labelFilter === label ? 600 : undefined}} onClick={() => changeLabelFilter(label)}>{label}</span>
+                    </div>)}
+                </div>
+                <div>
+                    <div style={{ fontSize: '1.4em' }}>
+                        {category.title}
+                    </div>
+                    <div style={{ fontSize: '0.9em', fontStyle: 'italic', marginBottom: '16px' }}>
+                        {category.details && <div>
+                            {category.details}
                         </div>}
-                    </SectionRow>)
-            }
-        </Layout>;
+                        {category.links && category.links.length > 0 && <div>
+                            {
+                                category.links.map(link => <div key={link.href}>
+                                    - <a href={link.href}>{link.title}</a>{link.details && ' - ' + link.details}
+                                </div>)
+                            }
+                        </div>}
+                    </div>
+                    <div style={{ fontSize: '0.9em', fontStyle: 'italic', color: 'gray' }}>
+                        <div>Wskazówki pomagające meytorycznie określić poziom 1, 2, 3, 3+ są na wiki.</div>
+                        <div><a href="https://wiki.consdata.pl/pages/viewpage.action?pageId=289182962">https://wiki.consdata.pl/pages/viewpage.action?pageId=289182962</a></div>
+                    </div>
+                    <SkillLevelFilter level={levelFilter} onLevelChange={level => changeFilter(level)} />
+                    {
+                        category.items && category.items
+                            .filter(item => item.items.some(skill => skill.level <= levelFilter))
+                            .filter(item => item.items.some(skill => !labelFilter || skill.labels?.includes(labelFilter)))
+                            .map(section => <SectionRow key={section.uuid} section={section}>
+                                {section.items && <div style={{ marginLeft: '16px' }}>
+                                    <FormGroup>
+                                        {section.items
+                                            .filter(topic => levelFilter === undefined || levelFilter >= topic.level)
+                                            .filter(topic => !labelFilter || topic.labels?.includes(labelFilter))
+                                            .map(topic => <TopicRow topic={topic} key={topic.uuid} categoryResults={categoryResults} />)}
+                                    </FormGroup>
+                                </div>}
+                            </SectionRow>)
+                    }
+                </div>
+            </TwoColumns>
+        </WideLayout>;
 
     }
 };
@@ -176,6 +219,27 @@ export const SkillRoadmapAreaSkillView = ({ team, user }: ViewProps) => {
 const Layout = styled.div`
     max-width: 1000px;
     margin: 0 auto 32px auto;
+`;
+
+const WideLayout = styled.div`
+    max-width: 1200px;
+    margin: 0 auto 32px auto;
+`;
+
+const TwoColumns = styled.div`
+    display: flex;
+
+    & > div:nth-child(1) {
+        flex-basis: 200px;
+        margin-right: 16px;
+        text-align: right;
+    }
+
+    & > div:nth-child(2) {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
 `;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface,@typescript-eslint/no-unused-vars

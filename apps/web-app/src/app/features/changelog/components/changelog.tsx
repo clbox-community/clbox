@@ -26,6 +26,7 @@ const changes = [
         date: '2024-07-02',
         items: [
             {summary: 'Ankieta oceny okresowej wspiera nawigację do poprzedniego/kolejnego pytani bez konieczności wybierania jeszcze raz tej samej odpowiedzi'},
+            {summary: 'Możliwość filtrowania obszarów roadmapy uczenia po labelkach'},
         ]
     },
     {
