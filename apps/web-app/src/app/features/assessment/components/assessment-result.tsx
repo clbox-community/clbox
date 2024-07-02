@@ -109,7 +109,7 @@ function responseColor(q: Question, assessment: WithId & Assessment, result: Wit
 // Desire response to oczekiwana żeby spełnić pytanie
 // Fail response to ocena spełnienia względem wymagań na bieżącym stanowisku
 function shouldShowQuestion(q: Question, assessment: WithId & Assessment, results: (WithId & UserAssessment)[], seniorityFilter: 'junior' | 'regular' | 'senior' | 'seniorPlus', onlyFails: boolean) {
-    if (asSeniorityGroup(seniorityFilter).indexOf(q.seniority) < 0) {
+    if (!seniorityFilterAtLeast(seniorityFilter, q.seniority)) {
         return false;
     }
     if (onlyFails && (results.every(result => !result.askedQuestion[q.id] || isDesiredResponse(q, assessment, result)))) {
@@ -221,6 +221,10 @@ const UserSeniorityReport = ({ questions, seniority, assessment, results }: {
     </>;
 };
 
+function seniorityFilterAtLeast(filter: keyof typeof Seniority, atLeast: Seniority) {
+    return asSeniorityGroup(filter).indexOf(atLeast) >= 0
+}
+
 export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector>) => {
     const { uuid } = useParams<{ uuid: string }>();
     // todo: remove allQuestions, replace with questionCategories? or leave it as is for report? or use useAsAq directly in report?
@@ -270,13 +274,13 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
                     </div>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px', fontSize: '0.9em', cursor: 'pointer', color: 'rgba(127, 140, 141, 1.0)', userSelect: 'none' }}>
-                    <span onClick={() => setSeniorityFilter('junior')} style={{ fontWeight: seniorityFilter === 'junior' ? 600 : undefined }}>junior</span>
+                    <span onClick={() => setSeniorityFilter('junior')} style={{ fontWeight: seniorityFilterAtLeast(seniorityFilter, Seniority.junior) ? 600 : undefined }}>junior</span>
                     &nbsp;|&nbsp;
-                    <span onClick={() => setSeniorityFilter('regular')} style={{ fontWeight: seniorityFilter === 'regular' ? 600 : undefined }}>regular</span>
+                    <span onClick={() => setSeniorityFilter('regular')} style={{ fontWeight: seniorityFilterAtLeast(seniorityFilter, Seniority.regular) ? 600 : undefined }}>regular</span>
                     &nbsp;|&nbsp;
-                    <span onClick={() => setSeniorityFilter('senior')} style={{ fontWeight: seniorityFilter === 'senior' ? 600 : undefined }}>senior</span>
+                    <span onClick={() => setSeniorityFilter('senior')} style={{ fontWeight: seniorityFilterAtLeast(seniorityFilter, Seniority.senior) ? 600 : undefined }}>senior</span>
                     &nbsp;|&nbsp;
-                    <span onClick={() => setSeniorityFilter('seniorPlus')} style={{ fontWeight: seniorityFilter === 'seniorPlus' ? 600 : undefined }}>lead</span>
+                    <span onClick={() => setSeniorityFilter('seniorPlus')} style={{ fontWeight: seniorityFilterAtLeast(seniorityFilter, Seniority.seniorPlus) ? 600 : undefined }}>lead</span>
                     &nbsp;&nbsp;&nbsp;
                     <span onClick={() => setOnlyFails(f => !f)}>
                         {onlyFails ? 'Pokaż wszystkie obszary' : 'Pokaż obszary do usprawnienia'}
