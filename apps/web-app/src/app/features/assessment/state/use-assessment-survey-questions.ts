@@ -121,8 +121,6 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
                 .find((questionToCheck, questionToCheckIdx) => isQuestionToShow(updatedAssessment, questionToCheck));
             updatedAssessment.currentQuestion = nextQuestion?.question.id ?? 'finished';
 
-            console.log(updatedAssessment)
-
             await updateAssessment(updatedAssessment);
             if (!nextQuestion) {
                 await finishAssessment();
