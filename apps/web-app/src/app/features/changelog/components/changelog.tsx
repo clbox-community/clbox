@@ -29,6 +29,12 @@ const changes = [
         ]
     },
     {
+        date: '2024-07-01',
+        items: [
+            {summary: 'Ankieta oceny okresowej może prezentować pytania w dodatkowych skalach (np. liczbowej z opisami na potrzeby oceny kompetencji technologicznych)'},
+        ]
+    },
+    {
         date: '2024-05-24',
         items: [
             {summary: 'Tabelka podsumowania kompetencji w chapterze'},
