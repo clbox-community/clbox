@@ -47,8 +47,23 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
     const hasForwardQuestion = useMemo(
         () => {
             if (assessment && question) {
+                const nextQuestion = () => {
+                    const currentQuestionIdx = Math.max(questions.findIndex(q => q.question.id === assessment.currentQuestion), 0);
+                    return questions
+                        .filter((_, idx) => idx > currentQuestionIdx)
+                        .find((questionToCheck, questionToCheckIdx) => isQuestionToShow(assessment, questionToCheck));
+                }
+                return assessment.responseValue[question.question.id] !== undefined && nextQuestion() != null;
+            }
+        },
+        [assessment, questions, question]
+    )
+    const hasFastForwardQuestion = useMemo(
+        () => {
+            if (assessment && question) {
                 const ffQuestion = findNextUnansweredQuestion(questions, assessment);
-                return ffQuestion && questions.findIndex(q => q.question.id === ffQuestion.question.id) > questions.findIndex(q => q.question.id === question.question.id);
+                // return ffQuestion && questions.findIndex(q => q.question.id === ffQuestion.question.id) > questions.findIndex(q => q.question.id === question.question.id);
+                return !!ffQuestion;
             }
         },
         [assessment, questions, question]
@@ -65,14 +80,31 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
                 .filter((_, idx) => idx < currentQuestionIdx)
                 .reverse()
                 .find((questionToCheck) => isQuestionToShow(assessment, questionToCheck));
-            await updateAssessment({
-                currentQuestion: prevQuestion?.question.id ?? questions[0].question.id
-            });
+            if (prevQuestion?.question.id) {
+                await updateAssessment({
+                    currentQuestion: prevQuestion?.question.id
+                });
+            }
         },
         [questions, updateAssessment, assessment]
     );
 
     const forward = useCallback(
+        async () => {
+            const currentQuestionIdx = Math.max(questions.findIndex(q => q.question.id === assessment.currentQuestion), 0);
+            const nextQuestion = questions
+                .filter((_, idx) => idx > currentQuestionIdx)
+                .find((questionToCheck, questionToCheckIdx) => isQuestionToShow(assessment, questionToCheck));
+            if (nextQuestion?.question.id) {
+                await updateAssessment({
+                    currentQuestion: nextQuestion?.question.id
+                });
+            }
+        },
+        [questions, updateAssessment, assessment]
+    );
+
+    const fastForward = useCallback(
         async () => {
             const nextQuestion = findNextUnansweredQuestion(questions, assessment);
             if (nextQuestion) {
@@ -167,7 +199,9 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
             isBackAvailable: questions.findIndex(q => q.question.id === question?.question.id) > 0,
             back,
             isForwardAvailable: hasForwardQuestion,
-            forward
+            forward,
+            isFastForwardAvailable: hasFastForwardQuestion,
+            fastForward: fastForward
         },
         progress: assessment && {
             count: questions.length,

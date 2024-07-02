@@ -111,7 +111,7 @@ const ScaleAnswers: FC<{ question: Question, submitAnswer, prevResponse: number,
         <div>
             {options.map(question => <React.Fragment key={`scale-value-${question.value}`}>
                 <Button variant="outlined" size="small" onClick={() => submitAnswer(question.value, commentRef.current?.value, feedbackRef.current?.value)}
-                        style={{ width: '200px', height: '50px', borderWidth: prevResponse === question.value ? 3 : undefined }}>
+                        style={{ width: '200px', height: '50px', backgroundColor: prevResponse === question.value ? 'rgba(192, 57, 43, .1)' : undefined }}>
                     <div>
                         {question.text}
                     </div>
@@ -282,27 +282,30 @@ const AssessmentView = ({ teamId, userId }: ViewProps) => {
                             userId={userId}
                             debug={debug}
             />
-            <SurveyFooter backAvailable={navigation.isBackAvailable} back={navigation.back} forwardAvailable={navigation.isForwardAvailable} forward={navigation.forward} />
+            <SurveyFooter backAvailable={navigation.isBackAvailable} back={navigation.back} forwardAvailable={navigation.isForwardAvailable} forward={navigation.forward}  fastForwardAvailable={navigation.isFastForwardAvailable} fastForward={navigation.fastForward} />
         </OneColumnLayoutWide>;
     }
 };
 
-const SurveyFooter: FC<{ backAvailable: boolean, back: () => void, forwardAvailable: boolean, forward: () => void }> = ({ backAvailable, back, forwardAvailable, forward }) => {
+const SurveyFooter: FC<{ backAvailable: boolean, back: () => void, forwardAvailable: boolean, forward: () => void, fastForwardAvailable: boolean, fastForward: () => void }> = ({ backAvailable, back, forwardAvailable, forward, fastForwardAvailable, fastForward }) => {
     return <div style={{ marginTop: 16, display: 'flex', flexDirection: 'row' }}>
         <div style={{ flex: 1 }}>
-            {backAvailable && <BackButton onClick={back}>
-                <ArrowBackIos /> <span>wróć do poprzedniego pytania</span>
-            </BackButton>}
+            {backAvailable && <NavButton onClick={back}>
+                <ArrowBackIos /> <span>wstecz</span>
+            </NavButton>}
         </div>
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-            {forwardAvailable && <BackButton onClick={forward}>
-                <span>przejdź do pytania bez odpowiedzi</span> <ArrowForwardIos />
-            </BackButton>}
+            {forwardAvailable && <NavButton onClick={forward}>
+                <span>dalej</span> <ArrowForwardIos />
+            </NavButton>}
+            {/*{fastForwardAvailable && <NavButton onClick={fastForward}>*/}
+            {/*    <span>przejdź do pytania bez odpowiedzi</span> <ArrowForwardIos /> <ArrowForwardIos />*/}
+            {/*</NavButton>}*/}
         </div>
     </div>;
 };
 
-const BackButton = styled(Button)`
+const NavButton = styled(Button)`
     height: 24px;
 `;
 

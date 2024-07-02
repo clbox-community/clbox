@@ -11,6 +11,8 @@ export interface AssessmentSurveyHook {
         isBackAvailable: boolean;
         forward: () => Promise<void>;
         isForwardAvailable: boolean;
+        fastForward: () => Promise<void>;
+        isFastForwardAvailable: boolean;
     };
     progress: {
         count: number;
