@@ -9,7 +9,6 @@ export const AssessmentSplash: FC<{confirm: () => void}> = ({ confirm }) => <Car
         <p>Kilka wskazówek przed rozpoczęciem ankiety:</p>
         <ul>
             <li>Ankieta służy do testowania i zbierania opinii. Testujemy i ulepszamy pytania, więc spodziewaj się błędów i niespójności.</li>
-            <li>Na tym etapie ankieta nie służy do oceny.</li>
             <li>Wyniki tej ankiety są przydatne do tworzenia celów. CL pomoże Ci ją omówić uwzględniając motywację konkretnych pytań i wskazówki.</li>
             <li>Jeśli chcesz dodać komentarz, zrób to przed wyborem odpowiedzi, ponieważ wybór wysyła odpowiedź.</li>
             <li>Jeśli chcesz dodać opinię do pytania, kliknij przycisk (?) i dodaj ją przed wyborem odpowiedzi, ponieważ wybór wysyła odpowiedź.</li>
@@ -20,7 +19,8 @@ export const AssessmentSplash: FC<{confirm: () => void}> = ({ confirm }) => <Car
                 poziomie ocenianego.
             </li>
             <li>Nie trzeba nadmiernie analizować pytań. Odpowiadaj na nie szybko, opierając się na pierwszych myślach.</li>
-            <li>Gdy nie potrafisz ocenić czy oceniana osoba coś robi zastanów się czy zauważasz, że tego nie robi. Oceń, czy potrafisz znaleźć sytuacje, w których widać, że coś nie jest robione.</li>
+            <li>Gdy nie potrafisz ocenić czy oceniana osoba coś robi zastanów się czy zauważasz, że tego nie robi. Oceń, czy potrafisz znaleźć sytuacje, w których widać, że coś nie jest robione. Jeżeli nie potrafisz czemuś zaprzeczyć to wybieraj opcje </li>
+            <li>W ankiecie odpowiadaj zgodnie z własnymi obserwacjami i odczuciami. Oceniasz czy zauważasz/uważasz, że ktoś coś robi i czy pracujesz polegającym na tym bez próby wydania jednoznacznej oceny jaki ktoś jest. Skupiamy się na obserwacjach i faktach bez wchodzenia w ocenę.</li>
             <li>Jeśli czujesz potrzebę dodania komentarza do odpowiedzi, być może pytanie jest za mało precyzyjne i możesz to napisać w feedbacku do pytania.</li>
             <li>Jeśli masz uwagi, koniecznie je zbierz i zgłoś. Jest to okres testowania, więc nie ma konsekwencji dla Twojej oceny. Problemy merytoryczne mogą wpłynąć na jakość oceny, gdy
                 ankieta zostanie wprowadzona do oceny rocznej.
