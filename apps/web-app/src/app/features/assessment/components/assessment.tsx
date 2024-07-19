@@ -193,7 +193,7 @@ const QuestionSurvey = ({ assessment, category, question, submitAnswer, reset, p
             </div>
         </CardContent>
         <CardContent>
-            <span style={{ fontStyle: 'italic', color: 'gray' }}>Możesz dodać komentarz, który zostanie zapisany po wybraniu jednej z odpowiedzi.</span>
+            <span style={{ fontStyle: 'italic', color: 'gray' }}>Czy chcesz powiedzieć coś więcej? Możesz dodać nieobowiązkowy komentarz poniżej.</span>
             <WideTextField inputRef={commentFieldRef} multiline rows={4} />
         </CardContent>
         <CardActions>

@@ -32,14 +32,18 @@ function isDesiredResponse(q: Question, assessment: WithId & Assessment, result:
     }
 }
 
+function questionExpectedResponsesBasedOnSeniority(q: Question, assessment: WithId & Assessment) {
+    return q.expectedResponses[assessment.user.seniority === 'lead' ? 'seniorPlus' : assessment.user.seniority];
+}
+
 /**
  * Checks if user has valid response based on seniority.
  */
 function isValidResponse(q: Question, assessment: WithId & Assessment, result: WithId & UserAssessment): boolean {
     if (hasBoolAnswerBasedOnQuestion(q)) {
-        return q.expectedResponses[assessment.user.seniority === 'lead' ? 'seniorPlus' : assessment.user.seniority].includes(boolAnswerBasedOnQuestion(q, result.responseValue[q.id]));
+        return questionExpectedResponsesBasedOnSeniority(q, assessment).includes(boolAnswerBasedOnQuestion(q, result.responseValue[q.id]));
     } else {
-        return q.expectedResponses[assessment.user.seniority === 'lead' ? 'seniorPlus' : assessment.user.seniority].includes(result.responseValue[q.id]);
+        return questionExpectedResponsesBasedOnSeniority(q, assessment).includes(result.responseValue[q.id]);
     }
 }
 
@@ -88,9 +92,12 @@ function isQuestionSeniorityGreaterThanUser(q: Question, assessment: WithId & As
 function responseColor(q: Question, assessment: WithId & Assessment, result: WithId & UserAssessment): string {
     const asked = result.askedQuestion[q.id];
     const valid = isValidResponse(q, assessment, result);
+    const questionHasValidResponses = q.expectedResponses[assessment.user.seniority === 'lead' ? 'seniorPlus' : assessment.user.seniority]?.length > 0;
 
     if (!asked) {
         return 'lightgray';
+    } else if (!questionHasValidResponses) {
+        return 'rgba(230, 126, 34, 1.0)';
     } else if (valid) {
         if (isDesiredResponse(q, assessment, result)) {
             return 'rgba(39, 174, 96, 1.0)';
@@ -193,10 +200,17 @@ const UserSeniorityReport = ({ questions, seniority, assessment, results }: {
     };
     questions
         .filter(q => q.question.seniority === seniority)
+        .filter(q => q.question.expectedResponses[seniority]?.length > 0)
         .forEach(q => {
             const wasAsked = results.map(result => result.askedQuestion[q.question.id]).some(answer => answer);
-            const isDesired = results.filter(result => result.askedQuestion[q.question.id]).map(result => isDesiredResponse(q.question, assessment, result)).every(answer => answer);
-            const isValid = results.filter(result => result.askedQuestion[q.question.id]).map(result => isValidResponse(q.question, assessment, result)).every(answer => answer);
+            const isDesired = results
+                .filter(result => result.askedQuestion[q.question.id])
+                .map(result => isDesiredResponse(q.question, assessment, result))
+                .every(answer => answer);
+            const isValid = results
+                .filter(result => result.askedQuestion[q.question.id])
+                .map(result => isValidResponse(q.question, assessment, result))
+                .every(answer => answer);
             stats.count++;
             if (!wasAsked) {
                 stats.wasAsked++;
@@ -222,7 +236,19 @@ const UserSeniorityReport = ({ questions, seniority, assessment, results }: {
 };
 
 function seniorityFilterAtLeast(filter: keyof typeof Seniority, atLeast: Seniority) {
-    return asSeniorityGroup(filter).indexOf(atLeast) >= 0
+    return asSeniorityGroup(filter).indexOf(atLeast) >= 0;
+}
+
+function answerCorrectnessMarkerText(result: WithId & UserAssessment, q: Question, assessment: WithId & Assessment) {
+    if (result.responseValue[q.id] !== undefined) {
+        if (questionExpectedResponsesBasedOnSeniority(q, assessment)?.length > 0) {
+            return isDesiredResponse(q, assessment, result) ? '✓' : '⤫';
+        } else {
+            return '?';
+        }
+    } else {
+        return '';
+    }
 }
 
 export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector>) => {
@@ -336,7 +362,7 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
                                                             <span title={`Odpowiedź: ${labelBasedOnQuestion(q, result.responseValue[q.id])}`}>
                                                                 {result.askedQuestion[q.id] ? (summaryAnswerBasedOnQuestion(q, result.responseValue[q.id])) : '-'}
                                                                 &nbsp;
-                                                                {result.responseValue[q.id] !== undefined ? (isDesiredResponse(q, assessment, result) ? '✓' : '⤫') : ''}
+                                                                {answerCorrectnessMarkerText(result, q, assessment)}
                                                             </span>
                                                         </ResultCell>
                                                     )}
