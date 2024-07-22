@@ -1,28 +1,25 @@
-import {firebaseApp} from "../../firebase/firebase.app";
-import {UserProfile} from "../model/user-profile";
-import {useEffect, useState} from "react";
+import { firebaseApp } from '../../firebase/firebase.app';
+import { useEffect, useState } from 'react';
+import { UserPublicProfile } from '../model/user-public-profile';
 
 const db = firebaseApp.firestore();
 
-export function useUserProfiles(teamId: string): UserProfile[] {
-    const [users, setUsers] = useState<UserProfile[]>();
+export function useUserPublicProfiles(teamId: string): UserPublicProfile[] {
+    const [users, setUsers] = useState<UserPublicProfile[]>();
     useEffect(
         () => {
             if (teamId) {
-                db.collection(`/team/${teamId}/user`)
+                db.collection(`/team/${teamId}/profile-public`)
                     .get()
                     .then(result => setUsers(result.docs.map(doc => doc.data()).map(doc => ({
+                        display_name: doc.display_name,
                         email: doc.email,
                         chapterLeader: doc.chapterLeader,
-                        display_name: doc.display_name,
                         teams: doc.teams,
-                        chapter: doc.chapter,
                         projects: doc.projects,
                         seniority: doc.seniority,
                         textForm: doc.textForm,
-                        leader: doc.leader,
-                        leaderOf: doc.leaderOf,
-                    }))))
+                    }))));
             }
         },
         [teamId]

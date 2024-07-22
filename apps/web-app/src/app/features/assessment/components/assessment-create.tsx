@@ -5,7 +5,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import { FormControl, InputLabel } from '@mui/material';
 import React, { useCallback, useMemo, useState } from 'react';
-import { useUserProfiles } from '../../user/firestore/use-user-profiles';
+import { useUserPublicProfiles } from '../../user/firestore/use-user-public-profiles';
 import { SelectFromDomain } from '../../skill-editor/component/select-from-domain';
 import Button from '@mui/material/Button';
 import { AssessmentUserSeniorityOfString } from '../model/assessment-user-seniority';
@@ -17,7 +17,7 @@ const firestore = firebaseApp.firestore();
 
 export const AssessmentCreateView = ({ userId, teamId }: ConnectedProps<typeof connector>) => {
     const navigate = useNavigate();
-    const users = useUserProfiles(teamId);
+    const users = useUserPublicProfiles(teamId);
     const [locked, setLocked] = useState<boolean>(false);
     const [assessed, setAssessed] = useState<string>('');
     const [assessors, setAssessors] = useState<string[]>([]);
@@ -81,6 +81,7 @@ export const AssessmentCreateView = ({ userId, teamId }: ConnectedProps<typeof c
                 deadline: new Date().getTime() + 1000 * 60 * 60 * 24 * 14,
                 author: userId,
                 createdAt: new Date().getTime(),
+                // TODO: te dane powinny być uzupełniane lambdą na podstawie pełnego profilu użytkownika bez udostępniania tych danych w publicznym profilu
                 user: {
                     name: assessedUserProfile.display_name,
                     projects: assessedUserProfile.projects,
