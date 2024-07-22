@@ -1,10 +1,10 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-  	function isAuthentiacted(req) {
+  	function isAuthentiacted() {
       return request.auth != null
     }
-    function authEmail(req) {
+    function authEmail() {
       return request.auth.token.email
     }
 
@@ -22,78 +22,81 @@ service cloud.firestore {
     }
 
     match /user/{user} {
-      allow read: if isAuthentiacted(request) && user == authEmail(request)
+      allow read: if isAuthentiacted() && user == authEmail()
     }
   	match /team/{team} {
-      allow read: if isAuthentiacted(request) && getUser(authEmail(request)).teams[team] == true
+      allow read: if isAuthentiacted() && getUser(authEmail()).teams[team] == true
     }
     match /team/{team}/user/{user}/{document=**} {
-      allow read: if isAuthentiacted(request) && user == authEmail(request)
+      allow read: if isAuthentiacted() && user == authEmail()
     }
     match /team/{team}/user/{user}/inbox/{document=**} {
-      allow read,write: if isAuthentiacted(request) && user == authEmail(request)
+      allow read,write: if isAuthentiacted() && user == authEmail()
     }
     match /team/{team}/user/{user}/user-assessment-pending/{document=**} {
-      allow read,write: if isAuthentiacted(request) && user == authEmail(request)
+      allow read,write: if isAuthentiacted() && user == authEmail()
     }
     match /team/{team}/user/{user}/user-assessment-sent/{document=**} {
-      allow read,write: if isAuthentiacted(request) && user == authEmail(request)
+      allow read,write: if isAuthentiacted() && user == authEmail()
     }
     match /team/{team}/user/{user}/skill-roadmap-result/{document=**} {
-      allow read,write: if isAuthentiacted(request) && user == authEmail(request)
+      allow read,write: if isAuthentiacted() && user == authEmail()
+    }
+    match /team/{team}/profile-public/{user} {
+          allow read: if isAuthentiacted()
     }
     match /team/{team}/user/{user} {
-      allow read: if isAuthentiacted(request) && getTeamUser(team, authEmail(request)).leader == true
+      allow read: if isAuthentiacted() && getTeamUser(team, authEmail()).leader == true
     }
     match /team/{team}/user/{user} {
-      allow read: if isAuthentiacted(request) && getTeamUser(team, user).chapterLeader == authEmail(request)
+      allow read: if isAuthentiacted() && getTeamUser(team, user).chapterLeader == authEmail()
     }
     match /team/{team}/assessment/{assessment} {
-      allow create: if isAuthentiacted(request);
-      allow read: if isAuthentiacted(request) && (resource.data.chapterLeader == authEmail(request) || authEmail(request) in resource.data.accessibleBy)
-      allow read, write: if isAuthentiacted(request) && resource.data.chapterLeader == authEmail(request)
+      allow create: if isAuthentiacted();
+      allow read: if isAuthentiacted() && (resource.data.chapterLeader == authEmail() || authEmail() in resource.data.accessibleBy)
+      allow read, write: if isAuthentiacted() && resource.data.chapterLeader == authEmail()
     }
     match /team/{team}/assessment-archive/{assessment} {
-      allow create: if isAuthentiacted(request);
-      allow read: if isAuthentiacted(request) && (resource.data.chapterLeader == authEmail(request) || authEmail(request) in resource.data.accessibleBy)
-      allow read, write: if isAuthentiacted(request) && resource.data.chapterLeader == authEmail(request)
+      allow create: if isAuthentiacted();
+      allow read: if isAuthentiacted() && (resource.data.chapterLeader == authEmail() || authEmail() in resource.data.accessibleBy)
+      allow read, write: if isAuthentiacted() && resource.data.chapterLeader == authEmail()
     }
     match /team/{team}/assessment/{assessment}/result/{userAssessment} {
-      allow read, write: if isAuthentiacted(request) && get(/databases/$(database)/documents/team/$(team)/assessment/$(assessment)/result/$(userAssessment)).data.assessor == authEmail(request)
+      allow read, write: if isAuthentiacted() && get(/databases/$(database)/documents/team/$(team)/assessment/$(assessment)/result/$(userAssessment)).data.assessor == authEmail()
     }
     match /team/{team}/assessment/{assessment}/result/{document=**} {
-      allow read: if isAuthentiacted(request) && (get(/databases/$(database)/documents/team/$(team)/assessment/$(assessment)).data.chapterLeader == authEmail(request) || authEmail(request) in get(/databases/$(database)/documents/team/$(team)/assessment/$(assessment)).data.accessibleBy)
+      allow read: if isAuthentiacted() && (get(/databases/$(database)/documents/team/$(team)/assessment/$(assessment)).data.chapterLeader == authEmail() || authEmail() in get(/databases/$(database)/documents/team/$(team)/assessment/$(assessment)).data.accessibleBy)
     }
     match /team/{team}/user/{user}/data/skills {
-      allow write: if isAuthentiacted(request) && user == authEmail(request)
+      allow write: if isAuthentiacted() && user == authEmail()
     }
     match /team/{team}/user/{user}/data/skills {
-      allow read: if isAuthentiacted(request) && getTeamUser(team, user).chapterLeader == authEmail(request)
+      allow read: if isAuthentiacted() && getTeamUser(team, user).chapterLeader == authEmail()
     }
     match /team/{team}/sent/{user}/{document=**} {
-      allow read, write: if isAuthentiacted(request) && user == authEmail(request)
+      allow read, write: if isAuthentiacted() && user == authEmail()
     }
   	match /team/{team}/stats/{day} {
-      allow read: if isAuthentiacted(request) && getUser(authEmail(request)).teams[team] == true
+      allow read: if isAuthentiacted() && getUser(authEmail()).teams[team] == true
     }
     match /team/{team}/channel/{channel}/{document=**} {
-      allow read, write: if isAuthentiacted(request) && getChannel(team, channel).managerMap[authEmail(request)] == true
+      allow read, write: if isAuthentiacted() && getChannel(team, channel).managerMap[authEmail()] == true
     }
     match /team/{team}/survey/{survey} {
       allow read, delete: if true;
     }
     match /team/{team}/campaign/{campaign} {
-      allow read: if isAuthentiacted(request) && authEmail(request) in resource.data.owners;
-      allow write: if isAuthentiacted(request) && authEmail(request) in resource.data.owners && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
+      allow read: if isAuthentiacted() && authEmail() in resource.data.owners;
+      allow write: if isAuthentiacted() && authEmail() in resource.data.owners && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
     }
     match /team/{team}/campaign/{campaign}/answers/{answers} {
-      allow read: if isAuthentiacted(request) && authEmail(request) in getCampaign(team, campaign).owners;
+      allow read: if isAuthentiacted() && authEmail() in getCampaign(team, campaign).owners;
     }
     match /team/{team}/campaign/{campaign}/answers/{answers} {
       allow write: if true;
     }
     match /team/{team}/skill/{document=**} {
-      allow read, write: if isAuthentiacted(request);
+      allow read, write: if isAuthentiacted();
     }
 
     // default deny

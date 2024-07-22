@@ -7,7 +7,7 @@ export const updatePublicProfileHandlerFactory = (
     firebase: typeof import('firebase-admin')
 ) => functions.firestore.document('team/{team}/user/{user}').onUpdate(
     async (change: Change<firestore.QueryDocumentSnapshot<UserPublicProfile>>, context) => {
-        console.log(`Update user public profile after user change on ${change.after.ref.path}`);
+        console.log(`Updating user public profile after user change on ${change.after.ref.path}`);
 
         const profileDoc: firestore.DocumentReference<UserPublicProfile> = firebase.firestore()
             .doc(`team/${context.params.team}/profile-public/${context.params.user}`) as firestore.DocumentReference<UserPublicProfile>;
