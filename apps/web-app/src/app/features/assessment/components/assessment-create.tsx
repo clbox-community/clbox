@@ -15,28 +15,13 @@ import { useNavigate } from 'react-router-dom';
 
 const firestore = firebaseApp.firestore();
 
-// import TextField from "@mui/material/TextField";
-// const TextInput = ({label, value, valueHandler}: {
-//     label: string, value: string, valueHandler:
-//         (value: string) => void
-// }) => {
-//     return <FormControl fullWidth sx={{marginBottom: '16px'}}>
-//         <TextField
-//             label={label}
-//             variant="outlined"
-//             multiline
-//             value={value}
-//             onChange={change => valueHandler(change.target.value)}
-//         />
-//     </FormControl>;
-// }
-
 export const AssessmentCreateView = ({ userId, teamId }: ConnectedProps<typeof connector>) => {
     const navigate = useNavigate();
     const users = useUserProfiles(teamId);
-    const [locekd, setLocked] = useState<boolean>(false);
+    const [locked, setLocked] = useState<boolean>(false);
     const [assessed, setAssessed] = useState<string>('');
     const [assessors, setAssessors] = useState<string[]>([]);
+    const [accessibleBy, setAccessibleBy] = useState<string[]>([]);
     const [errors, setErrors] = useState<string[]>();
 
     const selectDomain = useMemo(() => {
@@ -55,13 +40,27 @@ export const AssessmentCreateView = ({ userId, teamId }: ConnectedProps<typeof c
     const setAssessedWithAutoAssessment = useCallback((assessed: string) => {
         setAssessed(assessed);
         setAssessors(value => value.indexOf(assessed) < 0 ? [...value, assessed] : value);
-    }, [setAssessed, setAssessors]);
+        setAccessibleBy(value => {
+            const assessedUserProfile = users.find(user => user.email === assessed);
+            const updatedList = [...value];
+            if (updatedList.indexOf(userId) < 0) {
+                updatedList.push(userId);
+            }
+            if (updatedList.indexOf(assessedUserProfile.chapterLeader) < 0) {
+                updatedList.push(assessedUserProfile.chapterLeader);
+            }
+            return updatedList;
+        });
+    }, [setAssessed, setAssessors, setAccessibleBy, userId, users]);
 
     const validateAndSubmit = useCallback(
         () => {
             const errors = [];
             if (!assessed) {
                 errors.push('Musisz wybrać osobę ocenianą');
+            }
+            if (accessibleBy.length === 0) {
+                errors.push('Musisz wskazać osoby upoważnione do ankiety');
             }
             if (assessors.length === 0) {
                 errors.push('Musisz wybrać osoby oceniające');
@@ -78,8 +77,7 @@ export const AssessmentCreateView = ({ userId, teamId }: ConnectedProps<typeof c
                 assessors: assessors,
                 finishedAssessors: {},
                 chapterLeader: assessedUserProfile.chapterLeader,
-                // chapterLeader: userId,
-                accessibleBy: userId === assessedUserProfile.chapterLeader ? [assessedUserProfile.chapterLeader] : [userId, assessedUserProfile.chapterLeader],
+                accessibleBy: accessibleBy,
                 deadline: new Date().getTime() + 1000 * 60 * 60 * 24 * 14,
                 author: userId,
                 createdAt: new Date().getTime(),
@@ -103,7 +101,7 @@ export const AssessmentCreateView = ({ userId, teamId }: ConnectedProps<typeof c
                     setErrors(['Nie udało się stworzyć ankiety, skontaktuj się z glipecki.']);
                 });
         },
-        [assessed, assessors, navigate, teamId, userId, users]
+        [assessed, assessors, accessibleBy, navigate, teamId, userId, users]
     );
 
     return <OneColumnLayoutWide>
@@ -118,7 +116,7 @@ export const AssessmentCreateView = ({ userId, teamId }: ConnectedProps<typeof c
                 <FormControl fullWidth sx={{ marginBottom: '16px' }}>
                     <InputLabel>Oceniany</InputLabel>
                     <SelectFromDomain
-                        disabled={locekd}
+                        disabled={locked}
                         value={assessed}
                         multiple={false}
                         label="Oceniany"
@@ -129,15 +127,25 @@ export const AssessmentCreateView = ({ userId, teamId }: ConnectedProps<typeof c
                 <FormControl fullWidth sx={{ marginBottom: '16px' }}>
                     <InputLabel>Lista oceniających</InputLabel>
                     <SelectFromDomain
-                        disabled={locekd}
+                        disabled={locked}
                         value={assessors}
                         label="Lista oceniających"
                         domain={selectDomain}
                         onChange={setAssessors}
                     />
                 </FormControl>
-                {locekd && <span>Tworzenie ankiety oceny...</span>}
-                {!locekd && <Button onClick={validateAndSubmit}>Stwórz</Button>}
+                <FormControl fullWidth sx={{ marginBottom: '16px' }}>
+                    <InputLabel>Osoby upoważnione</InputLabel>
+                    <SelectFromDomain
+                        disabled={locked}
+                        value={accessibleBy}
+                        label="Lista upoważniony"
+                        domain={selectDomain}
+                        onChange={setAccessibleBy}
+                    />
+                </FormControl>
+                {locked && <span>Tworzenie ankiety oceny...</span>}
+                {!locked && <Button onClick={validateAndSubmit}>Stwórz</Button>}
             </CardContent>}
         </Card>
     </OneColumnLayoutWide>;
