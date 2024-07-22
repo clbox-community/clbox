@@ -23,6 +23,13 @@ const Layout = styled.div`
 
 const changes = [
     {
+        date: '2024-07-22',
+        items: [
+            {summary: 'Możliwość określenia osób upoważnionych podczas tworzenia ankiety oceny okresowej'},
+            {summary: 'Otwarte pytania catch-all na końcu ankiety oceny okresowej'},
+        ]
+    },
+    {
         date: '2024-07-02',
         items: [
             {summary: 'Ankieta oceny okresowej wspiera nawigację do poprzedniego/kolejnego pytani bez konieczności wybierania jeszcze raz tej samej odpowiedzi'},
