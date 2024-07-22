@@ -4,8 +4,8 @@
     "license": "AGPL 3.0",
     "scripts": {
         "nx": "nx",
-        "start": "nx serve",
-        "build": "nx build --prod",
+        "start": "NX_APP_VERSION=$(git log -n 1 --pretty=format:'%H') nx serve",
+        "build": "NX_APP_VERSION=$(git log -n 1 --pretty=format:'%H') nx build --prod",
         "test": "nx test",
         "lint": "nx workspace-lint && nx lint",
         "affected:apps": "nx affected:apps",
@@ -21,8 +21,8 @@
         "update": "nx migrate latest",
         "dep-graph": "nx dep-graph",
         "help": "nx help",
-        "build:web-app": "nx build --prod --project web-app",
-        "build:backend": "nx build --prod --project backend",
+        "build:web-app": "NX_APP_VERSION=$(git log -n 1 --pretty=format:'%H') nx build --prod --project web-app",
+        "build:backend": "NX_APP_VERSION=$(git log -n 1 --pretty=format:'%H') nx build --prod --project backend",
         "workspace-generator": "nx workspace-generator"
     },
     "private": true,
