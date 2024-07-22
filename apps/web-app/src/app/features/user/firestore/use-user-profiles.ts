@@ -1,11 +1,11 @@
-import {firebaseApp} from "../../firebase/firebase.app";
-import {UserProfile} from "../model/user-profile";
-import {useEffect, useState} from "react";
+import { firebaseApp } from '../../firebase/firebase.app';
+import { useEffect, useState } from 'react';
+import { UserPublicProfile } from '../model/user-public-profile';
 
 const db = firebaseApp.firestore();
 
-export function useUserProfiles(teamId: string): UserProfile[] {
-    const [users, setUsers] = useState<UserProfile[]>();
+export function useUserProfiles(teamId: string): UserPublicProfile[] {
+    const [users, setUsers] = useState<UserPublicProfile[]>();
     useEffect(
         () => {
             if (teamId) {
@@ -21,8 +21,8 @@ export function useUserProfiles(teamId: string): UserProfile[] {
                         seniority: doc.seniority,
                         textForm: doc.textForm,
                         leader: doc.leader,
-                        leaderOf: doc.leaderOf,
-                    }))))
+                        leaderOf: doc.leaderOf
+                    }))));
             }
         },
         [teamId]

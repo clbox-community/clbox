@@ -37,6 +37,7 @@ import {
 } from "./app/user-assessments-create/user-assessments-create-handler.factory";
 import {exportTechSkillsFactory} from "./app/export-tech-skills/export-tech-skills.factory";
 import { userAssessmentsFinishHandlerFactory } from './app/user-assessments-finish/user-assessments-finish-handler.factory';
+import { updatePublicProfileHandlerFactory } from './app/public-profile/update-public-profile-handler.factory';
 
 firebase.initializeApp();
 
@@ -82,3 +83,7 @@ export const exportTechSkillsCron = exportTechSkillsFactory(
     functions.config(),
     firebase
 );
+export const updatePublicProfileHandler = updatePublicProfileHandlerFactory(
+    functionBuilder().runWith({}),
+    firebase
+)

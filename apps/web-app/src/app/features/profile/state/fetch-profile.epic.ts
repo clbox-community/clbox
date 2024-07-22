@@ -18,6 +18,7 @@ export const fetchProfileEpic: Epic<ReturnType<typeof loggedIn>, any, AppState> 
         distinct(([user, team]) => `${user}/${team}`),
         switchMap(([user, team]) => {
             if (user && team) {
+                console.log({user, team})
                 return new Observable<firebase.firestore.DocumentSnapshot>(subscriber => {
                     firestore.collection(`team/${team}/user`).doc(user)
                         .onSnapshot(subscriber)

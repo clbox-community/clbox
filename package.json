@@ -22,7 +22,7 @@
         "dep-graph": "nx dep-graph",
         "help": "nx help",
         "build:web-app": "NX_APP_VERSION=$(git log -n 1 --pretty=format:'%H') nx build --prod --project web-app",
-        "build:backend": "NX_APP_VERSION=$(git log -n 1 --pretty=format:'%H') nx build --prod --project backend",
+        "build:backend": "nx build --prod --project backend",
         "workspace-generator": "nx workspace-generator"
     },
     "private": true,

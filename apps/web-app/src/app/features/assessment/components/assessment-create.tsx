@@ -81,6 +81,7 @@ export const AssessmentCreateView = ({ userId, teamId }: ConnectedProps<typeof c
                 deadline: new Date().getTime() + 1000 * 60 * 60 * 24 * 14,
                 author: userId,
                 createdAt: new Date().getTime(),
+                // TODO: te dane powinny być uzupełniane lambdą na podstawie pełnego profilu użytkownika bez udostępniania tych danych w publicznym profilu
                 user: {
                     name: assessedUserProfile.display_name,
                     projects: assessedUserProfile.projects,
