@@ -23,6 +23,12 @@ const Layout = styled.div`
 
 const changes = [
     {
+        date: '2024-08-06',
+        items: [
+            {summary: 'Komentarze i feedbacki w ocenie okresowej zapisują się również w przypadku nawigacji dalej/wstecz bez zmiany odpowiedzi'},
+        ]
+    },
+    {
         date: '2024-07-22',
         items: [
             {summary: 'Możliwość określenia osób upoważnionych podczas tworzenia ankiety oceny okresowej'},

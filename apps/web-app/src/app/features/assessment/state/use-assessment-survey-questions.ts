@@ -51,7 +51,7 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
                     const currentQuestionIdx = Math.max(questions.findIndex(q => q.question.id === assessment.currentQuestion), 0);
                     return questions
                         .filter((_, idx) => idx > currentQuestionIdx)
-                        .find((questionToCheck, questionToCheckIdx) => isQuestionToShow(assessment, questionToCheck));
+                        .find((questionToCheck) => isQuestionToShow(assessment, questionToCheck));
                 }
                 return assessment.responseValue[question.question.id] !== undefined && nextQuestion() != null;
             }
@@ -73,35 +73,50 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const questionTime = useMemo(() => new Date().getTime(), [assessment, question]);
 
+    const navWithoutAnswer = useCallback(async (questionId: string, update: {comment?: string, feedback?: string}) => {
+        const updatedAssessment: Partial<UserAssessment> = {
+            currentQuestion: questionId
+        };
+        if (update.comment !== undefined) {
+            updatedAssessment.comment = {
+                ...assessment.comment,
+                [assessment.currentQuestion]: update.comment
+            };
+        }
+        if (update.feedback !== undefined) {
+            updatedAssessment.questionFeedback = {
+                ...assessment.questionFeedback,
+                [assessment.currentQuestion]: update.feedback
+            };
+        }
+        await updateAssessment(updatedAssessment);
+    }, [assessment, updateAssessment])
+
     const back = useCallback(
-        async () => {
+        async (change: {comment?: string, feedback?: string}) => {
             const currentQuestionIdx = Math.max(questions.findIndex(q => q.question.id === assessment.currentQuestion), 0);
             const prevQuestion = questions
                 .filter((_, idx) => idx < currentQuestionIdx)
                 .reverse()
                 .find((questionToCheck) => isQuestionToShow(assessment, questionToCheck));
             if (prevQuestion?.question.id) {
-                await updateAssessment({
-                    currentQuestion: prevQuestion?.question.id
-                });
+                await navWithoutAnswer(prevQuestion?.question.id, change);
             }
         },
-        [questions, updateAssessment, assessment]
+        [questions, navWithoutAnswer, assessment]
     );
 
     const forward = useCallback(
-        async () => {
+        async (update: {comment?: string, feedback?: string}) => {
             const currentQuestionIdx = Math.max(questions.findIndex(q => q.question.id === assessment.currentQuestion), 0);
             const nextQuestion = questions
                 .filter((_, idx) => idx > currentQuestionIdx)
-                .find((questionToCheck, questionToCheckIdx) => isQuestionToShow(assessment, questionToCheck));
+                .find((questionToCheck) => isQuestionToShow(assessment, questionToCheck));
             if (nextQuestion?.question.id) {
-                await updateAssessment({
-                    currentQuestion: nextQuestion?.question.id
-                });
+                await navWithoutAnswer(nextQuestion?.question.id, update);
             }
         },
-        [questions, updateAssessment, assessment]
+        [questions, navWithoutAnswer, assessment]
     );
 
     const fastForward = useCallback(
@@ -150,7 +165,7 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
             const currentQuestionIdx = Math.max(questions.findIndex(q => q.question.id === updatedAssessment.currentQuestion), 0);
             const nextQuestion = questions
                 .filter((_, idx) => idx > currentQuestionIdx)
-                .find((questionToCheck, questionToCheckIdx) => isQuestionToShow(updatedAssessment, questionToCheck));
+                .find((questionToCheck) => isQuestionToShow(updatedAssessment, questionToCheck));
             updatedAssessment.currentQuestion = nextQuestion?.question.id ?? 'finished';
 
             await updateAssessment(updatedAssessment);
@@ -173,22 +188,6 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
         [updateAssessment]
     );
 
-    const timeLeft = useMemo(
-        () => {
-            if (assessment && question) {
-                const availableQuestions = questions.filter(q => isQuestionToShow(assessment, question));
-                if (availableQuestions.indexOf(question) > 5) {
-                    const times = Object.keys(assessment.questionTime);
-                    const sum = times
-                        .map(key => assessment.questionTime[key])
-                        .reduce((prev, current) => prev + current, 0);
-                    return (sum / times.length) * (availableQuestions.length - 1 - availableQuestions.indexOf(question));
-                }
-            }
-        },
-        [assessment, question, questions]
-    );
-
     return {
         category: question?.category,
         question: question?.question,
@@ -206,8 +205,7 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
         progress: assessment && {
             count: questions.length,
             currentIdx: questions.indexOf(question),
-            percents: (questions.indexOf(question) / questions.length) * 100,
-            timeLeft
+            percents: (questions.indexOf(question) / questions.length) * 100
         }
     };
 };
