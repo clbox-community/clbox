@@ -20,10 +20,10 @@ function answerValueBasedOnQuestionType(question: Question, value: unknown): str
         return '' + value;
     } else if (question.type === QuestionType.Correctness) {
         switch (value as number) {
-            case 4: return 'zdecydowanie tak';
+            case 4: return 'tak';
             case 3: return 'raczej tak';
             case 2: return 'raczej nie';
-            case 1: return 'zdecydowanie nie';
+            case 1: return 'nie';
             default: return `??? (${value})`;
         }
     } else if (question.type === QuestionType.Frequency) {
