@@ -23,11 +23,11 @@ function normalizeResponses(array: unknown[]): number[] {
   const normalized: number[] = [];
   array.forEach(item => {
     if (item === true) {
-      pushIfNotIncluded(normalized, 2);
       pushIfNotIncluded(normalized, 3);
+      pushIfNotIncluded(normalized, 4);
     } else if (item === false) {
-      pushIfNotIncluded(normalized, 0);
       pushIfNotIncluded(normalized, 1);
+      pushIfNotIncluded(normalized, 2);
     } else {
       pushIfNotIncluded(normalized, item);
     }

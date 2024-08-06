@@ -19,9 +19,21 @@ function answerValueBasedOnQuestionType(question: Question, value: unknown): str
     } else if (question.type === QuestionType.Scale) {
         return '' + value;
     } else if (question.type === QuestionType.Correctness) {
-        return value as number > 1 ? 'tak' : 'nie';
+        switch (value as number) {
+            case 4: return 'zdecydowanie tak';
+            case 3: return 'raczej tak';
+            case 2: return 'raczej nie';
+            case 1: return 'zdecydowanie nie';
+            default: return `??? (${value})`;
+        }
     } else if (question.type === QuestionType.Frequency) {
-        return value as number > 1 ? 'często' : 'rzadko';
+        switch (value as number) {
+            case 4: return 'zawsze';
+            case 3: return 'często';
+            case 2: return 'rzadko';
+            case 1: return 'nigdy';
+            default: return `??? (${value})`;
+        }
     } else {
         return '' + value;
     }
@@ -35,7 +47,7 @@ export function labelBasedOnQuestion(userSeniority: Seniority, question: Questio
     const answer = answerValueBasedOnQuestionType(question, value);
     const reason = asHumanText(assessmentResponseAssessResult(userSeniority, question, value));
 
-    return `Odpowiedź: ${answer}
+    return `Odpowiedź: ${answer} (${value})
 Ocena: ${reason}
 Spodziewane odpowiedzi: ${question.expectedResponses[Seniority.seniorPlus].map(a => answerValueBasedOnQuestionType(question, a)).join(', ')}
 Dopuszczalne odpowiedzi: ${question.expectedResponses[userSeniority].map(a => answerValueBasedOnQuestionType(question, a)).join(', ')}`;
