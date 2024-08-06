@@ -15,8 +15,9 @@ import { useAssessmentQuestionCategories } from '../state/use-assessment-questio
 import { AppState } from '../../../state/app-state';
 import { ResponseAssessmentResult } from '../model/assessment-response-result';
 import { assessmentResponseAssessResult } from '../model/assessment-response-assess-result';
-import { Category, labelBasedOnQuestion, Question, QuestionType, Seniority, summaryAnswerBasedOnQuestion } from '@clbox/assessment-survey';
+import { Category, Question, Seniority } from '@clbox/assessment-survey';
 import { UserSeniorityReport } from './user-seniority';
+import { labelBasedOnQuestion, summaryAnswerBasedOnQuestion } from '../model/assessment-response-ui-text';
 
 export const OneColumnLayoutUltraWide = styled.div`
     width: 90%;

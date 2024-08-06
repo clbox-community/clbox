@@ -1,7 +1,7 @@
 import { ResponseAssessmentResult } from './assessment-response-result';
 import { Question, Seniority } from '@clbox/assessment-survey';
 
-export function assessmentResponseAssessResult(userSeniority: Seniority, question: Question, response: number): ResponseAssessmentResult {
+export function assessmentResponseAssessResult(userSeniority: Seniority, question: Question, response: number|undefined): ResponseAssessmentResult {
   if (response === undefined) {
     return ResponseAssessmentResult.NotAsked;
   }
@@ -20,7 +20,7 @@ export function assessmentResponseAssessResult(userSeniority: Seniority, questio
 }
 
 function normalizeResponses(array: unknown[]): number[] {
-  const normalized = [];
+  const normalized: number[] = [];
   array.forEach(item => {
     if (item === true) {
       pushIfNotIncluded(normalized, 2);
