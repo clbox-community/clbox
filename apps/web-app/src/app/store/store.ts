@@ -5,8 +5,7 @@ import { rootReducer } from './root-reducer';
 
 export const store = configureStore({
     reducer: rootReducer(),
-    middleware: [epicMiddleware],
-    enhancers: []
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(epicMiddleware)
 });
 
 epicMiddleware.run(rootEpic);

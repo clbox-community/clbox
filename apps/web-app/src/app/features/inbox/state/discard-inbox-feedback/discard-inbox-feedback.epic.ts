@@ -1,15 +1,15 @@
-import {Epic} from 'redux-observable';
-import {EMPTY, from} from 'rxjs';
-import {catchError, switchMap, withLatestFrom} from 'rxjs/operators';
-import {firebaseApp} from "../../../firebase/firebase.app";
-import {discardInboxFeedback} from "./discard-inbox-feedback.action";
-import {AppState} from "../../../../state/app-state";
+import { EMPTY, from } from 'rxjs';
+import { catchError, filter, switchMap, withLatestFrom } from 'rxjs/operators';
+import { firebaseApp } from '../../../firebase/firebase.app';
+import { discardInboxFeedback } from './discard-inbox-feedback.action';
+import { AppState } from '../../../../state/app-state';
+import { Epic } from 'redux-observable';
 
-export const discardInboxFeedbackEpic: Epic<ReturnType<typeof discardInboxFeedback>, any, AppState> = (action$, state$) => action$
-    .ofType(discardInboxFeedback.type)
+export const discardInboxFeedbackEpic: Epic<unknown, unknown, AppState> = (action$, state$) => action$
     .pipe(
+        filter(discardInboxFeedback.match),
         withLatestFrom(state$),
-        switchMap(([{payload}, state]) =>
+        switchMap(([{ payload }, state]) =>
             from(
                 firebaseApp.firestore()
                     .collection(`team/${state.team.current.id}/user/${state.authentication.email}/inbox/`)
