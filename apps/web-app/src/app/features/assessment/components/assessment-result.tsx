@@ -5,47 +5,24 @@ import { useAssessmentResults } from '../state/use-assessment-results';
 import { connect, ConnectedProps } from 'react-redux';
 import { useAssessment } from '../state/use-assessment';
 import styled from 'styled-components';
-import { QuestionWithCategory } from '../state/question-with-category';
 import { WithId } from '../model/with-id';
 import { Assessment } from '../model/assessment';
 import { UserAssessment } from '../model/user-assessment';
 import { useEffect, useState } from 'react';
-import { boolAnswerBasedOnQuestion, Category, hasBoolAnswerBasedOnQuestion, labelBasedOnQuestion, Question, Seniority, summaryAnswerBasedOnQuestion } from '@clbox/assessment-survey';
 import { AssessmentUserSeniority } from '../model/assessment-user-seniority';
 import { useAssessmentQuestions } from '../state/use-assessment-questions';
 import { useAssessmentQuestionCategories } from '../state/use-assessment-question-categories';
 import { AppState } from '../../../state/app-state';
+import { ResponseAssessmentResult } from '../model/assessment-response-result';
+import { assessmentResponseAssessResult } from '../model/assessment-response-assess-result';
+import { Category, Question, Seniority } from '@clbox/assessment-survey';
+import { UserSeniorityReport } from './user-seniority';
+import { labelBasedOnQuestion, summaryAnswerBasedOnQuestion } from '../model/assessment-response-ui-text';
 
 export const OneColumnLayoutUltraWide = styled.div`
     width: 90%;
     margin: 0 auto;
 `;
-
-/**
- * Checks if user response matches desired response
- */
-function isDesiredResponse(q: Question, assessment: WithId & Assessment, result: WithId & UserAssessment) {
-    if (hasBoolAnswerBasedOnQuestion(q)) {
-        return q.expectedResponses['seniorPlus'].includes(boolAnswerBasedOnQuestion(q, result.responseValue[q.id]));
-    } else {
-        return q.expectedResponses['seniorPlus'].includes(result.responseValue[q.id]);
-    }
-}
-
-function questionExpectedResponsesBasedOnSeniority(q: Question, assessment: WithId & Assessment) {
-    return q.expectedResponses[assessment.user.seniority === 'lead' ? 'seniorPlus' : assessment.user.seniority];
-}
-
-/**
- * Checks if user has valid response based on seniority.
- */
-function isValidResponse(q: Question, assessment: WithId & Assessment, result: WithId & UserAssessment): boolean {
-    if (hasBoolAnswerBasedOnQuestion(q)) {
-        return questionExpectedResponsesBasedOnSeniority(q, assessment).includes(boolAnswerBasedOnQuestion(q, result.responseValue[q.id]));
-    } else {
-        return questionExpectedResponsesBasedOnSeniority(q, assessment).includes(result.responseValue[q.id]);
-    }
-}
 
 function asSeniority(seniority: AssessmentUserSeniority) {
     switch (seniority) {
@@ -75,58 +52,36 @@ function asSeniorityGroup(filter: 'junior' | 'regular' | 'senior' | 'seniorPlus'
     }
 }
 
-function isQuestionSeniorityGreaterThanUser(q: Question, assessment: WithId & Assessment) {
-    switch (assessment.user.seniority) {
-        case AssessmentUserSeniority.junior:
-            return [Seniority.junior].indexOf(q.seniority) < 0;
-        case AssessmentUserSeniority.regular:
-            return [Seniority.junior, Seniority.regular].indexOf(q.seniority) < 0;
-        case AssessmentUserSeniority.senior:
-            return [Seniority.junior, Seniority.regular, Seniority.senior].indexOf(q.seniority) < 0;
-        case AssessmentUserSeniority.lead:
-            return [Seniority.junior, Seniority.regular, Seniority.senior, Seniority.seniorPlus].indexOf(q.seniority) < 0;
-    }
-    return false;
+function responseColor(question: Question, assessment: WithId & Assessment, result: WithId & UserAssessment): string {
+    const colorMap: Record<ResponseAssessmentResult, string> = {
+        [ResponseAssessmentResult.ExpectedResponse]: 'rgba(39, 174, 96, 1.0)',
+        [ResponseAssessmentResult.NotExpectedRequired]: 'rgba(192, 57, 43, 1.0)',
+        [ResponseAssessmentResult.NotAsked]: 'rgba(127, 140, 141, 1.0)',
+        [ResponseAssessmentResult.NotExpectedNotRequired]: 'rgba(230, 126, 34, 1.0)'
+    };
+
+    return colorMap[assessmentResponseAssessResult(
+        asSeniority(assessment.user.seniority),
+        question,
+        result.responseValue[question.id]
+    )];
 }
 
-function responseColor(q: Question, assessment: WithId & Assessment, result: WithId & UserAssessment): string {
-    const asked = result.askedQuestion[q.id];
-    const valid = isValidResponse(q, assessment, result);
-    const questionHasValidResponses = q.expectedResponses[assessment.user.seniority === 'lead' ? 'seniorPlus' : assessment.user.seniority]?.length > 0;
-
-    if (!asked) {
-        return 'lightgray';
-    } else if (!questionHasValidResponses) {
-        return 'rgba(230, 126, 34, 1.0)';
-    } else if (valid) {
-        if (isDesiredResponse(q, assessment, result)) {
-            return 'rgba(39, 174, 96, 1.0)';
-        } else if (isQuestionSeniorityGreaterThanUser(q, assessment)) {
-            return 'rgba(127, 140, 141, 1.0)';
-        } else {
-            return 'rgba(230, 126, 34, 1.0)';
-        }
-    } else if (!valid) {
-        return 'rgba(192, 57, 43, 1.0)';
-    }
-
-    return undefined;
-}
-
-// Desire response to oczekiwana żeby spełnić pytanie
-// Fail response to ocena spełnienia względem wymagań na bieżącym stanowisku
-function shouldShowQuestion(q: Question, assessment: WithId & Assessment, results: (WithId & UserAssessment)[], seniorityFilter: 'junior' | 'regular' | 'senior' | 'seniorPlus', onlyFails: boolean) {
-    if (!seniorityFilterAtLeast(seniorityFilter, q.seniority)) {
+function shouldShowQuestion(userSeniority: Seniority, question: Question, assessment: WithId & Assessment, results: (WithId & UserAssessment)[], seniorityFilter: 'junior' | 'regular' | 'senior' | 'seniorPlus', onlyFails: boolean) {
+    if (!seniorityFilterAtLeast(seniorityFilter, question.seniority)) {
         return false;
     }
-    if (onlyFails && (results.every(result => !result.askedQuestion[q.id] || isDesiredResponse(q, assessment, result)))) {
+    if (onlyFails && (results.every(result => {
+        const resultAssessment = assessmentResponseAssessResult(userSeniority, question, result.responseValue[question.id]);
+        return resultAssessment === ResponseAssessmentResult.NotAsked || resultAssessment === ResponseAssessmentResult.ExpectedResponse;
+    }))) {
         return false;
     }
     return true;
 }
 
-function hasAnyVisibleQuestion(category: Category, assessment: WithId & Assessment, results: (WithId & UserAssessment)[], seniorityFilter: 'junior' | 'regular' | 'senior' | 'seniorPlus', onlyFails: boolean) {
-    return category.questions.some(q => shouldShowQuestion(q, assessment, results, seniorityFilter, onlyFails));
+function hasAnyVisibleQuestion(userSeniority: Seniority, category: Category, assessment: WithId & Assessment, results: (WithId & UserAssessment)[], seniorityFilter: 'junior' | 'regular' | 'senior' | 'seniorPlus', onlyFails: boolean) {
+    return category.questions.some(q => shouldShowQuestion(userSeniority, q, assessment, results, seniorityFilter, onlyFails));
 }
 
 const HeaderRow = styled.div`
@@ -185,70 +140,23 @@ const CategoryRow = styled.div`
     margin-bottom: 24px;
 `;
 
-const UserSeniorityReport = ({ questions, seniority, assessment, results }: {
-    questions: QuestionWithCategory[],
-    seniority: Seniority,
-    assessment: WithId & Assessment,
-    results: (WithId & UserAssessment)[]
-}) => {
-    const stats = {
-        desired: 0,
-        notDesiredButAcceptable: 0,
-        notValid: 0,
-        count: 0,
-        wasAsked: 0
-    };
-    questions
-        .filter(q => q.question.seniority === seniority)
-        .filter(q => q.question.expectedResponses[seniority]?.length > 0)
-        .forEach(q => {
-            const wasAsked = results.map(result => result.askedQuestion[q.question.id]).some(answer => answer);
-            const isDesired = results
-                .filter(result => result.askedQuestion[q.question.id])
-                .map(result => isDesiredResponse(q.question, assessment, result))
-                .every(answer => answer);
-            const isValid = results
-                .filter(result => result.askedQuestion[q.question.id])
-                .map(result => isValidResponse(q.question, assessment, result))
-                .every(answer => answer);
-            stats.count++;
-            if (!wasAsked) {
-                stats.wasAsked++;
-            } else if (isDesired) {
-                stats.desired++;
-            } else if (isValid) {
-                stats.notDesiredButAcceptable++;
-            } else {
-                stats.notValid++;
-            }
-        });
-    const barLength = 265;
-    return <>
-        <span title={Math.floor((stats.desired / stats.count) * 100) + '%'}
-              style={{ display: 'inline-block', width: ((stats.desired / stats.count) * barLength), height: '8px', backgroundColor: 'rgba(39, 174, 96, 1.0)' }}></span>
-        <span title={Math.floor((stats.notDesiredButAcceptable / stats.count) * 100) + '%'}
-              style={{ display: 'inline-block', width: ((stats.notDesiredButAcceptable / stats.count) * barLength), height: '8px', backgroundColor: 'rgba(230, 126, 34, 1.0)' }}></span>
-        <span title={Math.floor((stats.notValid / stats.count) * 100) + '%'}
-              style={{ display: 'inline-block', width: ((stats.notValid / stats.count) * barLength), height: '8px', backgroundColor: 'rgba(192, 57, 43, 1.0)' }}></span>
-        <span title={Math.floor((stats.wasAsked / stats.count) * 100) + '%'}
-              style={{ display: 'inline-block', width: ((stats.wasAsked / stats.count) * barLength), height: '8px', backgroundColor: 'rgba(127, 140, 141, 1.0)' }}></span>
-    </>;
-};
-
 function seniorityFilterAtLeast(filter: keyof typeof Seniority, atLeast: Seniority) {
     return asSeniorityGroup(filter).indexOf(atLeast) >= 0;
 }
 
-function answerCorrectnessMarkerText(result: WithId & UserAssessment, q: Question, assessment: WithId & Assessment) {
-    if (result.responseValue[q.id] !== undefined) {
-        if (questionExpectedResponsesBasedOnSeniority(q, assessment)?.length > 0) {
-            return isDesiredResponse(q, assessment, result) ? '✓' : '⤫';
-        } else {
-            return '?';
-        }
-    } else {
-        return '';
-    }
+function answerCorrectnessMarkerText(result: WithId & UserAssessment, question: Question, assessment: WithId & Assessment) {
+    const markMap: Record<ResponseAssessmentResult, string> = {
+        [ResponseAssessmentResult.ExpectedResponse]: '✓',
+        [ResponseAssessmentResult.NotExpectedRequired]: '⤫',
+        [ResponseAssessmentResult.NotExpectedNotRequired]: '⤫',
+        [ResponseAssessmentResult.NotAsked]: '-'
+    };
+
+    return markMap[assessmentResponseAssessResult(
+        asSeniority(assessment.user.seniority),
+        question,
+        result.responseValue[question.id]
+    )];
 }
 
 export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector>) => {
@@ -260,11 +168,12 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
     const results = useAssessmentResults(teamId, uuid);
     const [onlyFails, setOnlyFails] = useState<boolean>(true);
     const [seniorityFilter, setSeniorityFilter] = useState<keyof typeof Seniority | undefined>(Seniority.junior);
+    const userSeniority = assessment?.user?.seniority !== undefined ? asSeniority(assessment.user.seniority) : undefined;
     useEffect(() => {
         if (assessment) {
-            setSeniorityFilter(asSeniority(assessment.user.seniority));
+            setSeniorityFilter(userSeniority);
         }
-    }, [assessment, setSeniorityFilter, results]);
+    }, [assessment, setSeniorityFilter, userSeniority, results]);
     return assessment && <OneColumnLayoutUltraWide>
         <Card>
             <CardContent>
@@ -280,24 +189,13 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
                         <div><HeaderLabel>Wyniki widoczne dla</HeaderLabel>{assessment.accessibleBy?.join(', ')}</div>
                     </div>
                     <div style={{ flex: 1 }}></div>
-                    <div style={{ marginLeft: '32px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <HeaderLabel onClick={() => setSeniorityFilter('junior')} style={{ width: '80px', cursor: 'pointer' }}>Junior</HeaderLabel>
-                            <UserSeniorityReport questions={allQuestions} seniority={Seniority.junior} assessment={assessment} results={results} />
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <HeaderLabel onClick={() => setSeniorityFilter('regular')} style={{ width: '80px', cursor: 'pointer' }}>Regular</HeaderLabel>
-                            <UserSeniorityReport questions={allQuestions} seniority={Seniority.regular} assessment={assessment} results={results} />
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <HeaderLabel onClick={() => setSeniorityFilter('senior')} style={{ width: '80px', cursor: 'pointer' }}>Senior</HeaderLabel>
-                            <UserSeniorityReport questions={allQuestions} seniority={Seniority.senior} assessment={assessment} results={results} />
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <HeaderLabel onClick={() => setSeniorityFilter('seniorPlus')} style={{ width: '80px', cursor: 'pointer' }}>Lead</HeaderLabel>
-                            <UserSeniorityReport questions={allQuestions} seniority={Seniority.seniorPlus} assessment={assessment} results={results} />
-                        </div>
-                    </div>
+                    <UserSeniorityReport
+                        userSeniority={userSeniority}
+                        allQuestions={allQuestions}
+                        onFilterChange={setSeniorityFilter}
+                        assessment={assessment}
+                        results={results}
+                    />
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px', fontSize: '0.9em', cursor: 'pointer', color: 'rgba(127, 140, 141, 1.0)', userSelect: 'none' }}>
                     <span onClick={() => setSeniorityFilter('junior')} style={{ fontWeight: seniorityFilterAtLeast(seniorityFilter, Seniority.junior) ? 600 : undefined }}>junior</span>
@@ -315,7 +213,7 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
                 {results && <div>
                     <div>
                         {questionCategories
-                            .filter(category => hasAnyVisibleQuestion(category, assessment, results, seniorityFilter, onlyFails))
+                            .filter(category => hasAnyVisibleQuestion(userSeniority, category, assessment, results, seniorityFilter, onlyFails))
                             .map(category => <CategoryRow key={category.id}>
                                 <div style={{ marginBottom: '8px' }}>
                                     <div style={{ fontSize: '1.1em', fontWeight: '500' }}>{category.name}</div>
@@ -340,7 +238,7 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
                                 </HeaderRow>
                                 <div>
                                     {category.questions
-                                        .filter(q => shouldShowQuestion(q, assessment, results, seniorityFilter, onlyFails))
+                                        .filter(q => shouldShowQuestion(userSeniority, q, assessment, results, seniorityFilter, onlyFails))
                                         .sort((a, b) => a.seniority.localeCompare(b.seniority))
                                         .map(q =>
                                             <ResultRowWrapper key={q.id}>
@@ -359,7 +257,7 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
                                                         <ResultCell key={result.assessor}
                                                                     style={{ ...Columns.result, color: responseColor(q, assessment, result) }}
                                                         >
-                                                            <span title={`Odpowiedź: ${labelBasedOnQuestion(q, result.responseValue[q.id])}`}>
+                                                            <span title={labelBasedOnQuestion(userSeniority, q, result.responseValue[q.id])}>
                                                                 {result.askedQuestion[q.id] ? (summaryAnswerBasedOnQuestion(q, result.responseValue[q.id])) : '-'}
                                                                 &nbsp;
                                                                 {answerCorrectnessMarkerText(result, q, assessment)}
