@@ -1,15 +1,14 @@
 import firebase from 'firebase/compat/app';
-import {Epic} from 'redux-observable';
-import {combineLatest, Observable, of} from 'rxjs';
-import {distinct, map, switchMap} from 'rxjs/operators';
-import {firebaseApp} from "../../../firebase/firebase.app";
-import {inboxFetched} from "./inbox-fetched";
-import {loggedIn} from "../../../authentication/state/login/logged-in.action";
-import {AppState} from "../../../../state/app-state";
-import {Message} from "../../../message/model/message";
+import { combineLatest, Observable, of } from 'rxjs';
+import { distinct, map, switchMap } from 'rxjs/operators';
+import { firebaseApp } from '../../../firebase/firebase.app';
+import { inboxFetched } from './inbox-fetched';
+import { AppState } from '../../../../state/app-state';
+import { Message } from '../../../message/model/message';
+import { Epic } from 'redux-observable';
 
 const firestore = firebaseApp.firestore();
-export const fetchInboxEpic: Epic<ReturnType<typeof loggedIn>, any, AppState> = (action$, state$) => combineLatest([
+export const fetchInboxEpic: Epic<unknown, unknown, AppState> = (_, state$) => combineLatest([
     state$.pipe(
         map(state => state.authentication?.email)
     ),

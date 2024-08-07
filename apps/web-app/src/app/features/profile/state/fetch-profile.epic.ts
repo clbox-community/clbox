@@ -1,16 +1,15 @@
 import firebase from 'firebase/compat/app';
-import {Epic} from 'redux-observable';
-import {combineLatest, Observable, of} from 'rxjs';
-import {distinct, map, switchMap} from 'rxjs/operators';
-import {AppState} from '../../../state/app-state';
-import {loggedIn} from '../../authentication/state/login/logged-in.action';
-import {firebaseApp} from '../../firebase/firebase.app';
-import {profileFetched} from "./profile-fetched";
-import {Profile} from "./profile";
+import { Epic } from 'redux-observable';
+import { combineLatest, Observable, of } from 'rxjs';
+import { distinct, map, switchMap } from 'rxjs/operators';
+import { AppState } from '../../../state/app-state';
+import { firebaseApp } from '../../firebase/firebase.app';
+import { profileFetched } from './profile-fetched';
+import { Profile } from './profile';
 
 const firestore = firebaseApp.firestore();
 
-export const fetchProfileEpic: Epic<ReturnType<typeof loggedIn>, any, AppState> = (action$, state$) =>
+export const fetchProfileEpic: Epic<unknown, unknown, AppState> = (_, state$) =>
     combineLatest([
         state$.pipe(map(state => state.authentication?.email)),
         state$.pipe(map(state => state.team?.current?.id))
@@ -20,11 +19,11 @@ export const fetchProfileEpic: Epic<ReturnType<typeof loggedIn>, any, AppState> 
             if (user && team) {
                 return new Observable<firebase.firestore.DocumentSnapshot>(subscriber => {
                     firestore.collection(`team/${team}/user`).doc(user)
-                        .onSnapshot(subscriber)
+                        .onSnapshot(subscriber);
                 });
             } else {
                 return of<firebase.firestore.DocumentSnapshot>();
             }
         }),
-        map(profileDoc => profileFetched({profile: profileDoc.data() as Profile}))
+        map(profileDoc => profileFetched({ profile: profileDoc.data() as Profile }))
     );

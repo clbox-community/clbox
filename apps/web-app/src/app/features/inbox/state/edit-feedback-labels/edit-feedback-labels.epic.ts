@@ -1,22 +1,22 @@
-import {Epic} from 'redux-observable';
-import {EMPTY, from} from 'rxjs';
-import {catchError, switchMap, withLatestFrom} from 'rxjs/operators';
-import {firebaseApp} from "../../../firebase/firebase.app";
-import {AppState} from "../../../../state/app-state";
-import {editFeedbackLabels} from "./edit-feedback-labels.action";
+import { EMPTY, from } from 'rxjs';
+import { catchError, filter, switchMap, withLatestFrom } from 'rxjs/operators';
+import { firebaseApp } from '../../../firebase/firebase.app';
+import { editFeedbackLabels } from './edit-feedback-labels.action';
+import { AppState } from '../../../../state/app-state';
+import { Epic } from 'redux-observable';
 
-export const editFeedbackLabelsEpic: Epic<ReturnType<typeof editFeedbackLabels>, any, AppState> = (action$, state$) => action$
-    .ofType(editFeedbackLabels.type)
+export const editFeedbackLabelsEpic: Epic<unknown, unknown, AppState> = (action$, state$) => action$
     .pipe(
+        filter(editFeedbackLabels.match),
         withLatestFrom(state$),
-        switchMap(([{payload}, state]) =>
+        switchMap(([{ payload }, state]) =>
             from(
                 firebaseApp.firestore()
                     .collection(`team/${state.team.current.id}/user/${state.authentication.email}/inbox/`)
                     .doc(payload.message.id)
                     .update({
                         labels: payload.labels,
-                        labelMap: payload.labels.reduce((map, label) => ({...map, [label]: true}), {})
+                        labelMap: payload.labels.reduce((map, label) => ({ ...map, [label]: true }), {})
                     })
             ).pipe(
                 switchMap(_ => EMPTY),
