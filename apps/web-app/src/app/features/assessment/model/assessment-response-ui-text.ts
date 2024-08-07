@@ -19,19 +19,23 @@ function answerValueBasedOnQuestionType(question: Question, value: unknown): str
     } else if (question.type === QuestionType.Scale) {
         return '' + value;
     } else if (question.type === QuestionType.Correctness) {
-        switch (value as number) {
+        switch (value) {
             case 4: return 'tak';
             case 3: return 'raczej tak';
             case 2: return 'raczej nie';
             case 1: return 'nie';
+            case true: return 'tak, raczej tak';
+            case false: return 'nie, raczej nie';
             default: return `??? (${value})`;
         }
     } else if (question.type === QuestionType.Frequency) {
-        switch (value as number) {
+        switch (value) {
             case 4: return 'zawsze';
             case 3: return 'często';
             case 2: return 'rzadko';
             case 1: return 'nigdy';
+            case true: return 'zawsze, często';
+            case false: return 'rzadko, nigdy';
             default: return `??? (${value})`;
         }
     } else {
