@@ -4,7 +4,6 @@ import CardContent from '@mui/material/CardContent';
 import React from 'react';
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import rehypeRaw from 'rehype-raw'
 import styled from 'styled-components';
 import {SurveyPage} from '../model/survey-page';
 import {SurveyTextData} from '../model/survey-text-data';
@@ -33,7 +32,7 @@ interface SurveyTextPageProps {
 export const SurveyTextPage = ({page, onAnswer, onBack, withBack, lastPage}: SurveyTextPageProps) => {
     return <StyledCard>
         <CardContent>
-            <ReactMarkdown children={page.data.text} remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}/>
+            <ReactMarkdown children={page.data.text} remarkPlugins={[remarkGfm]} />
             <ActionsBar>
                 {withBack && <Button
                     variant="outlined"

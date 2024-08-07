@@ -53,7 +53,6 @@
         "react-router-dom": "6.11.2",
         "redux": "4.0.5",
         "redux-observable": "1.2.0",
-        "rehype-raw": "7.0.0",
         "remark-gfm": "4.0.0",
         "rxjs": "6.6.3",
         "styled-components": "5.3.6",
