@@ -99,14 +99,14 @@ export const FeedbackCard = ({feedback, existingLabels, onDiscard, onCommentChan
                 onChange={onLabelsAutocompleteChange}
                 renderTags={(value: string[], getTagProps) =>
                     value.map((option: string, index: number) => (
-                        <Chip variant="outlined" label={option} {...getTagProps({index})} />
+                        <Chip variant="outlined" label={option} {...getTagProps({index})} key={option} />
                     ))
                 }
                 renderInput={(params) => (
                     <TextField
                         {...params}
                         variant="standard"
-                        placeholder={labels.length == 0 ? 'Labels' : undefined}
+                        placeholder={labels.length === 0 ? 'Labels' : undefined}
                         InputProps={{...params.InputProps, disableUnderline: true}}
                         sx={{
                             minWidth: '300px',

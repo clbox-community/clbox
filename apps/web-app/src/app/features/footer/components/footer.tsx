@@ -12,8 +12,8 @@ export const Footer = () => <div>
     &nbsp;
     /
     &nbsp;
-    <Link to={'https://github.com/clbox-community/clbox/commit/' + process.env.NX_APP_VERSION} style={{ textDecoration: 'none', color: 'inherit', fontWeight: 300 }}>
-        {process.env.NX_APP_VERSION}
+    <Link to={'https://github.com/clbox-community/clbox/commit/' + process.env.NX_PUBLIC_APP_VERSION} style={{ textDecoration: 'none', color: 'inherit', fontWeight: 300 }}>
+        {process.env.NX_PUBLIC_APP_VERSION}
     </Link>
     )
 </div>;
