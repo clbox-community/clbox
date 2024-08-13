@@ -5,18 +5,18 @@ import { useAssessmentResults } from '../state/use-assessment-results';
 import { connect, ConnectedProps } from 'react-redux';
 import { useAssessment } from '../state/use-assessment';
 import styled from 'styled-components';
-import { WithId } from '../model/with-id';
-import { Assessment } from '../model/assessment';
-import { UserAssessment } from '../model/user-assessment';
 import { useEffect, useState } from 'react';
-import { AssessmentUserSeniority } from '../model/assessment-user-seniority';
 import { useAssessmentQuestions } from '../state/use-assessment-questions';
 import { useAssessmentQuestionCategories } from '../state/use-assessment-question-categories';
 import { AppState } from '../../../state/app-state';
-import { ResponseAssessmentResult } from '../model/assessment-response-result';
-import { assessmentResponseAssessResult } from '../model/assessment-response-assess-result';
 import { Category, Question, Seniority } from '@clbox/assessment-survey';
 import { UserSeniorityReport } from './user-seniority';
+import {
+    Assessment, AssessmentUserSeniority,
+    ResponseAssessmentResult, UserAssessment,
+    WithId
+} from 'assessment-model';
+import { assessmentResponseAssessResult } from '../model/assessment-response-assess-result';
 import { labelBasedOnQuestion, summaryAnswerBasedOnQuestion } from '../model/assessment-response-ui-text';
 
 export const OneColumnLayoutUltraWide = styled.div`

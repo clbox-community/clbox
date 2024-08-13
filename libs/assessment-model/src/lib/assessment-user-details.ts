@@ -1,4 +1,4 @@
-import {AssessmentUserSeniority} from "./assessment-user-seniority";
+import { AssessmentUserSeniority } from './assessment-user-seniority';
 
 export interface AssessmentUserDetails {
     name: string;

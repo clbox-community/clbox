@@ -17,7 +17,8 @@
         "baseUrl": ".",
         "paths": {
             "@clbox/assessment-survey": ["libs/assessment-survey/src/index.ts"],
-            "@clbox/skill-roadmap": ["libs/skill-roadmap/src/index.ts"]
+            "@clbox/skill-roadmap": ["libs/skill-roadmap/src/index.ts"],
+            "assessment-model": ["libs/assessment-model/src/index.ts"]
         }
     },
     "exclude": ["node_modules", "tmp"]

@@ -1,10 +1,7 @@
 import { QuestionWithCategory } from '../state/question-with-category';
 import { Seniority } from '@clbox/assessment-survey';
-import { WithId } from '../model/with-id';
-import { Assessment } from '../model/assessment';
-import { UserAssessment } from '../model/user-assessment';
+import { Assessment, ResponseAssessmentResult, UserAssessment, WithId } from 'assessment-model';
 import { assessmentResponseAssessResult } from '../model/assessment-response-assess-result';
-import { ResponseAssessmentResult } from '../model/assessment-response-result';
 
 export const UserSeniorityReportCard = ({ userSeniority, questions, seniority, assessment, results }: {
     userSeniority: Seniority,

@@ -1,0 +1,29 @@
+{
+    "name": "assessment-model",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "libs/assessment-model/src",
+    "projectType": "library",
+    "tags": [],
+    "targets": {
+        "build": {
+            "executor": "@nx/js:tsc",
+            "outputs": ["{options.outputPath}"],
+            "options": {
+                "outputPath": "dist/libs/assessment-model",
+                "main": "libs/assessment-model/src/index.ts",
+                "tsConfig": "libs/assessment-model/tsconfig.lib.json",
+                "assets": []
+            }
+        },
+        "lint": {
+            "executor": "@nx/eslint:lint"
+        },
+        "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+            "options": {
+                "jestConfig": "libs/assessment-model/jest.config.ts"
+            }
+        }
+    }
+}

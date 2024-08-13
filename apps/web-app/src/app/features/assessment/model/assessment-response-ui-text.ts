@@ -1,6 +1,6 @@
-import { ResponseAssessmentResult } from './assessment-response-result';
 import { Question, QuestionType, Seniority } from '@clbox/assessment-survey';
 import { assessmentResponseAssessResult } from './assessment-response-assess-result';
+import { ResponseAssessmentResult } from 'assessment-model';
 
 function asHumanText(result: ResponseAssessmentResult): string {
     const textMap: Record<ResponseAssessmentResult, string> = {

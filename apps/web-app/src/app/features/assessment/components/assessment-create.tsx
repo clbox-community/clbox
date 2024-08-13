@@ -8,10 +8,9 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useUserPublicProfiles } from '../../user/firestore/use-user-public-profiles';
 import { SelectFromDomain } from '../../skill-editor/component/select-from-domain';
 import Button from '@mui/material/Button';
-import { AssessmentUserSeniorityOfString } from '../model/assessment-user-seniority';
-import { Assessment } from '../model/assessment';
 import { firebaseApp } from '../../firebase/firebase.app';
 import { useNavigate } from 'react-router-dom';
+import { Assessment, AssessmentUserSeniorityOfString } from 'assessment-model';
 
 const firestore = firebaseApp.firestore();
 
