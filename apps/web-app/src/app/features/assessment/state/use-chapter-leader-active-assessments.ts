@@ -1,7 +1,6 @@
 import {firebaseApp} from "../../firebase/firebase.app";
 import {useEffect, useState} from "react";
-import {WithId} from "../model/with-id";
-import {Assessment} from "../model/assessment";
+import { Assessment, WithId } from 'assessment-model';
 
 const firestore = firebaseApp.firestore();
 

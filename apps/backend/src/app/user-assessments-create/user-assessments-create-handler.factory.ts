@@ -1,6 +1,4 @@
-import { UserAssessmentRef } from '../../../../web-app/src/app/features/assessment/model/user-assessment-ref';
-import { Assessment } from '../../../../web-app/src/app/features/assessment/model/assessment';
-import { UserAssessment } from '../../../../web-app/src/app/features/assessment/model/user-assessment';
+import { Assessment, UserAssessment, UserAssessmentRef } from 'assessment-model';
 
 export const userAssessmentsCreateHandlerFactory = (
     functions: import('firebase-functions').FunctionBuilder,

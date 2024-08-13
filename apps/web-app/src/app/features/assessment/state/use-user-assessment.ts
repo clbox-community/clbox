@@ -1,9 +1,7 @@
-import { UserAssessment } from '../model/user-assessment';
 import { firebaseApp } from '../../firebase/firebase.app';
 import { useCallback, useEffect, useState } from 'react';
-import { WithId } from '../model/with-id';
-import { UserAssessmentRef } from '../model/user-assessment-ref';
 import { guessResponseValues } from '@clbox/assessment-survey';
+import { UserAssessment, UserAssessmentRef, WithId } from 'assessment-model';
 
 const firestore = firebaseApp.firestore();
 

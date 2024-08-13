@@ -1,9 +1,9 @@
-import { AssessmentSurveyHook } from '../model/assessment-survey-hook';
 import { boolAnswerBasedOnQuestion, hasBoolAnswerBasedOnQuestion, SurveyContext } from '@clbox/assessment-survey';
 import { useCallback, useMemo } from 'react';
-import { UserAssessment } from '../model/user-assessment';
 import { useAssessmentQuestions } from './use-assessment-questions';
 import { QuestionWithCategory } from './question-with-category';
+import { UserAssessment } from 'assessment-model';
+import { AssessmentSurveyHook } from '../model/assessment-survey-hook';
 
 function isQuestionToShow(assessment: UserAssessment, question: QuestionWithCategory): boolean {
     const questionForm = assessment.assessed === assessment.assessor ? 'text1st' : 'text3rd';

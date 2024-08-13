@@ -1,7 +1,6 @@
 import { firebaseApp } from '../../firebase/firebase.app';
 import { useEffect, useState } from 'react';
-import { WithId } from '../model/with-id';
-import { UserAssessmentRef } from '../model/user-assessment-ref';
+import { UserAssessmentRef, WithId } from 'assessment-model';
 
 const firestore = firebaseApp.firestore();
 

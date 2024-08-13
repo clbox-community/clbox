@@ -1,5 +1,4 @@
-import {AssessmentUserDetails} from "./assessment-user-details";
-import { QuestionType } from '@clbox/assessment-survey';
+import { AssessmentUserDetails } from './assessment-user-details';
 
 export interface UserAssessment {
     /** Identifier of source assessment based on which user assessment survey was created */

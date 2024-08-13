@@ -1,5 +1,5 @@
-import { ResponseAssessmentResult } from './assessment-response-result';
 import { Question, Seniority } from '@clbox/assessment-survey';
+import { ResponseAssessmentResult } from 'assessment-model';
 
 export function assessmentResponseAssessResult(userSeniority: Seniority, question: Question, response: number|undefined): ResponseAssessmentResult {
   if (response === undefined) {

@@ -1,4 +1,4 @@
-import {AssessmentUserDetails} from "./assessment-user-details";
+import { AssessmentUserDetails } from './assessment-user-details';
 
 export interface Assessment {
     /** User system/authentication identifiers of assessed person, e.g. grzegorz@lipecki.net */

@@ -21,9 +21,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useUserAssessment } from '../state/use-user-assessment';
 import { AssessmentSplash } from './assessment-splash';
 import { ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
-import { WithId } from '../model/with-id';
-import { UserAssessment } from '../model/user-assessment';
 import { Category, Question, QuestionType } from '@clbox/assessment-survey';
+import { UserAssessment, WithId } from 'assessment-model';
 import { AssessmentSurveyHookNavigationNavigation, AssessmentSurveyHookProgress, AssessmentSurveyHookSubmitAnswer } from '../model/assessment-survey-hook';
 
 const LoadingAssessment = () => <Card>

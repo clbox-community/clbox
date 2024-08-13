@@ -1,10 +1,8 @@
 import { QuestionWithCategory } from '../state/question-with-category';
 import { Seniority } from '@clbox/assessment-survey';
-import { WithId } from '../model/with-id';
-import { Assessment } from '../model/assessment';
-import { UserAssessment } from '../model/user-assessment';
 import { UserSeniorityReportCard } from './user-seniority-report';
 import styled from 'styled-components';
+import { Assessment, UserAssessment, WithId } from 'assessment-model';
 
 const HeaderLabel = styled.span`
     font-weight: 300;
