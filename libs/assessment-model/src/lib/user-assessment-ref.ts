@@ -5,6 +5,8 @@ export interface UserAssessmentRef {
     userAssessmentId: string;
     /** User system/authentication identifiers of assessed person, e.g. grzegorz@lipecki.net */
     assessedId: string;
+    /** User system/authentication identifiers of assessor, e.g. grzegorz@lipecki.net */
+    assessorId: string;
     /** User full name of assessed person, e.g. Grzegorz Lipecki */
     assessedName: string;
     /** Assessment due date after which responses will not be stored */
