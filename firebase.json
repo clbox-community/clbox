@@ -39,6 +39,7 @@
         "source": "dist/apps/backend"
     },
     "firestore": {
-        "rules": "packages/firestore/firestore.rules"
+        "rules": "packages/firestore/firestore.rules",
+        "indexes": "packages/firestore/firestore.indexes.json"
     }
 }

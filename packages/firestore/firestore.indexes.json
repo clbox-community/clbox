@@ -1,0 +1,53 @@
+{
+    "indexes": [
+        {
+            "collectionGroup": "assessment",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "accessibleBy", "arrayConfig": "CONTAINS" },
+                { "fieldPath": "deadline", "order": "ASCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "assessment",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "accessibleBy", "arrayConfig": "CONTAINS" },
+                { "fieldPath": "deadline", "order": "DESCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "assessment",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "chapterLeader", "order": "ASCENDING" },
+                { "fieldPath": "deadline", "order": "ASCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "assessment",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "chapterLeader", "order": "ASCENDING" },
+                { "fieldPath": "deadline", "order": "DESCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "assessment-survey",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "type", "order": "ASCENDING" },
+                { "fieldPath": "deadline", "order": "ASCENDING"}
+            ]
+        },
+        {
+            "collectionGroup": "survey",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "forUser", "order": "ASCENDING" },
+                { "fieldPath": "createdTimestamp", "order": "DESCENDING" }
+            ]
+        }
+    ],
+    "fieldOverrides": []
+}
