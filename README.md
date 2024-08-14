@@ -1,3 +1,9 @@
+### Starting with custom env
+
+```
+dotenvx run --env-file=.dev.local.env -- nx serve
+```
+
 ### Testing Functions with local copy of Cloud Config
 
 ```

@@ -33,8 +33,8 @@ import {
 } from "./app/update-filter-stats/update-filter-stats-after-inbox-delete";
 import {userFeedbackStatsFactory} from './app/user-feedback-stats/user-feedback-stats-factory';
 import {
-    userAssessmentsCreateHandlerFactory
-} from "./app/user-assessments-create/user-assessments-create-handler.factory";
+    userAssessmentsWriteHandlerFactory
+} from "./app/user-assessments-create/user-assessments-write-handler.factory";
 import {exportTechSkillsFactory} from "./app/export-tech-skills/export-tech-skills.factory";
 import { userAssessmentsFinishHandlerFactory } from './app/user-assessments-finish/user-assessments-finish-handler.factory';
 import { updatePublicProfileHandlerFactory } from './app/public-profile/update-public-profile-handler.factory';
@@ -54,7 +54,7 @@ export const notifyAfterUserFeedback = notifyAfterUserFeedbackFactory(functionBu
 export const notifyAfterChannelFeedback = notifyAfterChannelFeedbackFactory(functionBuilder(), functions.config(), firebase);
 export const notifyAfterLeaderChange = notificationAfterLeaderChangeFactory(functionBuilder(), functions.config());
 export const notifyAfterSurveyCreated = notificationAfterSurveyCreatedFactory(functionBuilder(), functions.config());
-export const feedbackStats = feedbackStatsFactory(functionBuilder(), firebase);
+feedbackStatsFactory(functionBuilder(), firebase);
 export const userFeedbackStats = userFeedbackStatsFactory(functionBuilder(), firebase);
 export const createUser = createUserFactory(functionBuilder(), firebase);
 export const expireUserAccounts = expireUserAccountsFactory(functionBuilder(), firebase);
@@ -70,7 +70,7 @@ export const kudosHandler = kudosHandlerFactory(
     'pending-user-feedbacks',
     'pending-channel-feedbacks'
 );
-export const userAssessmentsCreateHandler = userAssessmentsCreateHandlerFactory(
+export const userAssessmentsWriteHandler = userAssessmentsWriteHandlerFactory(
     functionBuilder().runWith({}),
     firebase
 );
