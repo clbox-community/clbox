@@ -53,13 +53,13 @@ service cloud.firestore {
     }
     match /team/{team}/assessment/{assessment} {
       allow create: if isAuthentiacted();
-      allow read: if isAuthentiacted() && (resource.data.chapterLeader == authEmail() || authEmail() in resource.data.accessibleBy)
-      allow read, write: if isAuthentiacted() && resource.data.chapterLeader == authEmail()
+      allow read: if isAuthentiacted() && (resource.data.chapterLeader == authEmail() || resource.data.author == authEmail() || authEmail() in resource.data.accessibleBy)
+      allow read, write: if isAuthentiacted() && (resource.data.chapterLeader == authEmail() || resource.data.author == authEmail())
     }
     match /team/{team}/assessment-archive/{assessment} {
       allow create: if isAuthentiacted();
       allow read: if isAuthentiacted() && (resource.data.chapterLeader == authEmail() || authEmail() in resource.data.accessibleBy)
-      allow read, write: if isAuthentiacted() && resource.data.chapterLeader == authEmail()
+      allow read, write: if isAuthentiacted() && (resource.data.chapterLeader == authEmail() || resource.data.author == authEmail())
     }
     match /team/{team}/assessment/{assessment}/result/{userAssessment} {
       allow read, write: if isAuthentiacted() && get(/databases/$(database)/documents/team/$(team)/assessment/$(assessment)/result/$(userAssessment)).data.assessor == authEmail()

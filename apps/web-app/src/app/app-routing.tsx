@@ -21,7 +21,7 @@ import { SkillRoadmapCategorySkills } from './features/skill-roadmap/component/s
 import { SkillRoadmap } from './features/skill-roadmap/component/skill-roadmap';
 import { Assessment } from './features/assessment/components/assessment';
 import { Assessments } from './features/assessment/components/assessments';
-import { AssessmentCreate } from './features/assessment/components/assessment-create';
+import { AssessmentEdit } from './features/assessment/components/assessment-edit';
 import { ProfilePage } from './features/profile/components/profile-page';
 import { AssessmentResult } from './features/assessment/components/assessment-result';
 import { UserProfilePage } from './features/profile/components/user-profile-page';
@@ -56,7 +56,9 @@ export const AppRoutingAuthenticated = () => <Routes>
     </Route>
     <Route path="/assessment">
         <Route path="" element={<Assessments />} />
-        <Route path="new" element={<AssessmentCreate />} />
+        <Route path="new" element={<AssessmentEdit />} />
+        <Route path="edit" element={<AssessmentEdit />} />
+        <Route path=":uuid/edit" element={<AssessmentEdit />} />
         <Route path=":uuid/result" element={<AssessmentResult />} />
         <Route path=":assessmentId/:userAssessmentId/:userAssessmentRefId" element={<Assessment />} />
     </Route>

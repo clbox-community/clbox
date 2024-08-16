@@ -11,16 +11,17 @@ import Button from '@mui/material/Button';
 import { firebaseApp } from '../../firebase/firebase.app';
 import { useNavigate } from 'react-router-dom';
 import { Assessment, AssessmentUserSeniorityOfString } from 'assessment-model';
+import { useParams } from 'react-router';
+import { useAssessmentForEdit } from '../state/use-assessment-for-edit';
 
-const firestore = firebaseApp.firestore();
+const db = firebaseApp.firestore();
 
 export const AssessmentCreateView = ({ userId, teamId }: ConnectedProps<typeof connector>) => {
+    const { uuid } = useParams<{ uuid: string | undefined }>();
+    const [assessment, setAssessment] = useAssessmentForEdit(teamId, uuid);
     const navigate = useNavigate();
     const users = useUserPublicProfiles(teamId);
     const [locked, setLocked] = useState<boolean>(false);
-    const [assessed, setAssessed] = useState<string>('');
-    const [assessors, setAssessors] = useState<string[]>([]);
-    const [accessibleBy, setAccessibleBy] = useState<string[]>([]);
     const [errors, setErrors] = useState<string[]>();
 
     const selectDomain = useMemo(() => {
@@ -36,32 +37,16 @@ export const AssessmentCreateView = ({ userId, teamId }: ConnectedProps<typeof c
         }
     }, [users]);
 
-    const setAssessedWithAutoAssessment = useCallback((assessed: string) => {
-        setAssessed(assessed);
-        setAssessors(value => value.indexOf(assessed) < 0 ? [...value, assessed] : value);
-        setAccessibleBy(value => {
-            const assessedUserProfile = users.find(user => user.email === assessed);
-            const updatedList = [...value];
-            if (updatedList.indexOf(userId) < 0) {
-                updatedList.push(userId);
-            }
-            if (updatedList.indexOf(assessedUserProfile.chapterLeader) < 0) {
-                updatedList.push(assessedUserProfile.chapterLeader);
-            }
-            return updatedList;
-        });
-    }, [setAssessed, setAssessors, setAccessibleBy, userId, users]);
-
     const validateAndSubmit = useCallback(
         () => {
             const errors = [];
-            if (!assessed) {
+            if (!assessment.assessed) {
                 errors.push('Musisz wybrać osobę ocenianą');
             }
-            if (accessibleBy.length === 0) {
+            if (assessment.accessibleBy.length === 0) {
                 errors.push('Musisz wskazać osoby upoważnione do ankiety');
             }
-            if (assessors.length === 0) {
+            if (assessment.assessors.length === 0) {
                 errors.push('Musisz wybrać osoby oceniające');
             }
             setErrors(errors);
@@ -70,18 +55,19 @@ export const AssessmentCreateView = ({ userId, teamId }: ConnectedProps<typeof c
             }
 
             setLocked(true);
-            const assessedUserProfile = users.find(user => user.email === assessed);
+            const assessedUserProfile = users.find(user => user.email === assessment.assessed);
+
             const userAssessment: Assessment = {
+                ...assessment,
                 assessed: assessedUserProfile.email,
-                assessors: assessors,
-                finishedAssessors: {},
+                assessors: assessment.assessors,
+                finishedAssessors: assessment.finishedAssessors ?? {},
                 chapterLeader: assessedUserProfile.chapterLeader,
-                accessibleBy: accessibleBy,
-                deadline: new Date().getTime() + 1000 * 60 * 60 * 24 * 14,
-                author: userId,
-                createdAt: new Date().getTime(),
-                // TODO: te dane powinny być uzupełniane lambdą na podstawie pełnego profilu użytkownika bez udostępniania tych danych w publicznym profilu
-                user: {
+                accessibleBy: assessment.accessibleBy,
+                deadline: assessment.deadline ?? new Date().getTime() + 1000 * 60 * 60 * 24 * 14,
+                author: assessment.author ? assessment.author : userId,
+                createdAt: assessment.createdAt ?? new Date().getTime(),
+                user: assessment.user ?? {
                     name: assessedUserProfile.display_name,
                     projects: assessedUserProfile.projects,
                     teams: assessedUserProfile.teams,
@@ -90,18 +76,25 @@ export const AssessmentCreateView = ({ userId, teamId }: ConnectedProps<typeof c
                 }
             };
 
-            firestore.collection(`/team/${teamId}/assessment/`)
-                .add(userAssessment)
-                .then(() => navigate({
-                    pathname: '../',
-                    search: 'created'
-                }))
-                .catch(error => {
-                    console.error(error);
-                    setErrors(['Nie udało się stworzyć ankiety, skontaktuj się z glipecki.']);
-                });
+            if (assessment.id) {
+                db.doc(`/team/${teamId}/assessment/${assessment.id}`)
+                    .set(userAssessment)
+                    .then(() => navigate({ pathname: '../', search: 'created' }))
+                    .catch(error => {
+                        console.error(error);
+                        setErrors(['Nie udało się zapisać ankiety, skontaktuj się z glipecki.']);
+                    });
+            } else {
+                db.collection(`/team/${teamId}/assessment/`)
+                    .add(userAssessment)
+                    .then(() => navigate({ pathname: '../', search: 'created' }))
+                    .catch(error => {
+                        console.error(error);
+                        setErrors(['Nie udało się stworzyć ankiety, skontaktuj się z glipecki.']);
+                    });
+            }
         },
-        [assessed, assessors, accessibleBy, navigate, teamId, userId, users]
+        [assessment, navigate, teamId, userId, users]
     );
 
     return <OneColumnLayoutWide>
@@ -116,36 +109,57 @@ export const AssessmentCreateView = ({ userId, teamId }: ConnectedProps<typeof c
                 <FormControl fullWidth sx={{ marginBottom: '16px' }}>
                     <InputLabel>Oceniany</InputLabel>
                     <SelectFromDomain
-                        disabled={locked}
-                        value={assessed}
+                        disabled={locked || !!assessment.id}
+                        value={assessment.assessed}
                         multiple={false}
                         label="Oceniany"
                         domain={selectDomain}
-                        onChange={selected => setAssessedWithAutoAssessment(selected[0])}
+                        onChange={change => setAssessment(assessment => ({
+                            ...assessment,
+                            assessed: change[0],
+                            assessors: assessment.assessors.indexOf(change[0]) < 0 ? [...assessment.assessors, change[0]] : assessment.assessors,
+                            accessibleBy: ((previous) => {
+                                const assessedUserProfile = users.find(user => user.email === change[0]);
+                                const updatedList = [...previous];
+                                if (updatedList.indexOf(userId) < 0) {
+                                    updatedList.push(userId);
+                                }
+                                if (updatedList.indexOf(assessedUserProfile.chapterLeader) < 0) {
+                                    updatedList.push(assessedUserProfile.chapterLeader);
+                                }
+                                return updatedList;
+                            })(assessment.accessibleBy)
+                        }))}
                     />
                 </FormControl>
                 <FormControl fullWidth sx={{ marginBottom: '16px' }}>
                     <InputLabel>Lista oceniających</InputLabel>
                     <SelectFromDomain
                         disabled={locked}
-                        value={assessors}
+                        value={assessment.assessors}
                         label="Lista oceniających"
                         domain={selectDomain}
-                        onChange={setAssessors}
+                        onChange={assessors => setAssessment(assessment => ({
+                            ...assessment,
+                            assessors
+                        }))}
                     />
                 </FormControl>
                 <FormControl fullWidth sx={{ marginBottom: '16px' }}>
                     <InputLabel>Osoby upoważnione</InputLabel>
                     <SelectFromDomain
                         disabled={locked}
-                        value={accessibleBy}
+                        value={assessment.accessibleBy}
                         label="Lista upoważniony"
                         domain={selectDomain}
-                        onChange={setAccessibleBy}
+                        onChange={accessibleBy => setAssessment(assessment => ({
+                            ...assessment,
+                            accessibleBy
+                        }))}
                     />
                 </FormControl>
-                {locked && <span>Tworzenie ankiety oceny...</span>}
-                {!locked && <Button onClick={validateAndSubmit}>Stwórz</Button>}
+                {locked && <span>Zapisywanie ankiety oceny...</span>}
+                {!locked && <Button onClick={validateAndSubmit}>Zapisz</Button>}
             </CardContent>}
         </Card>
     </OneColumnLayoutWide>;
@@ -159,4 +173,4 @@ const connector = connect(
     {}
 );
 
-export const AssessmentCreate = connector(AssessmentCreateView);
+export const AssessmentEdit = connector(AssessmentCreateView);
