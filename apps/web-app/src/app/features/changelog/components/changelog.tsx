@@ -23,6 +23,12 @@ const Layout = styled.div`
 
 const changes = [
     {
+        date: '2024-08-16',
+        items: [
+            {summary: 'Ankiety oceny okresowej można edytować i dodawać do nich kolejne osoby oceniające'},
+        ]
+    },
+    {
         date: '2024-08-06',
         items: [
             {summary: 'Komentarze i feedbacki w ocenie okresowej zapisują się również w przypadku nawigacji dalej/wstecz bez zmiany odpowiedzi'},
