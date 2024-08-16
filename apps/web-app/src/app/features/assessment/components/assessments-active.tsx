@@ -3,7 +3,7 @@ import { connect, ConnectedProps } from 'react-redux';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
-import React, { useCallback } from 'react';
+import React, { ReactNode, useCallback } from 'react';
 import { useChapterLeaderActiveAssessments } from '../state/use-chapter-leader-active-assessments';
 import DownloadingIcon from '@mui/icons-material/Downloading';
 import { asLocalDate } from './as-local-date';
@@ -14,7 +14,37 @@ import WarningIcon from '@mui/icons-material/Warning';
 import Button from '@mui/material/Button';
 import { Link, useNavigate } from 'react-router-dom';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import EditIcon from '@mui/icons-material/Edit';
 import { useAssessmentArchive } from '../state/use-archive-assessment';
+
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import { Assessment } from 'assessment-model';
+
+const RemoveActionWithConfirm: React.FC<{ render: (openDialog: () => void) => ReactNode, handler: () => void, assessment: Assessment }> = ({ render, handler, assessment }) => {
+    const [open, setOpen] = React.useState(false);
+    return <>
+        <Dialog open={open}>
+            <DialogTitle id="alert-dialog-title">
+                Usuwanie ankiety dla {assessment.user.name}
+            </DialogTitle>
+            <DialogContent>
+                <div>Usunięcie ankiety usunie jej wszystkie dane, w tym odpowiedzi użytkowników.</div>
+                <div>Czy jesteś pewien?</div>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={() => setOpen(false)} autoFocus>Anuluj</Button>
+                <Button onClick={() => {
+                    setOpen(false);
+                    handler();
+                }}>Tak</Button>
+            </DialogActions>
+        </Dialog>
+        {render(() => setOpen(true))}
+    </>;
+};
 
 const AsessmentRow = styled.tr`
     :hover {
@@ -88,16 +118,23 @@ const AssessmentsActiveView = ({ teamId, userId }: ViewProps) => {
                             {assessment.deadline <= today && <WarningIcon color="error" />}
                         </AssessmentRowCell>
                         <AssessmentRowCell style={{ textAlign: 'center' }}>
-                            {assessment.chapterLeader === userId && <DeleteForeverIcon
-                                onClick={() => archiveAssessment(assessment.id)}
-                                sx={{ cursor: 'pointer', color: 'lightgray', '&:hover': { color: 'rgb(211, 47, 47)' } }}
+                            {(assessment.chapterLeader === userId) && <RemoveActionWithConfirm
+                                assessment={assessment}
+                                handler={() => archiveAssessment(assessment.id)}
+                                render={openDialog => <DeleteForeverIcon
+                                    onClick={openDialog}
+                                    sx={{ cursor: 'pointer', color: 'lightgray', '&:hover': { color: 'rgb(211, 47, 47)' } }}
+                                />}
                             />}
+                            {(assessment.chapterLeader === userId || assessment.author === userId) && <Link to={assessment.id + '/edit'}>
+                                <EditIcon sx={{ cursor: 'pointer', color: 'lightgray', '&:hover': { color: 'rgb(211, 47, 47)' } }} />
+                            </Link>}
                         </AssessmentRowCell>
                     </AsessmentRow>
                 )}
                 </tbody>
             </table>}
-            <Button size="medium" color="primary" component={Link} to={'new'}>Stwórz ankietę</Button>
+            <Button size="medium" color="primary" component={Link} to={'edit'}>Stwórz ankietę</Button>
         </CardContent>
     </Card>;
 };
