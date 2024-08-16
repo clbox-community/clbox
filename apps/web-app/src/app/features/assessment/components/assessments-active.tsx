@@ -118,7 +118,7 @@ const AssessmentsActiveView = ({ teamId, userId }: ViewProps) => {
                             {assessment.deadline <= today && <WarningIcon color="error" />}
                         </AssessmentRowCell>
                         <AssessmentRowCell style={{ textAlign: 'center' }}>
-                            {(assessment.chapterLeader === userId) && <RemoveActionWithConfirm
+                            {(assessment.chapterLeader === userId || assessment.author === userId) && <RemoveActionWithConfirm
                                 assessment={assessment}
                                 handler={() => archiveAssessment(assessment.id)}
                                 render={openDialog => <DeleteForeverIcon

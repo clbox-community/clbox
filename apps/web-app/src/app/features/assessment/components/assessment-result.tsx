@@ -11,11 +11,7 @@ import { useAssessmentQuestionCategories } from '../state/use-assessment-questio
 import { AppState } from '../../../state/app-state';
 import { Category, Question, Seniority } from '@clbox/assessment-survey';
 import { UserSeniorityReport } from './user-seniority';
-import {
-    Assessment, AssessmentUserSeniority,
-    ResponseAssessmentResult, UserAssessment,
-    WithId
-} from 'assessment-model';
+import { Assessment, AssessmentUserSeniority, ResponseAssessmentResult, UserAssessment, WithId } from 'assessment-model';
 import { assessmentResponseAssessResult } from '../model/assessment-response-assess-result';
 import { labelBasedOnQuestion, summaryAnswerBasedOnQuestion } from '../model/assessment-response-ui-text';
 
@@ -230,11 +226,13 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
                                         Pytanie
                                     </HeaderCell>
                                     <HeaderCell style={{ ...Columns.seniority }}>Poziom</HeaderCell>
-                                    {results.map(result =>
-                                        <HeaderCell key={result.assessor} style={{ ...Columns.result }} title={result.assessor?.substring(0, result.assessor?.indexOf('@'))}>
-                                            {result.assessor?.substring(0, result.assessor?.indexOf('@')).substring(0, 4)}
-                                        </HeaderCell>
-                                    )}
+                                    {results
+                                        .filter(result => assessment.assessors.includes(result.assessor))
+                                        .map(result =>
+                                            <HeaderCell key={result.assessor} style={{ ...Columns.result }} title={result.assessor?.substring(0, result.assessor?.indexOf('@'))}>
+                                                {result.assessor?.substring(0, result.assessor?.indexOf('@')).substring(0, 4)}
+                                            </HeaderCell>
+                                        )}
                                 </HeaderRow>
                                 <div>
                                     {category.questions
@@ -253,17 +251,19 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
                                                     <ResultCell style={{ ...Columns.seniority }}>
                                                         {q.seniority}
                                                     </ResultCell>
-                                                    {results.map(result =>
-                                                        <ResultCell key={result.assessor}
-                                                                    style={{ ...Columns.result, color: responseColor(q, assessment, result) }}
-                                                        >
+                                                    {results
+                                                        .filter(result => assessment.assessors.includes(result.assessor))
+                                                        .map(result =>
+                                                            <ResultCell key={result.assessor}
+                                                                        style={{ ...Columns.result, color: responseColor(q, assessment, result) }}
+                                                            >
                                                             <span title={labelBasedOnQuestion(userSeniority, q, result.responseValue[q.id])}>
                                                                 {result.askedQuestion[q.id] ? (summaryAnswerBasedOnQuestion(q, result.responseValue[q.id])) : '-'}
                                                                 &nbsp;
                                                                 {answerCorrectnessMarkerText(result, q, assessment)}
                                                             </span>
-                                                        </ResultCell>
-                                                    )}
+                                                            </ResultCell>
+                                                        )}
                                                 </ResultRow>
                                                 <div style={{ marginLeft: Columns.id.flexBasis, fontStyle: 'italic', maxWidth: '80%', fontSize: '.9em', color: 'dimgray' }}>
                                                     {q.comment && <div>{q.comment}</div>}
