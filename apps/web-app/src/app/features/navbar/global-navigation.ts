@@ -26,21 +26,6 @@ export const globalNavigation: NavigationGroup[] = [
         ]
     },
     {
-        text: 'Ankiety',
-        path: '/survey',
-        items: [
-            {
-                text: 'Odebrane',
-                path: '/inbox',
-                default: true
-            },
-            {
-                text: 'Wysłane',
-                path: '/campaign',
-            }
-        ]
-    },
-    {
         text: 'Umiejętności',
         path: '/skill',
         items: [
@@ -65,14 +50,29 @@ export const globalNavigation: NavigationGroup[] = [
         ]
     },
     {
-        text: 'Ocena',
+        text: 'Ocena okresowa',
         path: '/assessment',
         items: [
             {
                 text: 'Moje',
-                path: ' ',
+                path: '',
                 default: true
             }
         ]
-    }
+    },
+    {
+        text: 'Ankiety',
+        path: '/survey',
+        items: [
+            {
+                text: 'Odebrane',
+                path: '/inbox',
+                default: true
+            },
+            {
+                text: 'Wysłane',
+                path: '/campaign',
+            }
+        ]
+    },
 ]
