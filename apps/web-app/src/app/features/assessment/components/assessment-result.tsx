@@ -5,7 +5,7 @@ import { useAssessmentResults } from '../state/use-assessment-results';
 import { connect, ConnectedProps } from 'react-redux';
 import { useAssessment } from '../state/use-assessment';
 import styled from 'styled-components';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAssessmentQuestions } from '../state/use-assessment-questions';
 import { useAssessmentQuestionCategories } from '../state/use-assessment-question-categories';
 import { AppState } from '../../../state/app-state';
