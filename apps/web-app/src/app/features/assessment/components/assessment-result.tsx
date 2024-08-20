@@ -163,13 +163,8 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
     const assessment = useAssessment(teamId, uuid);
     const results = useAssessmentResults(teamId, uuid);
     const [onlyFails, setOnlyFails] = useState<boolean>(true);
-    const [seniorityFilter, setSeniorityFilter] = useState<keyof typeof Seniority | undefined>(Seniority.junior);
+    const [seniorityFilter, setSeniorityFilter] = useState<keyof typeof Seniority | undefined>(Seniority.seniorPlus);
     const userSeniority = assessment?.user?.seniority !== undefined ? asSeniority(assessment.user.seniority) : undefined;
-    useEffect(() => {
-        if (assessment) {
-            setSeniorityFilter(userSeniority);
-        }
-    }, [assessment, setSeniorityFilter, userSeniority, results]);
     return assessment && <OneColumnLayoutUltraWide>
         <Card>
             <CardContent>
