@@ -8,8 +8,9 @@ import DownloadingIcon from "@mui/icons-material/Downloading";
 import React from "react";
 import {Link} from "react-router-dom";
 import {asLocalDate} from "./as-local-date";
+import { environment } from '../../../../environments/environment';
 
-const AssessmentsPendingView = ({teamId, userId}: ViewProps) => {
+const AssessmentsPendingView = ({teamId, userId, locale}: ViewProps) => {
     const assessments = useUserAssessments(teamId, userId);
     return <Card>
         <CardHeader title="Ankiety czekające na wypełnienie"/>
@@ -23,7 +24,7 @@ const AssessmentsPendingView = ({teamId, userId}: ViewProps) => {
                     assessment => <li key={assessment.id}>
                         <Link to={`/assessment/${assessment.assessmentId}/${assessment.userAssessmentId}/${assessment.id}`}>
                             Ocena okresowa dla {assessment.assessedName}
-                            {assessment.deadline && ` w terminie do ` + asLocalDate(assessment.deadline)}
+                            {assessment.deadline && ` w terminie do ` + asLocalDate(assessment.deadline, locale)}
                         </Link>
                     </li>
                 )}
@@ -40,7 +41,8 @@ interface ViewProps extends ConnectedProps<typeof connector> {
 const connector = connect(
     (state: AppState) => ({
         teamId: state.team.current?.id,
-        userId: state.authentication?.email
+        userId: state.authentication?.email,
+        locale: state.profile?.profile?.locale ?? environment.defaultLocale
     }),
     {}
 );

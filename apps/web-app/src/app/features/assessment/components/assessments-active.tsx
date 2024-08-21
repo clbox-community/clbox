@@ -16,12 +16,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import EditIcon from '@mui/icons-material/Edit';
 import { useAssessmentArchive } from '../state/use-archive-assessment';
-
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { Assessment } from 'assessment-model';
+import { environment } from '../../../../environments/environment';
 
 const RemoveActionWithConfirm: React.FC<{ render: (openDialog: () => void) => ReactNode, handler: () => void, assessment: Assessment }> = ({ render, handler, assessment }) => {
     const [open, setOpen] = React.useState(false);
@@ -72,7 +72,7 @@ const AssessmentAssessesListItem = styled.li`
 
 const today = new Date().getTime();
 
-const AssessmentsActiveView = ({ teamId, userId }: ViewProps) => {
+const AssessmentsActiveView = ({ teamId, userId, locale }: ViewProps) => {
     const navigate = useNavigate();
     const assessments = useChapterLeaderActiveAssessments(teamId, userId);
     const archiveAssessment = useAssessmentArchive(teamId);
@@ -104,8 +104,8 @@ const AssessmentsActiveView = ({ teamId, userId }: ViewProps) => {
                 {assessments?.map(
                     assessment => <AsessmentRow key={assessment.id}>
                         <AssessmentRowCell style={{ cursor: 'pointer' }} onClick={() => navigateToResult(assessment.id)}>{assessment.assessed}</AssessmentRowCell>
-                        <AssessmentRowCell>{asLocalDate(assessment.createdAt)}</AssessmentRowCell>
-                        <AssessmentRowCell>{asLocalDate(assessment.deadline)}</AssessmentRowCell>
+                        <AssessmentRowCell>{asLocalDate(assessment.createdAt, locale)}</AssessmentRowCell>
+                        <AssessmentRowCell>{asLocalDate(assessment.deadline, locale)}</AssessmentRowCell>
                         <AssessmentRowCell>
                             <AssessmentAssessesList>
                                 {assessment.assessors?.map((assessor) => <AssessmentAssessesListItem key={assessor}>
@@ -147,7 +147,8 @@ interface ViewProps extends ConnectedProps<typeof connector> {
 const connector = connect(
     (state: AppState) => ({
         teamId: state.team.current?.id,
-        userId: state.authentication?.email
+        userId: state.authentication?.email,
+        locale: state.profile?.profile?.locale ?? environment.defaultLocale
     }),
     {}
 );

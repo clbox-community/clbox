@@ -25,5 +25,10 @@ export const fetchProfileEpic: Epic<unknown, unknown, AppState> = (_, state$) =>
                 return of<firebase.firestore.DocumentSnapshot>();
             }
         }),
-        map(profileDoc => profileFetched({ profile: profileDoc.data() as Profile }))
+        map(profileDoc => profileDoc.data()),
+        map(profile => ({
+            ...profile,
+            locale: profile.locale ?? 'pl-PL'
+        } as Profile)),
+        map(profile => profileFetched({ profile }))
     );

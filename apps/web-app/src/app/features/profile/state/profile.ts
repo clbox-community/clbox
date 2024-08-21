@@ -16,4 +16,5 @@ export interface Profile {
     teams: string[];
     projects: string[];
     textForm: 'm' | 'f';
+    locale: Intl.UnicodeBCP47LocaleIdentifier;
 }

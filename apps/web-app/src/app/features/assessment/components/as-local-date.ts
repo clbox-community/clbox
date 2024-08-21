@@ -1,7 +1,7 @@
-export function asLocalDate(raw: number) {
+export function asLocalDate(raw: number, locale: Intl.UnicodeBCP47LocaleIdentifier) {
     try {
         const date = new Date(raw);
-        return `${date.getDate()}/${date.getMonth() < 8 && '0'}${date.getMonth() + 1}/${date.getFullYear()}`;
+        return date.toLocaleDateString(locale);
     } catch {
     }
     return '';
