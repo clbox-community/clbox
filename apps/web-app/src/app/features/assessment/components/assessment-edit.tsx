@@ -18,6 +18,7 @@ const db = firebaseApp.firestore();
 
 export const AssessmentCreateView = ({ userId, teamId }: ConnectedProps<typeof connector>) => {
     const { uuid } = useParams<{ uuid: string | undefined }>();
+    const [originalAssessment] = useAssessmentForEdit(teamId, uuid);
     const [assessment, setAssessment] = useAssessmentForEdit(teamId, uuid);
     const navigate = useNavigate();
     const users = useUserPublicProfiles(teamId);
@@ -48,6 +49,9 @@ export const AssessmentCreateView = ({ userId, teamId }: ConnectedProps<typeof c
             }
             if (assessment.assessors.length === 0) {
                 errors.push('Musisz wybrać osoby oceniające');
+            }
+            if (originalAssessment?.assessors?.some(originalAssessor => !assessment.assessors.includes(originalAssessor))) {
+                errors.push('Usuwanie osób oceniających nie jest obsługiwane. Wszyscy wcześniej oceniający nadal muszą być na liście: ' + originalAssessment?.assessors.join(', '));
             }
             setErrors(errors);
             if (errors.length > 0) {
