@@ -25,6 +25,7 @@ const changes = [
     {
         date: '2024-08-21',
         items: [
+            {summary: 'Pytania w podsumowaniu oceny okresowej są prezentowane w kolejności, w której były prezentowane w ankiecie'},
             {summary: 'Poprawa prezentowania lokalnych dat'},
         ]
     },
