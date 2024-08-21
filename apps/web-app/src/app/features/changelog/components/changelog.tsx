@@ -23,6 +23,12 @@ const Layout = styled.div`
 
 const changes = [
     {
+        date: '2024-08-21',
+        items: [
+            {summary: 'Poprawa prezentowania lokalnych dat'},
+        ]
+    },
+    {
         date: '2024-08-16',
         items: [
             {summary: 'Ankiety oceny okresowej można edytować i dodawać do nich kolejne osoby oceniające'},
