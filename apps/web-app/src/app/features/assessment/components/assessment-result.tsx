@@ -6,7 +6,6 @@ import { connect, ConnectedProps } from 'react-redux';
 import { useAssessment } from '../state/use-assessment';
 import styled from 'styled-components';
 import { useState } from 'react';
-import { useAssessmentQuestions } from '../state/use-assessment-questions';
 import { useAssessmentQuestionCategories } from '../state/use-assessment-question-categories';
 import { AppState } from '../../../state/app-state';
 import { Category, Question, Seniority } from '@clbox/assessment-survey';
@@ -157,8 +156,6 @@ function answerCorrectnessMarkerText(result: WithId & UserAssessment, question: 
 
 export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector>) => {
     const { uuid } = useParams<{ uuid: string }>();
-    // todo: remove allQuestions, replace with questionCategories? or leave it as is for report? or use useAsAq directly in report?
-    const allQuestions = useAssessmentQuestions();
     const questionCategories = useAssessmentQuestionCategories();
     const assessment = useAssessment(teamId, uuid);
     const results = useAssessmentResults(teamId, uuid);
@@ -182,7 +179,6 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
                     <div style={{ flex: 1 }}></div>
                     <UserSeniorityReport
                         userSeniority={userSeniority}
-                        allQuestions={allQuestions}
                         onFilterChange={setSeniorityFilter}
                         assessment={assessment}
                         results={results}
@@ -232,12 +228,11 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
                                 <div>
                                     {category.questions
                                         .filter(q => shouldShowQuestion(userSeniority, q, assessment, results, seniorityFilter, onlyFails))
-                                        .sort((a, b) => a.seniority.localeCompare(b.seniority))
                                         .map(q =>
                                             <ResultRowWrapper key={q.id}>
                                                 <ResultRow>
                                                     <ResultCell style={{ ...Columns.id }}>
-                                                        {q.id.replace('_', '.')}
+                                                        {q.id.replaceAll('_', '.')}
                                                     </ResultCell>
                                                     <ResultCell style={{ ...Columns.question }}>
                                                         {q.text3rd && q.text3rd[assessment.user.textForm]}

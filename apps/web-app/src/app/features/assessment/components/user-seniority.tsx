@@ -1,8 +1,8 @@
-import { QuestionWithCategory } from '../state/question-with-category';
 import { Seniority } from '@clbox/assessment-survey';
 import { UserSeniorityReportCard } from './user-seniority-report';
 import styled from 'styled-components';
 import { Assessment, UserAssessment, WithId } from 'assessment-model';
+import { useAssessmentQuestions } from '../state/use-assessment-questions';
 
 const HeaderLabel = styled.span`
     font-weight: 300;
@@ -11,13 +11,14 @@ const HeaderLabel = styled.span`
     margin-right: 16px;
 `;
 
-export const UserSeniorityReport = ({ userSeniority, allQuestions, onFilterChange, assessment, results }: {
+export const UserSeniorityReport = ({ userSeniority, onFilterChange, assessment, results }: {
     userSeniority: Seniority,
-    allQuestions: QuestionWithCategory[],
     onFilterChange: (filter: keyof typeof Seniority) => void,
     assessment: WithId & Assessment,
     results: (WithId & UserAssessment)[]
 }) => {
+    // todo: remove allQuestions, replace with questionCategories? or leave it as is for report? or use useAsAq directly in report?
+    const allQuestions = useAssessmentQuestions();
     return <div style={{ marginLeft: '32px' }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
             <HeaderLabel onClick={() => onFilterChange('junior')} style={{ width: '80px', cursor: 'pointer' }}>Junior</HeaderLabel>
