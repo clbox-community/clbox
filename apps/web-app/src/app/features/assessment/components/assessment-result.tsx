@@ -159,7 +159,7 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
     const questionCategories = useAssessmentQuestionCategories();
     const assessment = useAssessment(teamId, uuid);
     const results = useAssessmentResults(teamId, uuid);
-    const [onlyFails, setOnlyFails] = useState<boolean>(true);
+    const [onlyFails, setOnlyFails] = useState<boolean>(false);
     const [seniorityFilter, setSeniorityFilter] = useState<keyof typeof Seniority | undefined>(Seniority.seniorPlus);
     const userSeniority = assessment?.user?.seniority !== undefined ? asSeniority(assessment.user.seniority) : undefined;
     return assessment && <OneColumnLayoutUltraWide>
@@ -194,7 +194,7 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
                     <span onClick={() => setSeniorityFilter('seniorPlus')} style={{ fontWeight: seniorityFilterAtLeast(seniorityFilter, Seniority.seniorPlus) ? 600 : undefined }}>lead</span>
                     &nbsp;&nbsp;&nbsp;
                     <span onClick={() => setOnlyFails(f => !f)}>
-                        {onlyFails ? 'Pokaż wszystkie obszary' : 'Pokaż obszary do usprawnienia'}
+                        {onlyFails ? 'Pokaż wszystkie obszary' : 'Pokaż tylko obszary do usprawnienia'}
                     </span>
                 </div>
                 {results && <div>

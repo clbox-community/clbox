@@ -25,6 +25,8 @@ const changes = [
     {
         date: '2024-08-21',
         items: [
+            {summary: 'Podsumowanie oceny okresowej domyślnie prezentuje wszystkie pytania (zamiast dotychczasowego prezentowania tylko obszarów do usprawnienia)'},
+            {summary: 'Zablokowanie możliwości usuwania oceniających w definicji ankiety oceny okresowej (do czasu zaimplementowania obsługi usuwania)'},
             {summary: 'Pytania w podsumowaniu oceny okresowej są prezentowane w kolejności, w której były prezentowane w ankiecie'},
             {summary: 'Poprawa prezentowania lokalnych dat'},
         ]
