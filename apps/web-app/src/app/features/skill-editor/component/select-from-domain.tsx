@@ -50,13 +50,13 @@ export const SelectFromDomain = ({
         renderValue={(selected) => (
             <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 0.5}}>
                 {(Array.isArray(selected) ? selected : [selected]).map((value) => (
-                    <Chip key={value} label={domain.find(item => item.id === value).label}/>
+                    <Chip key={value} label={domain?.find(item => item.id === value)?.label ?? ''}/>
                 ))}
             </Box>
         )}
         MenuProps={MenuProps}
     >
-        {domain.map(
+        {domain?.map(
             item => <MenuItem
                 key={item.id}
                 value={item.id}
