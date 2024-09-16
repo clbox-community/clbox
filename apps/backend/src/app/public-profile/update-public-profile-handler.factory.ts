@@ -5,7 +5,7 @@ import type { Change } from 'firebase-functions';
 export const updatePublicProfileHandlerFactory = (
     functions: import('firebase-functions').FunctionBuilder,
     firebase: typeof import('firebase-admin')
-) => functions.firestore.document('team/{team}/user/{user}').onUpdate(
+) => functions.firestore.document('team/{team}/user/{user}').onWrite(
     async (change: Change<firestore.QueryDocumentSnapshot<UserPublicProfile>>, context) => {
         console.log(`Updating user public profile after user change on ${change.after.ref.path}`);
 
