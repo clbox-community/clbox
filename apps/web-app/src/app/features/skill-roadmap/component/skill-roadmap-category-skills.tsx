@@ -54,14 +54,14 @@ const TopicRow: React.FC<{ topic: RoadmapSkillTopic, categoryResults: CategoryRe
                 label={<span style={{ fontSize: '0.9em' }}>{topic.title}</span>} />
             <div style={{ fontSize: '0.8em', fontStyle: 'italic', display: 'flex' }}>
                 {topic.labels && <span style={{ color: 'gray', marginRight: '6px' }}>{topic.labels?.join(', ')}</span>}
-                {(topic.summary || topic.links?.length > 0) && <div style={{ color: 'gray', cursor: 'pointer' }}
+                {(topic.summary || topic.details || topic.links?.length > 0) && <div style={{ color: 'gray', cursor: 'pointer' }}
                                                                     onClick={() => setExpanded(prev => !prev)}>{expanded ? '(zwiń)' : '(więcej)'}</div>}
                 <div style={{ width: '70px', textAlign: 'right' }}>poziom {labelOfLevel(topic.level)}</div>
             </div>
         </TopicRowHeader>
         {expanded && <TopicRowBody>
             {topic.summary && <ReactMarkdown>{topic.summary}</ReactMarkdown>}
-            {topic.docs && <ReactMarkdown>{topic.docs}</ReactMarkdown>}
+            {topic.details && <ReactMarkdown>{topic.details}</ReactMarkdown>}
             {topic.links?.length > 0 && <Fragment>
                 {topic.links.map(link => <div key={link.title}>
                     ✓ <a href={link.href}>{link.title}</a>
