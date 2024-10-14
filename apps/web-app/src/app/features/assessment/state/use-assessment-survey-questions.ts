@@ -1,9 +1,18 @@
-import { boolAnswerBasedOnQuestion, hasBoolAnswerBasedOnQuestion, SurveyContext } from '@clbox/assessment-survey';
+import { boolAnswerBasedOnQuestion, hasBoolAnswerBasedOnQuestion, SurveyContext, UserRole } from '@clbox/assessment-survey';
 import { useCallback, useMemo } from 'react';
 import { useAssessmentQuestions } from './use-assessment-questions';
 import { QuestionWithCategory } from './question-with-category';
-import { UserAssessment } from 'assessment-model';
+import { UserAssessment, AssessmentUserRole } from 'assessment-model';
 import { AssessmentSurveyHook } from '../model/assessment-survey-hook';
+
+function asContextRole(role: AssessmentUserRole): UserRole {
+    switch (role) {
+        case AssessmentUserRole.Developer: return UserRole.Developer;
+        case AssessmentUserRole.ProductOwner: return UserRole.ProductOwner;
+        case AssessmentUserRole.QA: return UserRole.QA;
+    }
+    return undefined;
+}
 
 function isQuestionToShow(assessment: UserAssessment, question: QuestionWithCategory): boolean {
     const questionForm = assessment.assessed === assessment.assessor ? 'text1st' : 'text3rd';
@@ -13,13 +22,20 @@ function isQuestionToShow(assessment: UserAssessment, question: QuestionWithCate
         answers: {
             get: (id: string) => hasBoolAnswerBasedOnQuestion(question.question) ? boolAnswerBasedOnQuestion(question.question, assessment.responseValue?.[n(id)]) : undefined,
             value: (id: string) => assessment.responseValue?.[n(id)]
+        },
+        assessor: {
+            roles: assessment.assessorDetails?.roles.filter(r => r !== AssessmentUserRole.None).map(asContextRole) ?? []
         }
     };
 
     const hasQuestionText = () => question.question[questionForm] !== undefined;
     const isValid = () => !question.question.validWhen || question.question.validWhen(context);
+    const isEligibleForAccessor = context.assessor.roles?.length > 0 ? () => !question.question.eligibleForAssessor || question.question.eligibleForAssessor(context) : () => true;
+    if (!context.assessor.roles || context.assessor.roles?.length === 0) {
+        console.warn(`Assessor without roles. All questions will be mark as eligible to display.`);
+    }
 
-    return hasQuestionText() && isValid();
+    return hasQuestionText() && isValid() && isEligibleForAccessor();
 }
 
 

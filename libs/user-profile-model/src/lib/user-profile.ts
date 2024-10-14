@@ -1,4 +1,4 @@
-import {Profile} from "../../profile/state/profile";
+import { Profile } from './profile';
 
 export type UserProfile = Pick<
     Profile,

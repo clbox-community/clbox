@@ -1,6 +1,6 @@
-import {Profile} from "../../profile/state/profile";
-
 // TODO: do przecięcia zależność na Profile, publiczny profil powinien być pochodną (modelem do odczytu) a nie projekcją pełnego profilu
+import { Profile } from './profile';
+
 export type UserPublicProfile = Pick<
     Profile,
     'display_name'
@@ -11,4 +11,5 @@ export type UserPublicProfile = Pick<
     | 'projects'
     | 'seniority'
     | 'textForm'
+    | 'roles'
 >;
