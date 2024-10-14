@@ -1,4 +1,4 @@
-import { Assessment, AssessmentAssessorDetails, UserAssessment, UserAssessmentRef } from 'assessment-model';
+import { Assessment, AssessmentAssessorDetails, AssessmentUserRoleOfString, UserAssessment, UserAssessmentRef } from 'assessment-model';
 import type { firestore } from 'firebase-admin';
 import { UserPublicProfile } from 'user-profile-model';
 
@@ -7,7 +7,7 @@ async function assessorDetails(db: firestore.Firestore, teamId: string, assessor
         .get()
         .then(doc => doc.data() as UserPublicProfile);
     return {
-        roles: []
+        roles: doc.roles.map(AssessmentUserRoleOfString) ?? []
     };
 }
 
