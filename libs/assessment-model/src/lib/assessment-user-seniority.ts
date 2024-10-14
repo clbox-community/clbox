@@ -7,12 +7,12 @@ export enum AssessmentUserSeniority {
     lead = 'lead'
 }
 
-export function AssessmentUserSeniorityOfString(raw: string): AssessmentUserSeniority {
+export function AssessmentUserSeniorityOfString(raw?: string): AssessmentUserSeniority {
     switch (raw) {
-        case AssessmentUserSeniority[AssessmentUserSeniority.junior]: return AssessmentUserSeniority.junior;
-        case AssessmentUserSeniority[AssessmentUserSeniority.regular]: return AssessmentUserSeniority.regular;
-        case AssessmentUserSeniority[AssessmentUserSeniority.senior]: return AssessmentUserSeniority.senior;
-        case AssessmentUserSeniority[AssessmentUserSeniority.lead]: return AssessmentUserSeniority.lead;
+        case AssessmentUserSeniority.junior: return AssessmentUserSeniority.junior;
+        case AssessmentUserSeniority.regular: return AssessmentUserSeniority.regular;
+        case AssessmentUserSeniority.senior: return AssessmentUserSeniority.senior;
+        case AssessmentUserSeniority.lead: return AssessmentUserSeniority.lead;
         default: return AssessmentUserSeniority.none;
     }
 }

@@ -5,7 +5,7 @@ import { distinct, map, switchMap } from 'rxjs/operators';
 import { AppState } from '../../../state/app-state';
 import { firebaseApp } from '../../firebase/firebase.app';
 import { profileFetched } from './profile-fetched';
-import { Profile } from './profile';
+import { Profile } from 'user-profile-model';
 
 const firestore = firebaseApp.firestore();
 

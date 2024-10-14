@@ -1,6 +1,6 @@
 import {firebaseApp} from "../../firebase/firebase.app";
-import {UserProfile} from "../model/user-profile";
 import {useEffect, useState} from "react";
+import { UserProfile } from 'user-profile-model';
 
 const db = firebaseApp.firestore();
 

@@ -1,6 +1,6 @@
 import { firebaseApp } from '../../firebase/firebase.app';
 import { useEffect, useState } from 'react';
-import { UserPublicProfile } from '../model/user-public-profile';
+import { UserPublicProfile } from 'user-profile-model';
 
 const db = firebaseApp.firestore();
 
@@ -17,6 +17,7 @@ export function useUserPublicProfiles(teamId: string): UserPublicProfile[] {
                         chapterLeader: doc.chapterLeader,
                         teams: doc.teams,
                         projects: doc.projects,
+                        roles: doc.roles,
                         seniority: doc.seniority,
                         textForm: doc.textForm,
                     }))));

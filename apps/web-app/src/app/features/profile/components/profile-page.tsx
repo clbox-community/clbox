@@ -1,7 +1,7 @@
-import {connect, ConnectedProps} from "react-redux";
-import {AppState} from "../../../state/app-state";
-import {OneColumnLayout} from "../../layout/one-column-layout";
-import {ProfileView} from "./profile-view";
+import { connect, ConnectedProps } from 'react-redux';
+import { AppState } from '../../../state/app-state';
+import { OneColumnLayout } from '../../layout/one-column-layout';
+import { ProfileView } from './profile-view';
 
 export const ProfilePageView = ({profile}: ConnectedProps<typeof connector>) => {
     if (!profile) {

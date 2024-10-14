@@ -17,4 +17,5 @@ export interface Profile {
     projects: string[];
     textForm: 'm' | 'f';
     locale: Intl.UnicodeBCP47LocaleIdentifier;
+    roles: string[];
 }
