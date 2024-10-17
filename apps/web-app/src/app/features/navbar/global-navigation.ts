@@ -14,10 +14,10 @@ export const globalNavigation: NavigationGroup[] = [
                 text: 'Wysłane',
                 path: '/sent',
             },
-            {
-                text: 'Statystyki',
-                path: '/stats',
-            },
+            // {
+            //     text: 'Statystyki',
+            //     path: '/stats',
+            // },
             {
                 text: 'Chapter',
                 path: '/chapter/stats',
