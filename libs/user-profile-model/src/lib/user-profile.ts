@@ -12,4 +12,5 @@ export type UserProfile = Pick<
     | 'projects'
     | 'seniority'
     | 'textForm'
+    | 'roles'
 >;

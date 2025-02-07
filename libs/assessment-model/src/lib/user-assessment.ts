@@ -1,5 +1,4 @@
 import { AssessmentUserDetails } from './assessment-user-details';
-import { AssessmentAssessorDetails } from './assessment-assessor-details';
 
 export interface UserAssessment {
     /** Identifier of source assessment based on which user assessment survey was created */
@@ -8,8 +7,6 @@ export interface UserAssessment {
     assessed: string;
     /** User system/authentication identifiers of assessees, e.g. [grzegorz@lipecki.net] */
     assessor: string;
-    /** Assessor details, */
-    assessorDetails?: AssessmentAssessorDetails;
     /** Users chapter leader identifier */
     chapterLeader: string;
     /** Assessment due date after which responses will not be stored */

@@ -23,6 +23,7 @@ export function useUserProfile(teamId: string, userId: string): UserProfile {
                         textForm: doc.textForm,
                         leader: doc.leader,
                         leaderOf: doc.leaderOf,
+                        roles: doc.roles ?? [],
                     }))
             }
         },

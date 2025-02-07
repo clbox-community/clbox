@@ -1,15 +1,4 @@
-import { Assessment, AssessmentAssessorDetails, AssessmentUserRoleOfString, UserAssessment, UserAssessmentRef } from 'assessment-model';
-import type { firestore } from 'firebase-admin';
-import { UserPublicProfile } from 'user-profile-model';
-
-async function assessorDetails(db: firestore.Firestore, teamId: string, assessor: string): Promise<AssessmentAssessorDetails> {
-    const doc = await db.doc(`/team/${teamId}/user/${assessor}`)
-        .get()
-        .then(doc => doc.data() as UserPublicProfile);
-    return {
-        roles: doc.roles.map(AssessmentUserRoleOfString) ?? []
-    };
-}
+import { Assessment, UserAssessment, UserAssessmentRef } from 'assessment-model';
 
 export const userAssessmentsWriteHandlerFactory = (
     functions: import('firebase-functions').FunctionBuilder,
@@ -36,7 +25,6 @@ export const userAssessmentsWriteHandlerFactory = (
                 ...assessment,
                 assessmentId: change.after.id,
                 assessor: assessor,
-                assessorDetails: await assessorDetails(db, context.params.team, assessor),
                 askedQuestion: {},
                 questionFeedback: {},
                 questionTime: {},
