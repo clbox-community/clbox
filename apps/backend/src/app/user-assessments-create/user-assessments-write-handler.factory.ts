@@ -33,7 +33,7 @@ export const userAssessmentsWriteHandlerFactory = (
                 finished: false
             };
             const assessmentDocRef = db.doc(`team/${context.params.team}/assessment/${change.after.id}/result/${assessor}`);
-            console.log(`Updating assessment result document for user [data=${JSON.stringify(userAssessment)}, ref=${assessmentDocRef.path}]`)
+            console.log(`Updating assessment result document for user [data=${JSON.stringify(userAssessment)}, ref=${assessmentDocRef.path}]`);
             await assessmentDocRef.set(userAssessment);
 
             const userAssessmentRef: UserAssessmentRef = {

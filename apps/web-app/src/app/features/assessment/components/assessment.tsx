@@ -24,6 +24,7 @@ import { ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
 import { Category, Question, QuestionType } from '@clbox/assessment-survey';
 import { UserAssessment, WithId } from 'assessment-model';
 import { AssessmentSurveyHookNavigationNavigation, AssessmentSurveyHookProgress, AssessmentSurveyHookSubmitAnswer } from '../model/assessment-survey-hook';
+import { useUserProfile } from '../../user/firestore/use-user-profile';
 
 const LoadingAssessment = () => <Card>
     <CardContent style={{ textAlign: 'center' }}>
@@ -276,6 +277,7 @@ const AssessmentView = ({ teamId, userId }: ViewProps) => {
     const debug = searchParams.has('debug');
     const demo = searchParams.has('demo');
 
+    const accessorProfile = useUserProfile(teamId, userId);
     const [assessment, updateAssessment, finishAssessment] = useUserAssessment(teamId, userId, assessmentId, userAssessmentId, userAssessmentRefId);
     const {
         category,
@@ -284,7 +286,7 @@ const AssessmentView = ({ teamId, userId }: ViewProps) => {
         reset,
         progress,
         navigation
-    } = useAssessmentSurveyQuestions(assessment, updateAssessment, finishAssessment, demo);
+    } = useAssessmentSurveyQuestions(assessment, updateAssessment, finishAssessment, accessorProfile, demo);
 
     useEffect(
         () => {

@@ -1,6 +1,6 @@
 import {firebaseApp} from "../../firebase/firebase.app";
-import {UserProfile} from "../model/user-profile";
 import {useEffect, useState} from "react";
+import { UserProfile } from 'user-profile-model';
 
 const db = firebaseApp.firestore();
 
@@ -23,6 +23,7 @@ export function useUserProfile(teamId: string, userId: string): UserProfile {
                         textForm: doc.textForm,
                         leader: doc.leader,
                         leaderOf: doc.leaderOf,
+                        roles: doc.roles ?? [],
                     }))
             }
         },

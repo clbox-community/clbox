@@ -1,4 +1,4 @@
-import {Profile} from "../../profile/state/profile";
+import { Profile } from './profile';
 
 export type UserProfile = Pick<
     Profile,
@@ -12,4 +12,5 @@ export type UserProfile = Pick<
     | 'projects'
     | 'seniority'
     | 'textForm'
+    | 'roles'
 >;

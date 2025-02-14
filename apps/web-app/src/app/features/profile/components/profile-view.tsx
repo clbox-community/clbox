@@ -90,6 +90,14 @@ export const ProfileView = ({profile}) => <OneColumnLayout>
                     )}
                 </RowValue>
             </Row>}
+            {profile.roles?.length > 0 && <Row>
+                <RowLabel>Role</RowLabel>
+                <RowValue>
+                    {profile.roles.map(
+                        role => <div key={role}>{role}</div>
+                    )}
+                </RowValue>
+            </Row>}
         </CardContent>
     </Card>
 </OneColumnLayout>;

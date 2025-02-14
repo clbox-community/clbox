@@ -1,6 +1,6 @@
-import { UserPublicProfile } from '../../../../web-app/src/app/features/user/model/user-public-profile';
 import type { firestore } from 'firebase-admin';
 import type { Change } from 'firebase-functions';
+import { UserPublicProfile } from 'user-profile-model';
 
 export const updatePublicProfileHandlerFactory = (
     functions: import('firebase-functions').FunctionBuilder,
@@ -23,7 +23,8 @@ export const updatePublicProfileHandlerFactory = (
                 seniority: user.seniority,
                 chapterLeader: user.chapterLeader,
                 projects: user.projects,
-                teams: user.teams
+                teams: user.teams,
+                roles: user.roles
             };
 
             const existingProfile = await profileDoc.get();
@@ -43,6 +44,7 @@ function isSameData(a: UserPublicProfile, b: UserPublicProfile): boolean {
         && a.seniority === b.seniority
         && a.textForm === b.textForm
         && a.chapterLeader === b.chapterLeader
+        && a.roles === b.roles
         && JSON.stringify(a.teams.sort()) === JSON.stringify(b.teams.sort())
         && JSON.stringify(a.projects.sort()) === JSON.stringify(b.projects.sort());
 }
