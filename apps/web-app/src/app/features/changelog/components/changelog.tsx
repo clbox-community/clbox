@@ -23,6 +23,13 @@ const Layout = styled.div`
 
 const changes = [
     {
+        date: '2025-02-17',
+        items: [
+            {summary: 'Obsługa ról użytkownika (role w zespole, tj. QA, Dev, PO; wyświetlanie w profilu)'},
+            {summary: 'Filtrowanie pytań oceny okresowej na podstawie ról użytkownika wypełniającego ankietę'}
+        ]
+    },
+    {
         date: '2024-08-21',
         items: [
             {summary: 'Podsumowanie oceny okresowej domyślnie prezentuje wszystkie pytania (zamiast dotychczasowego prezentowania tylko obszarów do usprawnienia)'},
