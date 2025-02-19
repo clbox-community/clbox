@@ -113,6 +113,9 @@
         "webpack": "5.98.0",
         "webpack-merge": "^5.8.0"
     },
+    "overrides": {
+        "overrides": ">=7.2.5"
+    },
     "volta": {
         "node": "16.19.1"
     }
