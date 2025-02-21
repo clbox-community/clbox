@@ -185,15 +185,15 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
                     />
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px', fontSize: '0.9em', cursor: 'pointer', color: 'rgba(127, 140, 141, 1.0)', userSelect: 'none' }}>
-                    <span onClick={() => setSeniorityFilter('junior')} role="button" style={{ fontWeight: seniorityFilterAtLeast(seniorityFilter, Seniority.junior) ? 600 : undefined }}>junior</span>
+                    <span onClick={() => setSeniorityFilter('junior')} style={{ fontWeight: seniorityFilterAtLeast(seniorityFilter, Seniority.junior) ? 600 : undefined }}>junior</span>
                     &nbsp;|&nbsp;
-                    <span onClick={() => setSeniorityFilter('regular')}role="button"  style={{ fontWeight: seniorityFilterAtLeast(seniorityFilter, Seniority.regular) ? 600 : undefined }}>regular</span>
+                    <span onClick={() => setSeniorityFilter('regular')} style={{ fontWeight: seniorityFilterAtLeast(seniorityFilter, Seniority.regular) ? 600 : undefined }}>regular</span>
                     &nbsp;|&nbsp;
-                    <span onClick={() => setSeniorityFilter('senior')} role="button" style={{ fontWeight: seniorityFilterAtLeast(seniorityFilter, Seniority.senior) ? 600 : undefined }}>senior</span>
+                    <span onClick={() => setSeniorityFilter('senior')} style={{ fontWeight: seniorityFilterAtLeast(seniorityFilter, Seniority.senior) ? 600 : undefined }}>senior</span>
                     &nbsp;|&nbsp;
-                    <span onClick={() => setSeniorityFilter('seniorPlus')} role="button" style={{ fontWeight: seniorityFilterAtLeast(seniorityFilter, Seniority.seniorPlus) ? 600 : undefined }}>lead</span>
+                    <span onClick={() => setSeniorityFilter('seniorPlus')} style={{ fontWeight: seniorityFilterAtLeast(seniorityFilter, Seniority.seniorPlus) ? 600 : undefined }}>lead</span>
                     &nbsp;&nbsp;&nbsp;
-                    <span onClick={() => setOnlyFails(f => !f)} role="button">
+                    <span onClick={() => setOnlyFails(f => !f)}>
                         {onlyFails ? 'Pokaż wszystkie obszary' : 'Pokaż tylko obszary do usprawnienia'}
                     </span>
                 </div>

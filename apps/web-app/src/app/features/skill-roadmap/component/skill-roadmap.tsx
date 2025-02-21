@@ -48,7 +48,7 @@ export const SkillRoadmapView = () => {
         <div>
             <div style={{fontWeight: 600}}>Obszary</div>
             <div style={{marginLeft: '8px', cursor: 'pointer', fontWeight: labelFilter === undefined ? 600 : undefined}}
-                 onClick={() => changeLabelFilter(undefined)}  role="button">
+                 onClick={() => changeLabelFilter(undefined)}>
                 Wszystkie
             </div>
             {labels.map(
@@ -59,7 +59,7 @@ export const SkillRoadmapView = () => {
                         cursor: 'pointer',
                         fontWeight: labelFilter === label ? 600 : undefined
                     }}
-                    onClick={() => changeLabelFilter(label)}  role="button">
+                    onClick={() => changeLabelFilter(label)}>
                     {label}
                 </div>
             )}
@@ -75,7 +75,7 @@ export const SkillRoadmapView = () => {
                     <div style={{marginBottom: '16px', cursor: 'pointer'}} onClick={() => navigate({
                         pathname: item.slug ? item.slug : item.uuid,
                         search: levelFilter !== 4 ? 'level=' + levelFilter : undefined
-                    })} role="button">
+                    })}>
                         <div>{item.title}</div>
                         <div style={{fontSize: '0.8em', marginLeft: '16px'}}>
                             {item.details && <div style={{fontStyle: 'italic', marginBottom: '16px'}}>

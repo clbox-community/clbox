@@ -55,7 +55,7 @@ const TopicRow: React.FC<{ topic: RoadmapSkillTopic, categoryResults: CategoryRe
             <div style={{ fontSize: '0.8em', fontStyle: 'italic', display: 'flex' }}>
                 {topic.labels && <span style={{ color: 'gray', marginRight: '6px' }}>{topic.labels?.join(', ')}</span>}
                 {(topic.summary || topic.details || topic.links?.length > 0) && <div style={{ color: 'gray', cursor: 'pointer' }}
-                                                                    onClick={() => setExpanded(prev => !prev)} role="button">{expanded ? '(zwiń)' : '(więcej)'}</div>}
+                                                                    onClick={() => setExpanded(prev => !prev)}>{expanded ? '(zwiń)' : '(więcej)'}</div>}
                 <div style={{ width: '70px', textAlign: 'right' }}>poziom {labelOfLevel(topic.level)}</div>
             </div>
         </TopicRowHeader>

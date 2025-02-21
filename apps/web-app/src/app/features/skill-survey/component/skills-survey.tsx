@@ -39,12 +39,11 @@ const SkillsSurveyView = ({teamId, userId}: ViewProps) => {
             <div style={{cursor: 'pointer'}}>
                 <div
                     style={{borderBottom: '1px solid lightgray', fontWeight: tagFilter === null ? 600 : undefined}}
-                    onClick={() => setTagFilter(null)}
-                    role="button">
+                    onClick={() => setTagFilter(null)}>
                     Wszystkie
                 </div>
                 {Object.keys(Tags).map(tag => <div key={tag} style={{fontWeight: tagFilter === tag ? 600 : undefined}}
-                                                   onClick={() => setTagFilter(tag)} role="button">
+                                                   onClick={() => setTagFilter(tag)}>
                     {tag}
                 </div>)}
             </div>
