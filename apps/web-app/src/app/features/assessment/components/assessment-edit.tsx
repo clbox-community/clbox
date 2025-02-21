@@ -28,6 +28,7 @@ export const AssessmentCreateView = ({ userId, teamId }: ConnectedProps<typeof c
     const selectDomain = useMemo(() => {
         if (users) {
             return users
+                .slice()
                 .sort((a, b) => a.display_name.localeCompare(b.display_name))
                 .map(user => ({
                     id: user.email,

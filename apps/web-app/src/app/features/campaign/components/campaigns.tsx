@@ -182,13 +182,13 @@ export const CampaignsView = ({teamId, userId}: ViewProps) => {
     return <Layout>
         <div style={{cursor: 'pointer'}}>
             <div style={{fontWeight: filter === CampaignStatus.Current ? 600 : undefined}}
-                 onClick={() => setFilter(CampaignStatus.Current)}>Bieżące
+                 onClick={() => setFilter(CampaignStatus.Current)} role="button">Bieżące
             </div>
             <div style={{fontWeight: filter === CampaignStatus.Archived ? 600 : undefined}}
-                 onClick={() => setFilter(CampaignStatus.Archived)}>Archiwalne
+                 onClick={() => setFilter(CampaignStatus.Archived)} role="button">Archiwalne
             </div>
             <div style={{fontWeight: filter === CampaignStatus.All ? 600 : undefined}}
-                 onClick={() => setFilter(CampaignStatus.All)}>Wszystkie
+                 onClick={() => setFilter(CampaignStatus.All)} role="button">Wszystkie
             </div>
         </div>
         <div>

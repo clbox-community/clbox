@@ -39,11 +39,12 @@ const SkillsSurveyView = ({teamId, userId}: ViewProps) => {
             <div style={{cursor: 'pointer'}}>
                 <div
                     style={{borderBottom: '1px solid lightgray', fontWeight: tagFilter === null ? 600 : undefined}}
-                    onClick={() => setTagFilter(null)}>
+                    onClick={() => setTagFilter(null)}
+                    role="button">
                     Wszystkie
                 </div>
                 {Object.keys(Tags).map(tag => <div key={tag} style={{fontWeight: tagFilter === tag ? 600 : undefined}}
-                                                   onClick={() => setTagFilter(tag)}>
+                                                   onClick={() => setTagFilter(tag)} role="button">
                     {tag}
                 </div>)}
             </div>
@@ -59,7 +60,7 @@ const SkillsSurveyView = ({teamId, userId}: ViewProps) => {
                 </div>
                 <div style={{marginTop: '16px'}}>
                     {skillTree && userSkills && skillTree
-                        .filter(skill => tagFilter === null || (skill.tag && skill.tag[tagFilter]))
+                        .filter(skill => tagFilter === null || skill.tag?.[tagFilter])
                         .map(skill => <SkillRow key={skill.id} style={{marginBottom: '8px'}}>
                             <SkillSurvey skill={skill} value={userSkills[skill.id]}
                                          onAnswered={(answer) => onSkillAnswered(skill, answer)}/>

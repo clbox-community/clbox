@@ -37,7 +37,7 @@ const InboxMessagesView = ({messages, inboxLabels, filter, onDiscard, onCommentC
     const filtered = filterMessages(messages, filter);
     const ordered = sortByDate(filtered); // TODO: user defined sort
     return <div>
-        {ordered && ordered.map(msg => <InboxItem key={msg.id}>
+        {ordered?.map(msg => <InboxItem key={msg.id}>
             <FeedbackCard
                 feedback={msg}
                 existingLabels={inboxLabels}

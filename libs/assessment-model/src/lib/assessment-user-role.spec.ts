@@ -7,6 +7,6 @@ describe('assessment user role parse', () => {
         expect(AssessmentUserRoleOfString('qa')).toBe(AssessmentUserRole.QA);
         expect(AssessmentUserRoleOfString('po')).toBe(AssessmentUserRole.ProductOwner);
         expect(AssessmentUserRoleOfString('blahbleh')).toBe(AssessmentUserRole.None);
-        expect(AssessmentUserRoleOfString(undefined)).toBe(AssessmentUserRole.None);
+        expect(AssessmentUserRoleOfString()).toBe(AssessmentUserRole.None);
     });
 });
