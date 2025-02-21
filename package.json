@@ -114,7 +114,8 @@
         "webpack-merge": "^5.8.0"
     },
     "overrides": {
-        "protobufjs": ">=7.2.5"
+        "protobufjs": ">=7.2.5",
+        "@grpc/grpc-js": ">=1.8.22"
     },
     "volta": {
         "node": "16.19.1"
