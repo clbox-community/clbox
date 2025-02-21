@@ -50,7 +50,7 @@ const SkillEditorView = ({teamId, userId}: ViewProps) => {
 
     return <Layout>
         <div>
-            {skills && skills.map(skill =>
+            {skills?.map(skill =>
                 <SkillRow onChanged={(prev, next) => onSkillChanged(prev, next)} skill={skill} key={skill.id}/>
             )}
             <AddSkill onAdd={onSkillAdded} />

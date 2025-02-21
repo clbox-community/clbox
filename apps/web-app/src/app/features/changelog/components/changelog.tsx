@@ -7,7 +7,7 @@ export const Changelog = () => {
             {changes.map(change => <div key={change.date}>
                 <div>{change.date}</div>
                 <ul>
-                    {change.items.map((item, index) => <div key={index}>
+                    {change.items.map(item => <div key={item.summary}>
                         <li>{item.summary}</li>
                     </div>)}
                 </ul>

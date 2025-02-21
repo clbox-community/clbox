@@ -45,6 +45,10 @@ function isSameData(a: UserPublicProfile, b: UserPublicProfile): boolean {
         && a.textForm === b.textForm
         && a.chapterLeader === b.chapterLeader
         && a.roles === b.roles
-        && JSON.stringify(a.teams.sort()) === JSON.stringify(b.teams.sort())
-        && JSON.stringify(a.projects.sort()) === JSON.stringify(b.projects.sort());
+        && JSON.stringify(sorted(a.teams)) === JSON.stringify(sorted(b.teams))
+        && JSON.stringify(sorted(a.projects)) === JSON.stringify(sorted(b.projects));
+}
+
+function sorted(array: string[]): string[] {
+    return array.slice().sort((a, b) => a.localeCompare(b));
 }

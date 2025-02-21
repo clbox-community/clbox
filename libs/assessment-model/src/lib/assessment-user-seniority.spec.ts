@@ -8,6 +8,6 @@ describe('assessment user seniority parse', () => {
         expect(AssessmentUserSeniorityOfString('regular')).toBe(AssessmentUserSeniority.regular);
         expect(AssessmentUserSeniorityOfString('junior')).toBe(AssessmentUserSeniority.junior);
         expect(AssessmentUserSeniorityOfString('blahbleh')).toBe(AssessmentUserSeniority.none);
-        expect(AssessmentUserSeniorityOfString(undefined)).toBe(AssessmentUserSeniority.none);
+        expect(AssessmentUserSeniorityOfString()).toBe(AssessmentUserSeniority.none);
     });
 });

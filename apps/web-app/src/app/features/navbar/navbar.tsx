@@ -26,7 +26,7 @@ const NavbarView = ({isLeader}: ConnectedProps<typeof connector>) => {
                 <SelectTeam></SelectTeam>
                 <NavbarMenuSpacer/>
 
-                {userNavigation && userNavigation.map(
+                {userNavigation?.map(
                     (group, index) => <React.Fragment key={group.path}>
                         <NavbarSubmenuGroup prefix={group.path} header={
                             <NavbarSubmenuItem path={group.path + group.items.find(item => item.default).path}

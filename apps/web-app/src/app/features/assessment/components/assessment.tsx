@@ -184,7 +184,7 @@ const QuestionSurvey = ({ assessment, category, question, submitAnswer, reset, p
                 {assessment && <>
                     <div>Bieżące pytanie: {assessment.currentQuestion.replaceAll('_0', '.')}</div>
                     <div>Pytania z
-                        odpowiedziami: {Object.keys(assessment.responseValue).sort().map(i => i === assessment.currentQuestion ? `*${i}*` : i).map(i => i.replaceAll('_0', '.')).join(', ')}</div>
+                        odpowiedziami: {Object.keys(assessment.responseValue).sort((a, b) => a.localeCompare(b)).map(i => i === assessment.currentQuestion ? `*${i}*` : i).map(i => i.replaceAll('_0', '.')).join(', ')}</div>
                 </>}
             </div>}
             <CardHeader

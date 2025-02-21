@@ -235,8 +235,7 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
                                                         {q.id.replaceAll('_', '.')}
                                                     </ResultCell>
                                                     <ResultCell style={{ ...Columns.question }}>
-                                                        {q.text3rd && q.text3rd[assessment.user.textForm]}
-                                                        {!q.text3rd && q.text1st[assessment.user.textForm]}
+                                                        {q.text3rd ? q.text3rd[assessment.user.textForm] : q.text1st[assessment.user.textForm]}
                                                     </ResultCell>
                                                     <ResultCell style={{ ...Columns.seniority }}>
                                                         {q.seniority}

@@ -1,6 +1,6 @@
 import {CreateUserRequest} from './create-user.request';
 
-const emailRegex = /^[a-zA-Z0-9._-]+@(?<domain>[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4})$/i;
+const emailRegex = /^[a-z0-9._-]+@(?<domain>[a-z0-9.-]+\.[a-z]{2,4})$/i;
 
 export const createUserFactory = (
   functions: import('firebase-functions').FunctionBuilder,
