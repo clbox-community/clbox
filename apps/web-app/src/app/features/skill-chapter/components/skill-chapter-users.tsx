@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { connect, ConnectedProps } from 'react-redux';
 import { AppState } from '../../../state/app-state';
 import { Link } from 'react-router-dom';
-import { useChapterUsers } from '../model/use-chapter-users';
+import { useChapterUsers } from '../../chapter/model/use-chapter-users';
 
 export const SkillChapterUsersView = ({teamId, userId}: ViewProps) => {
     const users = useChapterUsers(teamId, userId);
