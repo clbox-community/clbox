@@ -2,6 +2,18 @@ import {NavigationGroup} from "./navigation";
 
 export const globalNavigation: NavigationGroup[] = [
     {
+        text: 'Chapter',
+        path: '/chapter',
+        condition: context => context.isLeader,
+        items: [
+            {
+                text: 'Przegląd',
+                path: '',
+                default: true
+            },
+        ]
+    },
+    {
         text: 'Feedback',
         path: '/feedback',
         items: [
@@ -74,5 +86,5 @@ export const globalNavigation: NavigationGroup[] = [
                 path: '/campaign',
             }
         ]
-    },
+    }
 ]

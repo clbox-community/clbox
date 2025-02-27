@@ -28,10 +28,15 @@ import { UserProfilePage } from './features/profile/components/user-profile-page
 import { SurveyRoot } from './features/survey/components/survey-root';
 import { SkillsSurvey } from './features/skill-survey/component/skills-survey';
 import { SkillChapterAll } from './features/skill-chapter/components/skill-chapter-all';
+import { ChapterDashboard } from './features/chapter/components/dashboard/chapter-dashboard';
+import { AssessmentCategoriesUser } from './features/assessment/components/categories-user/assessment-categories-user';
 
 export const AppRoutingAuthenticated = () => <Routes>
     <Route path="/s/:team/:uuid" element={<SurveyRoot />} />
-    <Route path="/" element={<Navigate to="/feedback/inbox" />} />
+    <Route path="/" element={<Navigate to="/chapter" />} />
+    <Route path="/chapter">
+        <Route path="" element={<ChapterDashboard />} />
+    </Route>
     <Route path="feedback">
         <Route path="inbox" element={<Inbox />} />
         <Route path="sent" element={<Sent />} />
@@ -58,6 +63,7 @@ export const AppRoutingAuthenticated = () => <Routes>
         <Route path="" element={<Assessments />} />
         <Route path="new" element={<AssessmentEdit />} />
         <Route path="edit" element={<AssessmentEdit />} />
+        <Route path="categories/:user" element={<AssessmentCategoriesUser />} />
         <Route path=":uuid/edit" element={<AssessmentEdit />} />
         <Route path=":uuid/result" element={<AssessmentResult />} />
         <Route path=":assessmentId/:userAssessmentId/:userAssessmentRefId" element={<Assessment />} />

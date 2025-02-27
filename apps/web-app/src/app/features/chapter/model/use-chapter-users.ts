@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 const db = firebaseApp.firestore();
 
-interface ChapterUser {
+export interface ChapterUser {
     name: string;
     id: string;
 }

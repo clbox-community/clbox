@@ -23,6 +23,12 @@ const Layout = styled.div`
 
 const changes = [
     {
+        date: '2025-02-27',
+        items: [
+            {summary: 'Możliwość określenia zbioru pytań oceny okresowej dla każdej osoby (oznaczenia pytań jako zweryfikowanych lub ignorowanych)'},
+        ]
+    },
+    {
         date: '2025-02-17',
         items: [
             {summary: 'Obsługa ról użytkownika (role w zespole, tj. QA, Dev, PO; wyświetlanie w profilu)'},
