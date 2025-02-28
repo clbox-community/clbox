@@ -54,6 +54,11 @@ const CategoryQuestionTextSeniorityColumn = styled(CategoryQuestionColumn)`
 const CategoryQuestionTextIdColumn = styled(CategoryQuestionColumn)`
     width: 80px;
 `;
+const CategoryQuestionTextIdColumnEllipsis = styled.div`
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+`
 const CategoryQuestionTextAssessmentColumn = styled(CategoryQuestionColumn)`
     width: 170px
 `;
@@ -171,8 +176,10 @@ const CategoryRow = ({ category, verifiedCategories, userProfile, updateVerifica
                         <CategoryQuestionTextSeniorityColumn>
                             {question.seniority}
                         </CategoryQuestionTextSeniorityColumn>
-                        <CategoryQuestionTextIdColumn>
-                            {question.id}
+                        <CategoryQuestionTextIdColumn title={question.id?.replaceAll('_', '.')}>
+                            <CategoryQuestionTextIdColumnEllipsis>
+                                {question.id?.replaceAll('_', '.')}
+                            </CategoryQuestionTextIdColumnEllipsis>
                         </CategoryQuestionTextIdColumn>
                         <CategoryQuestionTextAssessmentColumn>
                             <QuestionAssessmentVerificationSelect
