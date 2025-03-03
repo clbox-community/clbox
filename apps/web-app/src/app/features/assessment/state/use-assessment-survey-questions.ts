@@ -35,11 +35,12 @@ function isQuestionToShow(assessment: UserAssessment, question: QuestionWithCate
     const hasQuestionText = () => question.question[questionForm] !== undefined;
     const valid = () => !question.question.validWhen || question.question.validWhen(context);
     const eligibleForAssessor = context.assessor.roles?.length > 0 ? () => !question.question.eligibleForAssessor || question.question.eligibleForAssessor(context) : () => true;
+    const skipped = assessment.questionToSkip !== undefined ? () => assessment.questionToSkip[question.question.id] === true : () => false;
     if (!context.assessor.roles || context.assessor.roles?.length === 0) {
         console.warn(`Assessor without roles. All questions will be mark as eligible to display.`);
     }
 
-    return hasQuestionText() && valid() && eligibleForAssessor();
+    return hasQuestionText() && valid() && eligibleForAssessor() && !skipped();
 }
 
 

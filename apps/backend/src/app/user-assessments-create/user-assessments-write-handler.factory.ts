@@ -1,4 +1,7 @@
 import { Assessment, UserAssessment, UserAssessmentRef } from 'assessment-model';
+import { firestore } from 'firebase-admin';
+import DocumentData = firestore.DocumentData;
+import DocumentSnapshot = firestore.DocumentSnapshot;
 
 export const userAssessmentsWriteHandlerFactory = (
     functions: import('firebase-functions').FunctionBuilder,
@@ -15,16 +18,20 @@ export const userAssessmentsWriteHandlerFactory = (
         const prevAssessment = change.before.data() as Assessment | undefined;
         const assessment = change.after.data() as Assessment;
         const assessors: string[] = assessment?.assessors ?? [];
+        const assessmentCategories= await db.doc(`team/${context.params.team}/user/${assessment.assessed}/data/assessment-categories`).get();
+
         for (const assessor of assessors) {
             if (prevAssessment?.assessors?.includes(assessor)) {
                 continue;
             }
             console.log(`Updating assessment documents for added assessor: ${assessor}`);
 
+
             const userAssessment: UserAssessment = {
                 ...assessment,
                 assessmentId: change.after.id,
                 assessor: assessor,
+                questionToSkip: asQuestionToSkip(assessmentCategories),
                 askedQuestion: {},
                 questionFeedback: {},
                 questionTime: {},
@@ -51,3 +58,12 @@ export const userAssessmentsWriteHandlerFactory = (
         }
     }
 );
+
+function asQuestionToSkip(document: DocumentSnapshot<DocumentData>) {
+    const questions: { [key: string]: boolean } = {};
+    if (document.exists) {
+        const data = document.data();
+        Object.keys(data).filter(key => data[key].status !== "Ask").map(key => questions[key] = true);
+    }
+    return questions;
+}

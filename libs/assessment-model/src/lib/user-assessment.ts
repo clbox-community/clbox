@@ -17,6 +17,10 @@ export interface UserAssessment {
     finished: boolean;
     /** Date when survey changed to finished state. */
     finishedDate?: number;
+    /** Collections of questions that will be skipped in the survey */
+    questionToSkip: {
+        [id: string]: boolean; // true when question will be skipped
+    };
     /** Collection of presented question identifiers. Some questions may be skipped and this map allows to verify that. */
     askedQuestion: {
         [id: string]: boolean; // true when question was presented, false or no row if question was skipped
