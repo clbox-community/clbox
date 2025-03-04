@@ -1,5 +1,5 @@
 export const updateCampaignAfterSurveyFactory = (
-    functions: import('firebase-functions').FunctionBuilder,
+    functions: import('firebase-functions/v1').FunctionBuilder,
     firebase: typeof import('firebase-admin'),
 ) => functions.firestore.document('team/{team}/campaign/{campaign}/answers/{answer}').onCreate(
     async (change, context) => {

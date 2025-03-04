@@ -35,7 +35,7 @@ function asStatsUpdate(firebase, before, after) {
 }
 
 export const updateFilterStatsAfterInboxChangeFactory = (
-    functions: import('firebase-functions').FunctionBuilder,
+    functions: import('firebase-functions/v1').FunctionBuilder,
     config: Record<string, any>,
     firebase: typeof import('firebase-admin')
 ) => functions.firestore.document('team/{team}/user/{user}/inbox/{messageId}').onUpdate(

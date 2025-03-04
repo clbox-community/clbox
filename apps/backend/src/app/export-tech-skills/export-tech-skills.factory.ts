@@ -1,7 +1,7 @@
 import {exportTechSkills} from "./export-tech-skills";
 
 export const exportTechSkillsFactory = (
-    functions: import('firebase-functions').FunctionBuilder,
+    functions: import('firebase-functions/v1').FunctionBuilder,
     config: Record<string, any>,
     firebase: typeof import('firebase-admin')
 ) => {

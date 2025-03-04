@@ -36,7 +36,8 @@
     },
     "functions": {
         "predeploy": "npm run -- build:backend",
-        "source": "dist/apps/backend"
+        "source": "dist/apps/backend",
+        "runtime": "nodejs20"
     },
     "firestore": {
         "rules": "packages/firestore/firestore.rules"
