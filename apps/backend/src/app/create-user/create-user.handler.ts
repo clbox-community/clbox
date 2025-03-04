@@ -3,7 +3,7 @@ import {CreateUserRequest} from './create-user.request';
 const emailRegex = /^[a-z0-9._-]+@(?<domain>[a-z0-9.-]+\.[a-z]{2,4})$/i;
 
 export const createUserFactory = (
-  functions: import('firebase-functions').FunctionBuilder,
+  functions: import('firebase-functions/v1').FunctionBuilder,
   firebase: typeof import('firebase-admin')
 ) => {
   async function tryToFindUserByEmail(email: string) {

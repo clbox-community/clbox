@@ -2,7 +2,7 @@ import { userProfile } from '../slack/fetch-user-profile';
 import { sendSlackMessage } from '../slack/send-slack-message';
 
 export const notifyAfterUserFeedbackFactory = (
-    functions: import('firebase-functions').FunctionBuilder,
+    functions: import('firebase-functions/v1').FunctionBuilder,
     config: Record<string, any>
 ) => functions.firestore.document('team/{team}/inbox/{chapterLeader}/message/{messageId}').onCreate(
     async (change, context) => {

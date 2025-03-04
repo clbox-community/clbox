@@ -1,5 +1,5 @@
 export const feedbackStatsFactory = (
-  functions: import('firebase-functions').FunctionBuilder,
+  functions: import('firebase-functions/v1').FunctionBuilder,
   firebase: typeof import('firebase-admin')
 ) => functions.firestore.document('team/{team}/inbox/{chapterLeader}/message/{messageId}').onCreate(
   async (change, context) => {

@@ -46,7 +46,7 @@ async function failedToSendFeedback(firebase: typeof import('firebase-admin'), h
 }
 
 export const storeUserFeedbackFactory = (
-    functions: import('firebase-functions').FunctionBuilder,
+    functions: import('firebase-functions/v1').FunctionBuilder,
     config: Record<string, any>,
     firebase: typeof import('firebase-admin'),
     topic: string) => {

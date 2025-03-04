@@ -1,7 +1,7 @@
 import { UserAssessmentRef } from 'assessment-model';
 
 export const userAssessmentsFinishHandlerFactory = (
-    functions: import('firebase-functions').FunctionBuilder,
+    functions: import('firebase-functions/v1').FunctionBuilder,
     firebase: typeof import('firebase-admin')
 ) => functions.firestore.document('/team/{team}/user/{assessor}/user-assessment-sent/{id}').onCreate(
     async (snapshot, context) => {

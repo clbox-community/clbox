@@ -1,7 +1,7 @@
 import {PubSub} from '@google-cloud/pubsub';
 import * as firebase from 'firebase-admin';
-import * as functions from 'firebase-functions';
-import {FunctionBuilder} from 'firebase-functions';
+import * as functions from 'firebase-functions/v1';
+import {FunctionBuilder} from 'firebase-functions/v1';
 import {createUserFactory} from './app/create-user/create-user.handler';
 import {expireUserAccountsFactory} from './app/expire-user-accounts/expire-user-accounts-factory';
 import {feedbackStatsFactory} from './app/feedback-stats/feedback-stats-factory';
@@ -38,6 +38,7 @@ import {
 import {exportTechSkillsFactory} from "./app/export-tech-skills/export-tech-skills.factory";
 import { userAssessmentsFinishHandlerFactory } from './app/user-assessments-finish/user-assessments-finish-handler.factory';
 import { updatePublicProfileHandlerFactory } from './app/public-profile/update-public-profile-handler.factory';
+import { aggregateSkillRoadmapStatsHandlerFactory } from './app/aggregate-skill-roadmap-stats/aggregate-skill-roadmap-stats-handler.factory';
 
 firebase.initializeApp();
 
@@ -54,7 +55,7 @@ export const notifyAfterUserFeedback = notifyAfterUserFeedbackFactory(functionBu
 export const notifyAfterChannelFeedback = notifyAfterChannelFeedbackFactory(functionBuilder(), functions.config(), firebase);
 export const notifyAfterLeaderChange = notificationAfterLeaderChangeFactory(functionBuilder(), functions.config());
 export const notifyAfterSurveyCreated = notificationAfterSurveyCreatedFactory(functionBuilder(), functions.config());
-feedbackStatsFactory(functionBuilder(), firebase);
+export const feedbackStats = feedbackStatsFactory(functionBuilder(), firebase);
 export const userFeedbackStats = userFeedbackStatsFactory(functionBuilder(), firebase);
 export const createUser = createUserFactory(functionBuilder(), firebase);
 export const expireUserAccounts = expireUserAccountsFactory(functionBuilder(), firebase);
@@ -84,6 +85,10 @@ export const exportTechSkillsCron = exportTechSkillsFactory(
     firebase
 );
 export const updatePublicProfileHandler = updatePublicProfileHandlerFactory(
+    functionBuilder().runWith({}),
+    firebase
+)
+export const aggregateSkillRoadmapStatsHandler = aggregateSkillRoadmapStatsHandlerFactory(
     functionBuilder().runWith({}),
     firebase
 )

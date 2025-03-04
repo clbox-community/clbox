@@ -24,7 +24,7 @@ function asMessage(channel, fromUser: SlackUserProfile, payload: PendingFeedback
 
 
 export const storeChannelFeedbackHandlerFactory = (
-    functions: import('firebase-functions').FunctionBuilder,
+    functions: import('firebase-functions/v1').FunctionBuilder,
     config: Record<string, any>,
     firebase: typeof import('firebase-admin'),
     topic: string) => {
