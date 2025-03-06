@@ -2,7 +2,7 @@ import { boolAnswerBasedOnQuestion, hasBoolAnswerBasedOnQuestion, SurveyContext,
 import { useCallback, useMemo } from 'react';
 import { useAssessmentQuestions } from './use-assessment-questions';
 import { QuestionWithCategory } from './question-with-category';
-import { AssessmentUserRole, UserAssessment } from 'assessment-model';
+import { AssessmentUserRole, UserAssessment, UserAssessmentVerification } from 'assessment-model';
 import { AssessmentSurveyHook } from '../model/assessment-survey-hook';
 import { UserProfile } from 'user-profile-model';
 
@@ -35,7 +35,9 @@ function isQuestionToShow(assessment: UserAssessment, question: QuestionWithCate
     const hasQuestionText = () => question.question[questionForm] !== undefined;
     const valid = () => !question.question.validWhen || question.question.validWhen(context);
     const eligibleForAssessor = context.assessor.roles?.length > 0 ? () => !question.question.eligibleForAssessor || question.question.eligibleForAssessor(context) : () => true;
-    const skipped = assessment.questionToSkip !== undefined ? () => assessment.questionToSkip[question.question.id] === true : () => false;
+    const skipped = !!assessment.verifiedCategories && assessment.verifiedCategories[question.question.id]?.status !== undefined
+        ? () => assessment.verifiedCategories[question.question.id].status !== UserAssessmentVerification.Ask
+        : () => false;
     if (!context.assessor.roles || context.assessor.roles?.length === 0) {
         console.warn(`Assessor without roles. All questions will be mark as eligible to display.`);
     }
