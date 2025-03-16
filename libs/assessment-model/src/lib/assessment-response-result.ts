@@ -3,4 +3,6 @@ export enum ResponseAssessmentResult {
     ExpectedResponse = 'ExpectedResponse',
     NotExpectedNotRequired = 'NotExpectedNotRequired',
     NotExpectedRequired = 'NotExpectedRequired',
+    Verified = 'Verified',
+    Skipped = 'Skipped'
 }

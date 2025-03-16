@@ -52,14 +52,12 @@ function responseColor(question: Question, assessment: WithId & Assessment, resu
         [ResponseAssessmentResult.ExpectedResponse]: 'rgba(39, 174, 96, 1.0)',
         [ResponseAssessmentResult.NotExpectedRequired]: 'rgba(192, 57, 43, 1.0)',
         [ResponseAssessmentResult.NotAsked]: 'rgba(127, 140, 141, 1.0)',
-        [ResponseAssessmentResult.NotExpectedNotRequired]: 'rgba(230, 126, 34, 1.0)'
+        [ResponseAssessmentResult.NotExpectedNotRequired]: 'rgba(230, 126, 34, 1.0)',
+        [ResponseAssessmentResult.Verified]: 'rgba(127, 140, 141, 1.0)',
+        [ResponseAssessmentResult.Skipped]: 'rgba(127, 140, 141, 1.0)'
     };
 
-    return colorMap[assessmentResponseAssessResult(
-        asSeniority(assessment.user.seniority),
-        question,
-        result.responseValue[question.id]
-    )];
+    return colorMap[assessmentResponseAssessResult(asSeniority(assessment.user.seniority), question, result.responseValue[question.id], result.verifiedCategories)];
 }
 
 function shouldShowQuestion(userSeniority: Seniority, question: Question, assessment: WithId & Assessment, results: (WithId & UserAssessment)[], seniorityFilter: 'junior' | 'regular' | 'senior' | 'seniorPlus', onlyFails: boolean) {
@@ -67,7 +65,7 @@ function shouldShowQuestion(userSeniority: Seniority, question: Question, assess
         return false;
     }
     if (onlyFails && (results.every(result => {
-        const resultAssessment = assessmentResponseAssessResult(userSeniority, question, result.responseValue[question.id]);
+        const resultAssessment = assessmentResponseAssessResult(userSeniority, question, result.responseValue[question.id], result.verifiedCategories);
         return resultAssessment === ResponseAssessmentResult.NotAsked || resultAssessment === ResponseAssessmentResult.ExpectedResponse;
     }))) {
         return false;
@@ -144,13 +142,16 @@ function answerCorrectnessMarkerText(result: WithId & UserAssessment, question: 
         [ResponseAssessmentResult.ExpectedResponse]: '✓',
         [ResponseAssessmentResult.NotExpectedRequired]: '⤫',
         [ResponseAssessmentResult.NotExpectedNotRequired]: '⤫',
-        [ResponseAssessmentResult.NotAsked]: '-'
+        [ResponseAssessmentResult.NotAsked]: '-',
+        [ResponseAssessmentResult.Verified]: 'potw.',
+        [ResponseAssessmentResult.Skipped]: 'nd.'
     };
 
     return markMap[assessmentResponseAssessResult(
         asSeniority(assessment.user.seniority),
         question,
-        result.responseValue[question.id]
+        result.responseValue[question.id],
+        result.verifiedCategories
     )];
 }
 
@@ -246,7 +247,7 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
                                                             <ResultCell key={result.assessor}
                                                                         style={{ ...Columns.result, color: responseColor(q, assessment, result) }}
                                                             >
-                                                            <span title={labelBasedOnQuestion(userSeniority, q, result.responseValue[q.id])}>
+                                                            <span title={labelBasedOnQuestion(userSeniority, q, result.responseValue[q.id], result.verifiedCategories)}>
                                                                 {result.askedQuestion[q.id] ? (summaryAnswerBasedOnQuestion(q, result.responseValue[q.id])) : '-'}
                                                                 &nbsp;
                                                                 {answerCorrectnessMarkerText(result, q, assessment)}
