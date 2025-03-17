@@ -12,7 +12,7 @@ import styled from 'styled-components';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
-import { UserAssessmentVerification, UserAssessmentVerifiedCategories, UserAssessmentVerifiedCategory } from '../../model/user-assessment-verified-categories';
+import { UserAssessmentVerification, UserAssessmentVerifiedCategories, UserAssessmentVerifiedCategory } from 'assessment-model';
 import { firebaseApp } from '../../../firebase/firebase.app';
 import { UserProfile } from 'user-profile-model';
 
