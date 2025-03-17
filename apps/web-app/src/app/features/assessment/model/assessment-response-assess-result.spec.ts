@@ -1,7 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 import { assessmentResponseAssessResult } from './assessment-response-assess-result';
 import { DesiredResponseBySeniority, Question, QuestionType, Seniority } from '@clbox/assessment-survey';
-import { ResponseAssessmentResult, UserAssessmentVerification, UserAssessmentVerifiedCategories } from 'assessment-model';
+import { ResponseAssessmentResult, UserAssessmentVerification } from 'assessment-model';
 
 function q(
     expectedResponses: Partial<DesiredResponseBySeniority> = {},
