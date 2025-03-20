@@ -33,7 +33,7 @@
         "@google-cloud/pubsub": "2.7.0",
         "@mui/icons-material": "^5.16.6",
         "@mui/material": "^5.16.6",
-        "@nx/react": "20.4.5",
+        "@nx/react": "20.5.1",
         "@reduxjs/toolkit": "^2.2.7",
         "@typescript-eslint/eslint-plugin": "7.18.0",
         "axios": "^1.6.0",
