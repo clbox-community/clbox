@@ -28,7 +28,8 @@ export const useUserAssessment = (team: string, user: string, assessmentId: stri
                                 responseValue: guessResponseValues(data),
                                 questionTime: data.questionTime ?? {},
                                 comment: data.comment ?? {},
-                                questionFeedback: data.questionFeedback ?? {}
+                                questionFeedback: data.questionFeedback ?? {},
+                                verifiedCategories: data.verifiedCategories ?? {}
                             });
                         } else {
                             setAssessment(null);

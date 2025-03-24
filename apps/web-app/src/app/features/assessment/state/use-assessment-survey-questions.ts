@@ -32,17 +32,15 @@ function isQuestionToShow(assessment: UserAssessment, question: QuestionWithCate
         }
     };
 
+    const markedToAsk = (assessment.verifiedCategories[question.question.id]?.status ?? UserAssessmentVerification.Ask) === UserAssessmentVerification.Ask;
     const hasQuestionText = () => question.question[questionForm] !== undefined;
     const valid = () => !question.question.validWhen || question.question.validWhen(context);
     const eligibleForAssessor = context.assessor.roles?.length > 0 ? () => !question.question.eligibleForAssessor || question.question.eligibleForAssessor(context) : () => true;
-    const skipped = !!assessment.verifiedCategories && assessment.verifiedCategories[question.question.id]?.status !== undefined
-        ? () => assessment.verifiedCategories[question.question.id].status !== UserAssessmentVerification.Ask
-        : () => false;
     if (!context.assessor.roles || context.assessor.roles?.length === 0) {
         console.warn(`Assessor without roles. All questions will be mark as eligible to display.`);
     }
 
-    return hasQuestionText() && valid() && eligibleForAssessor() && !skipped();
+    return markedToAsk && hasQuestionText() && valid() && eligibleForAssessor();
 }
 
 

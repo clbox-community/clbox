@@ -66,7 +66,10 @@ function shouldShowQuestion(userSeniority: Seniority, question: Question, assess
     }
     if (onlyFails && (results.every(result => {
         const resultAssessment = assessmentResponseAssessResult(userSeniority, question, result.responseValue[question.id], result.verifiedCategories);
-        return resultAssessment === ResponseAssessmentResult.NotAsked || resultAssessment === ResponseAssessmentResult.ExpectedResponse;
+        return resultAssessment === ResponseAssessmentResult.NotAsked
+            || resultAssessment === ResponseAssessmentResult.ExpectedResponse
+            || resultAssessment === ResponseAssessmentResult.Verified
+            || resultAssessment === ResponseAssessmentResult.Skipped;
     }))) {
         return false;
     }

@@ -27,7 +27,7 @@ export const userAssessmentsWriteHandlerFactory = (
                 ...assessment,
                 assessmentId: change.after.id,
                 assessor: assessor,
-                verifiedCategories: assessmentCategories?.data() as UserAssessmentVerifiedCategories ?? null,
+                verifiedCategories: assessmentCategories?.data() as UserAssessmentVerifiedCategories ?? {},
                 askedQuestion: {},
                 questionFeedback: {},
                 questionTime: {},

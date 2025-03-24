@@ -2,10 +2,10 @@ import { Question, Seniority } from '@clbox/assessment-survey';
 import { ResponseAssessmentResult, UserAssessmentVerification, UserAssessmentVerifiedCategories } from 'assessment-model';
 
 export function assessmentResponseAssessResult(userSeniority: Seniority, question: Question, response: number|undefined, verifiedCategories: UserAssessmentVerifiedCategories): ResponseAssessmentResult {
-  if (verifiedCategories?.[question.id]?.status === UserAssessmentVerification.Verified) {
+  if (verifiedCategories[question.id]?.status === UserAssessmentVerification.Verified) {
       return ResponseAssessmentResult.Verified;
   }
-  if (verifiedCategories?.[question.id]?.status === UserAssessmentVerification.Skip) {
+  if (verifiedCategories[question.id]?.status === UserAssessmentVerification.Skip) {
       return ResponseAssessmentResult.Skipped;
   }
   if (response === undefined) {
