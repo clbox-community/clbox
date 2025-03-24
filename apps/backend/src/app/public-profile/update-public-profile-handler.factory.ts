@@ -1,9 +1,9 @@
 import type { firestore } from 'firebase-admin';
-import type { Change } from 'firebase-functions';
+import type { Change } from 'firebase-functions/v1';
 import { UserPublicProfile } from 'user-profile-model';
 
 export const updatePublicProfileHandlerFactory = (
-    functions: import('firebase-functions').FunctionBuilder,
+    functions: import('firebase-functions/v1').FunctionBuilder,
     firebase: typeof import('firebase-admin')
 ) => functions.firestore.document('team/{team}/user/{user}').onWrite(
     async (change: Change<firestore.QueryDocumentSnapshot<UserPublicProfile>>, context) => {

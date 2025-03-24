@@ -4,7 +4,7 @@ interface GetChapterStatsRequest {
 }
 
 export const getChapterStatsFactory = (
-  functions: import('firebase-functions').FunctionBuilder,
+  functions: import('firebase-functions/v1').FunctionBuilder,
   firebase: typeof import('firebase-admin')
 ) => functions.https.onCall(async (data: GetChapterStatsRequest, context) => {
   if (!context.auth?.token?.email) {

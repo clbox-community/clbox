@@ -1,5 +1,5 @@
 export const expireUserAccountsFactory = (
-    functions: import('firebase-functions').FunctionBuilder,
+    functions: import('firebase-functions/v1').FunctionBuilder,
     firebase: typeof import('firebase-admin')
 ) => {
     const firestore = firebase.firestore();

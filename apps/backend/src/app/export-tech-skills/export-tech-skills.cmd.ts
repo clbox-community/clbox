@@ -1,4 +1,4 @@
-import * as functions from 'firebase-functions';
+import * as functions from 'firebase-functions/v1';
 import * as firebase from 'firebase-admin';
 import {exportTechSkills} from "./export-tech-skills";
 

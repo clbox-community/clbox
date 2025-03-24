@@ -3,7 +3,7 @@ import {PendingFeedbackMessage} from '../pending-feedback-message';
 import {SlashCommandRequest} from '../slack/slash-command-request';
 
 export const kudosHandlerFactory = (
-    functions: import('firebase-functions').FunctionBuilder,
+    functions: import('firebase-functions/v1').FunctionBuilder,
     config: Record<string, any>,
     pubsub: import('@google-cloud/pubsub').PubSub,
     userFeedbackTopic: string,

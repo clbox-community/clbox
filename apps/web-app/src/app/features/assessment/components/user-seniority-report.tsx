@@ -21,16 +21,16 @@ export const UserSeniorityReportCard = ({ userSeniority, questions, seniority, a
         .filter(q => q.question.seniority === seniority)
         .filter(q => q.question.expectedResponses[seniority]?.length > 0)
         .forEach(q => {
-            const wasAsked = results.map(result => result.askedQuestion[q.question.id]).some(answer => answer);
+            const wasAsked = results?.map(result => result.askedQuestion[q.question.id]).some(answer => answer);
             const responses = results
-                .filter(result => result.askedQuestion[q.question.id])
-                .map(result => assessmentResponseAssessResult(userSeniority, q.question, result.responseValue[q.question.id], result.verifiedCategories))
+                ?.filter(result => result.askedQuestion[q.question.id])
+                ?.map(result => assessmentResponseAssessResult(userSeniority, q.question, result.responseValue[q.question.id], result.verifiedCategories))
             const isDesired = responses
-                .map(answer => answer === ResponseAssessmentResult.ExpectedResponse)
-                .every(answer => answer);
+                ?.map(answer => answer === ResponseAssessmentResult.ExpectedResponse)
+                ?.every(answer => answer);
             const isValid = responses
-                .map(answer => answer !== ResponseAssessmentResult.NotExpectedRequired)
-                .every(answer => answer);
+                ?.map(answer => answer !== ResponseAssessmentResult.NotExpectedRequired)
+                ?.every(answer => answer);
             stats.count++;
             if (!wasAsked) {
                 stats.wasAsked++;

@@ -1,7 +1,7 @@
 import { Assessment, UserAssessment, UserAssessmentRef, UserAssessmentVerifiedCategories } from 'assessment-model';
 
 export const userAssessmentsWriteHandlerFactory = (
-    functions: import('firebase-functions').FunctionBuilder,
+    functions: import('firebase-functions/v1').FunctionBuilder,
     firebase: typeof import('firebase-admin')
 ) => functions.firestore.document('team/{team}/assessment/{assessment}').onWrite(
     async (change, context) => {
