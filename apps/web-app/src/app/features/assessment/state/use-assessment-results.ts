@@ -17,6 +17,7 @@ export const useAssessmentResults = (team: string, assessment: string): (WithId 
                             id: doc.id,
                             assessor: doc.data().assessee, // temp legacy data fallback
                             ...(doc.data() as UserAssessment),
+                            verifiedCategories: (doc.data() as UserAssessment).verifiedCategories ?? {},
                             responseValue: guessResponseValues(doc.data())
                         }))
                     ))

@@ -6,3 +6,4 @@ export * from './lib/user-assessment';
 export * from './lib/user-assessment-ref';
 export * from './lib/with-id';
 export * from './lib/assessment-user-role';
+export * from './lib/user-assessment-verified-categories';

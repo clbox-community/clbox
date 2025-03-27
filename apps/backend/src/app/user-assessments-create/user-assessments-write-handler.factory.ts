@@ -1,4 +1,4 @@
-import { Assessment, UserAssessment, UserAssessmentRef } from 'assessment-model';
+import { Assessment, UserAssessment, UserAssessmentRef, UserAssessmentVerifiedCategories } from 'assessment-model';
 
 export const userAssessmentsWriteHandlerFactory = (
     functions: import('firebase-functions/v1').FunctionBuilder,
@@ -15,6 +15,8 @@ export const userAssessmentsWriteHandlerFactory = (
         const prevAssessment = change.before.data() as Assessment | undefined;
         const assessment = change.after.data() as Assessment;
         const assessors: string[] = assessment?.assessors ?? [];
+        const assessmentCategories= await db.doc(`team/${context.params.team}/user/${assessment.assessed}/data/assessment-categories`).get();
+
         for (const assessor of assessors) {
             if (prevAssessment?.assessors?.includes(assessor)) {
                 continue;
@@ -25,6 +27,7 @@ export const userAssessmentsWriteHandlerFactory = (
                 ...assessment,
                 assessmentId: change.after.id,
                 assessor: assessor,
+                verifiedCategories: assessmentCategories?.data() as UserAssessmentVerifiedCategories ?? {},
                 askedQuestion: {},
                 questionFeedback: {},
                 questionTime: {},

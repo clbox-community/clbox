@@ -24,7 +24,7 @@ export const UserSeniorityReportCard = ({ userSeniority, questions, seniority, a
             const wasAsked = results?.map(result => result.askedQuestion[q.question.id]).some(answer => answer);
             const responses = results
                 ?.filter(result => result.askedQuestion[q.question.id])
-                ?.map(result => assessmentResponseAssessResult(userSeniority, q.question, result.responseValue[q.question.id]))
+                ?.map(result => assessmentResponseAssessResult(userSeniority, q.question, result.responseValue[q.question.id], result.verifiedCategories))
             const isDesired = responses
                 ?.map(answer => answer === ResponseAssessmentResult.ExpectedResponse)
                 ?.every(answer => answer);

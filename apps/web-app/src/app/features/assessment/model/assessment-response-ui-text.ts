@@ -1,13 +1,15 @@
 import { Question, QuestionType, Seniority } from '@clbox/assessment-survey';
 import { assessmentResponseAssessResult } from './assessment-response-assess-result';
-import { ResponseAssessmentResult } from 'assessment-model';
+import { ResponseAssessmentResult, UserAssessmentVerifiedCategories } from 'assessment-model';
 
 function asHumanText(result: ResponseAssessmentResult): string {
     const textMap: Record<ResponseAssessmentResult, string> = {
         [ResponseAssessmentResult.ExpectedResponse]: 'Idealna odpowiedź',
         [ResponseAssessmentResult.NotExpectedRequired]: 'Niepoprawna odpowiedź wymagana na stanowisku',
         [ResponseAssessmentResult.NotAsked]: 'Brak odpowiedzi',
-        [ResponseAssessmentResult.NotExpectedNotRequired]: 'Niepoprawna odpowiedź jednak dopuszczalna na stanowisku'
+        [ResponseAssessmentResult.NotExpectedNotRequired]: 'Niepoprawna odpowiedź jednak dopuszczalna na stanowisku',
+        [ResponseAssessmentResult.Verified]: 'Potwierdzone',
+        [ResponseAssessmentResult.Skipped]: 'Nie dotyczy'
     };
 
     return textMap[result];
@@ -47,9 +49,9 @@ export function summaryAnswerBasedOnQuestion(question: Question, value: number) 
     return answerValueBasedOnQuestionType(question, value);
 }
 
-export function labelBasedOnQuestion(userSeniority: Seniority, question: Question, value: number) {
+export function labelBasedOnQuestion(userSeniority: Seniority, question: Question, value: number, verifiedCategories: UserAssessmentVerifiedCategories) {
     const answer = answerValueBasedOnQuestionType(question, value);
-    const reason = asHumanText(assessmentResponseAssessResult(userSeniority, question, value));
+    const reason = asHumanText(assessmentResponseAssessResult(userSeniority, question, value, verifiedCategories));
 
     return `Odpowiedź: ${answer} (${value})
 Ocena: ${reason}

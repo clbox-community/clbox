@@ -1,4 +1,5 @@
 import { AssessmentUserDetails } from './assessment-user-details';
+import { UserAssessmentVerifiedCategories } from './user-assessment-verified-categories';
 
 export interface UserAssessment {
     /** Identifier of source assessment based on which user assessment survey was created */
@@ -17,6 +18,8 @@ export interface UserAssessment {
     finished: boolean;
     /** Date when survey changed to finished state. */
     finishedDate?: number;
+    /** Collection of questions with verification status */
+    verifiedCategories?: UserAssessmentVerifiedCategories;
     /** Collection of presented question identifiers. Some questions may be skipped and this map allows to verify that. */
     askedQuestion: {
         [id: string]: boolean; // true when question was presented, false or no row if question was skipped

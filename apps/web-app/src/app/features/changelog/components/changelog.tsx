@@ -23,6 +23,12 @@ const Layout = styled.div`
 
 const changes = [
     {
+        date: '2025-03-16',
+        items: [
+            {summary: 'Pomijanie w ankiecie pytań zweryfikowanych i ignorowanych'},
+        ]
+    },
+    {
         date: '2025-02-27',
         items: [
             {summary: 'Możliwość określenia zbioru pytań oceny okresowej dla każdej osoby (oznaczenia pytań jako zweryfikowanych lub ignorowanych)'},
