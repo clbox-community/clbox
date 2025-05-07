@@ -3,6 +3,7 @@ import { Assessment, ResponseAssessmentResult, UserAssessment, WithId } from 'as
 import { Category, Question, Seniority } from '@clbox/assessment-survey';
 import { assessmentResponseAssessResult } from '../model/assessment-response-assess-result';
 import { AssessmentUserSeniorityToSeniority } from '../model/assessment-seniority-converter';
+import { AssessmentResultFilter } from './assessment-result-filter';
 
 export const AssessmentResultExport = {
     copyResultToClipboard: function(result: (WithId & UserAssessment)[], assessment: WithId & Assessment) {
@@ -99,12 +100,7 @@ function getDataRowForNotRequired(question: Question, textForm: string) {
 }
 
 function filterNotExpected(userSeniority: Seniority, question: Question, results: (WithId & UserAssessment)[]) {
-    return (results.some(result => {
-        const resultAssessment = assessmentResponseAssessResult(userSeniority, question, result.responseValue[question.id], result.verifiedCategories);
-        return resultAssessment === ResponseAssessmentResult.NotExpectedNotRequired
-            || resultAssessment === ResponseAssessmentResult.NotExpectedRequired
-            || resultAssessment === ResponseAssessmentResult.NotAsked;
-    }));
+    return AssessmentResultFilter.isFail(userSeniority, question, results);
 }
 
 function filterExpectedNotRequired(userSeniority: Seniority, question: Question, results: (WithId & UserAssessment)[]) {

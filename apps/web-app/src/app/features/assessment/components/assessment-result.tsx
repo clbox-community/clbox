@@ -17,6 +17,7 @@ import { ContentCopy } from '@mui/icons-material';
 import { AssessmentResultExport } from './assessment-result-export';
 import { Snackbar } from '@mui/material';
 import { AssessmentUserSeniorityToSeniority } from '../model/assessment-seniority-converter';
+import { AssessmentResultFilter } from './assessment-result-filter';
 
 export const OneColumnLayoutUltraWide = styled.div`
     width: 90%;
@@ -53,13 +54,7 @@ function shouldShowQuestion(userSeniority: Seniority, question: Question, assess
     if (!seniorityFilterAtLeast(seniorityFilter, question.seniority)) {
         return false;
     }
-    if (onlyFails && (results.every(result => {
-        const resultAssessment = assessmentResponseAssessResult(userSeniority, question, result.responseValue[question.id], result.verifiedCategories);
-        return resultAssessment === ResponseAssessmentResult.NotAsked
-            || resultAssessment === ResponseAssessmentResult.ExpectedResponse
-            || resultAssessment === ResponseAssessmentResult.Verified
-            || resultAssessment === ResponseAssessmentResult.Skipped;
-    }))) {
+    if (onlyFails && AssessmentResultFilter.isCorrect(userSeniority, question, results)) {
         return false;
     }
     return true;
