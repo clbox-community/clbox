@@ -5,7 +5,7 @@ import { useAssessmentResults } from '../state/use-assessment-results';
 import { connect, ConnectedProps } from 'react-redux';
 import { useAssessment } from '../state/use-assessment';
 import styled from 'styled-components';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAssessmentQuestionCategories } from '../state/use-assessment-question-categories';
 import { AppState } from '../../../state/app-state';
 import { Category, Question, Seniority } from '@clbox/assessment-survey';
@@ -157,8 +157,7 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
             open={!!copyConfirmationOpen}
             autoHideDuration={5000}
             onClose={() => setCopyConfirmationOpen(false)}
-            message="Result copied to clipboard"
-            key="toastSnackbar"
+            message="Wyniki skopiowane do schowka"
         />
         <Card>
             <CardContent>
