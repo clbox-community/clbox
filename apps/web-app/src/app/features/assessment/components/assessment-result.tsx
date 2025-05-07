@@ -10,29 +10,19 @@ import { useAssessmentQuestionCategories } from '../state/use-assessment-questio
 import { AppState } from '../../../state/app-state';
 import { Category, Question, Seniority } from '@clbox/assessment-survey';
 import { UserSeniorityReport } from './user-seniority';
-import { Assessment, AssessmentUserSeniority, ResponseAssessmentResult, UserAssessment, WithId } from 'assessment-model';
+import { Assessment, ResponseAssessmentResult, UserAssessment, WithId } from 'assessment-model';
 import { assessmentResponseAssessResult } from '../model/assessment-response-assess-result';
 import { labelBasedOnQuestion, summaryAnswerBasedOnQuestion } from '../model/assessment-response-ui-text';
+import { ContentCopy } from '@mui/icons-material';
+import { AssessmentResultExport } from './assessment-result-export';
+import { Snackbar } from '@mui/material';
+import { AssessmentUserSeniorityToSeniority } from '../model/assessment-seniority-converter';
+import { AssessmentResultFilter } from './assessment-result-filter';
 
 export const OneColumnLayoutUltraWide = styled.div`
     width: 90%;
     margin: 0 auto;
 `;
-
-function asSeniority(seniority: AssessmentUserSeniority) {
-    switch (seniority) {
-        case AssessmentUserSeniority.none:
-            return undefined;
-        case AssessmentUserSeniority.junior:
-            return Seniority.junior;
-        case AssessmentUserSeniority.regular:
-            return Seniority.regular;
-        case AssessmentUserSeniority.senior:
-            return Seniority.senior;
-        case AssessmentUserSeniority.lead:
-            return Seniority.seniorPlus;
-    }
-}
 
 function asSeniorityGroup(filter: 'junior' | 'regular' | 'senior' | 'seniorPlus'): Seniority[] {
     switch (filter) {
@@ -57,20 +47,14 @@ function responseColor(question: Question, assessment: WithId & Assessment, resu
         [ResponseAssessmentResult.Skipped]: 'rgba(127, 140, 141, 1.0)'
     };
 
-    return colorMap[assessmentResponseAssessResult(asSeniority(assessment.user.seniority), question, result.responseValue[question.id], result.verifiedCategories)];
+    return colorMap[assessmentResponseAssessResult(AssessmentUserSeniorityToSeniority(assessment.user.seniority), question, result.responseValue[question.id], result.verifiedCategories)];
 }
 
 function shouldShowQuestion(userSeniority: Seniority, question: Question, assessment: WithId & Assessment, results: (WithId & UserAssessment)[], seniorityFilter: 'junior' | 'regular' | 'senior' | 'seniorPlus', onlyFails: boolean) {
     if (!seniorityFilterAtLeast(seniorityFilter, question.seniority)) {
         return false;
     }
-    if (onlyFails && (results.every(result => {
-        const resultAssessment = assessmentResponseAssessResult(userSeniority, question, result.responseValue[question.id], result.verifiedCategories);
-        return resultAssessment === ResponseAssessmentResult.NotAsked
-            || resultAssessment === ResponseAssessmentResult.ExpectedResponse
-            || resultAssessment === ResponseAssessmentResult.Verified
-            || resultAssessment === ResponseAssessmentResult.Skipped;
-    }))) {
+    if (onlyFails && AssessmentResultFilter.isCorrect(userSeniority, question, results)) {
         return false;
     }
     return true;
@@ -151,7 +135,7 @@ function answerCorrectnessMarkerText(result: WithId & UserAssessment, question: 
     };
 
     return markMap[assessmentResponseAssessResult(
-        asSeniority(assessment.user.seniority),
+        AssessmentUserSeniorityToSeniority(assessment.user.seniority),
         question,
         result.responseValue[question.id],
         result.verifiedCategories
@@ -160,13 +144,21 @@ function answerCorrectnessMarkerText(result: WithId & UserAssessment, question: 
 
 export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector>) => {
     const { uuid } = useParams<{ uuid: string }>();
+    const [copyConfirmationOpen, setCopyConfirmationOpen] = useState(false);
     const questionCategories = useAssessmentQuestionCategories();
     const assessment = useAssessment(teamId, uuid);
     const results = useAssessmentResults(teamId, uuid);
     const [onlyFails, setOnlyFails] = useState<boolean>(false);
     const [seniorityFilter, setSeniorityFilter] = useState<keyof typeof Seniority | undefined>(Seniority.seniorPlus);
-    const userSeniority = assessment?.user?.seniority !== undefined ? asSeniority(assessment.user.seniority) : undefined;
+    const userSeniority = assessment?.user?.seniority !== undefined ? AssessmentUserSeniorityToSeniority(assessment.user.seniority) : undefined;
     return assessment && <OneColumnLayoutUltraWide>
+        <Snackbar
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            open={!!copyConfirmationOpen}
+            autoHideDuration={5000}
+            onClose={() => setCopyConfirmationOpen(false)}
+            message="Wyniki skopiowane do schowka"
+        />
         <Card>
             <CardContent>
                 <div style={{ fontSize: '1.2em' }}>{assessment.user.name}</div>
@@ -200,11 +192,16 @@ export const AssessmentResultView = ({ teamId }: ConnectedProps<typeof connector
                     <span onClick={() => setOnlyFails(f => !f)}>
                         {onlyFails ? 'Pokaż wszystkie obszary' : 'Pokaż tylko obszary do usprawnienia'}
                     </span>
+                    &nbsp;&nbsp;&nbsp;
+                    <span onClick={() => {
+                        AssessmentResultExport.copyResultToClipboard(results, assessment);
+                        setCopyConfirmationOpen(true);
+                    }}><ContentCopy /></span>
                 </div>
                 {results && <div>
                     <div>
                         {questionCategories
-                            .filter(category => hasAnyVisibleQuestion(userSeniority, category, assessment, results, seniorityFilter, onlyFails))
+                        .filter(category => hasAnyVisibleQuestion(userSeniority, category, assessment, results, seniorityFilter, onlyFails))
                             .map(category => <CategoryRow key={category.id}>
                                 <div style={{ marginBottom: '8px' }}>
                                     <div style={{ fontSize: '1.1em', fontWeight: '500' }}>{category.name}</div>
