@@ -32,7 +32,6 @@ function isQuestionToShow(assessment: UserAssessment, question: QuestionWithCate
         }
     };
 
-    const markedToAsk = (assessment.verifiedCategories[question.question.id]?.status ?? UserAssessmentVerification.Ask) === UserAssessmentVerification.Ask;
     const hasQuestionText = () => question.question[questionForm] !== undefined;
     const valid = () => !question.question.validWhen || question.question.validWhen(context);
     const eligibleForAssessor = context.assessor.roles?.length > 0 ? () => !question.question.eligibleForAssessor || question.question.eligibleForAssessor(context) : () => true;
@@ -40,7 +39,7 @@ function isQuestionToShow(assessment: UserAssessment, question: QuestionWithCate
         console.warn(`Assessor without roles. All questions will be mark as eligible to display.`);
     }
 
-    return markedToAsk && hasQuestionText() && valid() && eligibleForAssessor();
+    return hasQuestionText() && valid() && eligibleForAssessor();
 }
 
 
@@ -57,7 +56,19 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
                                              accessorProfile: UserProfile,
                                              demo = false
 ): AssessmentSurveyHook => {
-    const questions = useAssessmentQuestions(demo);
+    const allQuestions = useAssessmentQuestions(demo);
+    const questions = useMemo(
+        () => {
+            if (assessment) {
+                const markedToAsk = (questionId: string) => (assessment.verifiedCategories[questionId]?.status ?? UserAssessmentVerification.Ask) === UserAssessmentVerification.Ask;
+                return allQuestions.filter(q => markedToAsk(q.question.id));
+            } else {
+                return [];
+            }
+        },
+        [assessment, allQuestions]
+    );
+
     const question: QuestionWithCategory | undefined = useMemo(
         () => {
             if (assessment && questions && accessorProfile) {
