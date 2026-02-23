@@ -1,17 +1,16 @@
 import { connect, ConnectedProps } from 'react-redux';
 import { AppState } from '../../../state/app-state';
 import { useParams } from 'react-router';
-import React, { Fragment, PropsWithChildren, useMemo, useState } from 'react';
+import React, { Fragment, PropsWithChildren, useMemo, useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import ReactMarkdown from 'react-markdown';
 import Checkbox from '@mui/material/Checkbox';
 import { FormControlLabel, FormGroup } from '@mui/material';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useLocation } from 'react-router-dom';
 import { SkillLevelFilter } from './skill-level-filter';
 import { RoadmapSkillSection, RoadmapSkillTopic, SkillLevel, SkillsRoadmap } from '@clbox/skill-roadmap';
 import { CategoryResults, useCategoryResult } from '../state/use-category-result';
 import CircularProgress from '@mui/material/CircularProgress';
-
 const TopicRowHeader = styled.div`
     display: flex;
     justify-items: baseline;
@@ -46,7 +45,16 @@ const labelOfLevel = (level: SkillLevel) => {
 
 const TopicRow: React.FC<{ topic: RoadmapSkillTopic, categoryResults: CategoryResults }> = ({ topic, categoryResults }) => {
     const [expanded, setExpanded] = useState(false);
-    return <div id={`${topic.uuid}`}>
+    const { hash } = useLocation();
+    const rowRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (topic.uuid && hash === `#${topic.uuid}` && rowRef.current) {
+            rowRef.current.scrollIntoView({ behavior: 'instant', block: 'center' });
+            setExpanded(true);
+        }
+    }, [hash, topic.uuid]);
+    return <div id={`${topic.uuid}`} ref={rowRef}>
         <TopicRowHeader>
             <FormControlLabel
                 control={<Checkbox disabled={!topic.uuid} checked={categoryResults[0][topic.uuid] ?? false} onChange={change => categoryResults[1](topic.uuid, !categoryResults[0][topic.uuid])}
