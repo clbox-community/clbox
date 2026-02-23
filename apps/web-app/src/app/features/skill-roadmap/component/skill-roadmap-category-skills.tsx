@@ -46,7 +46,7 @@ const labelOfLevel = (level: SkillLevel) => {
 
 const TopicRow: React.FC<{ topic: RoadmapSkillTopic, categoryResults: CategoryResults }> = ({ topic, categoryResults }) => {
     const [expanded, setExpanded] = useState(false);
-    return <div>
+    return <div id={`${topic.uuid}`}>
         <TopicRowHeader>
             <FormControlLabel
                 control={<Checkbox disabled={!topic.uuid} checked={categoryResults[0][topic.uuid] ?? false} onChange={change => categoryResults[1](topic.uuid, !categoryResults[0][topic.uuid])}
