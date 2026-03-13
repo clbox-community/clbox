@@ -51,10 +51,11 @@ const TopicRow: React.FC<{ topic: RoadmapSkillTopic, categoryResults: CategoryRe
     useEffect(() => {
         if (topic.uuid && hash === `#${topic.uuid}` && rowRef.current) {
             rowRef.current.scrollIntoView({ behavior: 'instant', block: 'center' });
+            rowRef.current.style.backgroundColor = 'rgba(255, 235, 59, 0.28)';
             setExpanded(true);
         }
     }, [hash, topic.uuid]);
-    return <div id={topic.uuid} ref={rowRef}>
+    return <div id={`${topic.uuid}`} ref={rowRef}>
         <TopicRowHeader>
             <FormControlLabel
                 control={<Checkbox disabled={!topic.uuid} checked={categoryResults[0][topic.uuid] ?? false} onChange={change => categoryResults[1](topic.uuid, !categoryResults[0][topic.uuid])}
