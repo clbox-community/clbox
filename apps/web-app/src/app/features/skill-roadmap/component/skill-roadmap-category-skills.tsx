@@ -55,7 +55,7 @@ const TopicRow: React.FC<{ topic: RoadmapSkillTopic, categoryResults: CategoryRe
             setExpanded(true);
         }
     }, [hash, topic.uuid]);
-    return <div id={`${topic.uuid}`} ref={rowRef}>
+    return <div id={topic.uuid} ref={rowRef}>
         <TopicRowHeader>
             <FormControlLabel
                 control={<Checkbox disabled={!topic.uuid} checked={categoryResults[0][topic.uuid] ?? false} onChange={change => categoryResults[1](topic.uuid, !categoryResults[0][topic.uuid])}
