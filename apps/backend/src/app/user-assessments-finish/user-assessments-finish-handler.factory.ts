@@ -1,18 +1,18 @@
 import { UserAssessmentRef } from 'assessment-model';
+import {onDocumentCreated} from 'firebase-functions/v2/firestore';
 
 export const userAssessmentsFinishHandlerFactory = (
-    functions: import('firebase-functions/v1').FunctionBuilder,
     firebase: typeof import('firebase-admin')
-) => functions.firestore.document('/team/{team}/user/{assessor}/user-assessment-sent/{id}').onCreate(
-    async (snapshot, context) => {
-        console.log(`Assessment finished [id=${context.params.id}]`);
+) => onDocumentCreated('/team/{team}/user/{assessor}/user-assessment-sent/{id}',
+    async (event) => {
+        console.log(`Assessment finished [id=${event.params.id}]`);
         const db = firebase.firestore();
 
-        const userAssessmentRef = snapshot.data() as UserAssessmentRef;
+        const userAssessmentRef = event.data.data() as UserAssessmentRef;
         await db.runTransaction(async (trn) => {
-            const resultDocPath = `/team/${context.params.team}/assessment/${userAssessmentRef.assessmentId}/result/${userAssessmentRef.userAssessmentId}`;
-            const assessmentDocPath = `/team/${context.params.team}/assessment/${userAssessmentRef.assessmentId}`;
-            const pendingDocPath = `/team/${context.params.team}/user/${context.params.assessor}/user-assessment-pending/${context.params.id}`;
+            const resultDocPath = `/team/${event.params.team}/assessment/${userAssessmentRef.assessmentId}/result/${userAssessmentRef.userAssessmentId}`;
+            const assessmentDocPath = `/team/${event.params.team}/assessment/${userAssessmentRef.assessmentId}`;
+            const pendingDocPath = `/team/${event.params.team}/user/${event.params.assessor}/user-assessment-pending/${event.params.id}`;
 
             const resultDoc = db.doc(resultDocPath);
             const assessmentDoc = db.doc(assessmentDocPath);
@@ -27,11 +27,11 @@ export const userAssessmentsFinishHandlerFactory = (
                 }
             );
 
-            console.log(`Update ${assessmentDocPath} with finished assessors: ${context.params.assessor}`);
+            console.log(`Update ${assessmentDocPath} with finished assessors: ${event.params.assessor}`);
             trn.update(
                 assessmentDoc,
                 {
-                    [`finishedAssessors.${context.params.assessor.replaceAll('.', '_')}`]: true
+                    [`finishedAssessors.${event.params.assessor.replaceAll('.', '_')}`]: true
                 }
             );
 

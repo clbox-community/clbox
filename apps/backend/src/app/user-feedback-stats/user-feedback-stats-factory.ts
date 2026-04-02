@@ -1,15 +1,16 @@
+import {onDocumentCreated} from 'firebase-functions/v2/firestore';
+
 export const userFeedbackStatsFactory = (
-  functions: import('firebase-functions/v1').FunctionBuilder,
   firebase: typeof import('firebase-admin')
-) => functions.firestore.document('team/{team}/sent/{user}/message/{messageId}').onCreate(
-  async (change, context) => {
+) => onDocumentCreated('team/{team}/sent/{user}/message/{messageId}',
+  async (event) => {
     const firestore = firebase.firestore();
 
-    const {date} = change.data() as { date: string };
+    const {date} = event.data.data() as { date: string };
     const day = date.substring(0, 10);
     const year = date.substring(0, 4);
     const statsRef = firestore
-      .collection(`team/${context.params.team}/user/${context.params.user}/stats`)
+      .collection(`team/${event.params.team}/user/${event.params.user}/stats`)
       .doc('sent-feedbacks');
 
     await statsRef.set(

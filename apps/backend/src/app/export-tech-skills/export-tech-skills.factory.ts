@@ -1,11 +1,9 @@
 import {exportTechSkills} from "./export-tech-skills";
+import {onSchedule} from 'firebase-functions/v2/scheduler';
 
 export const exportTechSkillsFactory = (
-    functions: import('firebase-functions/v1').FunctionBuilder,
     config: Record<string, any>,
     firebase: typeof import('firebase-admin')
 ) => {
-    return functions.pubsub.schedule('0 3 * * 1-7')
-        .timeZone('Europe/Warsaw')
-        .onRun(async () => exportTechSkills(config, firebase))
+    return onSchedule({ schedule: '0 3 * * 1-7', timeZone: 'Europe/Warsaw' }, async () => exportTechSkills(config, firebase));
 }

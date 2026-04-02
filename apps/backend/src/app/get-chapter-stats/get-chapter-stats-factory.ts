@@ -1,17 +1,19 @@
+import {onCall} from 'firebase-functions/v2/https';
+
 interface GetChapterStatsRequest {
   team: string;
   statType: string;
 }
 
 export const getChapterStatsFactory = (
-  functions: import('firebase-functions/v1').FunctionBuilder,
   firebase: typeof import('firebase-admin')
-) => functions.https.onCall(async (data: GetChapterStatsRequest, context) => {
-  if (!context.auth?.token?.email) {
+) => onCall(async (request) => {
+  if (!request.auth?.token?.email) {
     throw new Error(`Functions requires authentication`);
   }
   const firestore = firebase.firestore();
-  const auth = context.auth?.token?.email;
+  const auth = request.auth?.token?.email;
+  const data = request.data as GetChapterStatsRequest;
 
   const users = await firestore
     .collection(`/team/${data.team}/user`)

@@ -1,20 +1,20 @@
 import { userProfile } from '../slack/fetch-user-profile';
 import { sendSlackMessage } from '../slack/send-slack-message';
 import { SlackUser } from '../slack/slack-user';
+import {onDocumentCreated} from 'firebase-functions/v2/firestore';
 
 export const notifyAfterChannelFeedbackFactory = (
-    functions: import('firebase-functions/v1').FunctionBuilder,
     config: Record<string, any>,
     firebase: typeof import('firebase-admin')
-) => functions.firestore.document('team/{team}/channel/{channel}/inbox/{messageId}').onCreate(
-    async (change, context) => {
-        console.log(`Notify managers after channel feedback (channel=${context.params.channel})`);
+) => onDocumentCreated('team/{team}/channel/{channel}/inbox/{messageId}',
+    async (event) => {
+        console.log(`Notify managers after channel feedback (channel=${event.params.channel})`);
         const slackToken = config.slack.bottoken;
         if (slackToken) {
-            const message = change.data();
+            const message = event.data.data();
             const channel = await firebase.firestore()
-                .collection(`team/${context.params.team}/channel/`)
-                .doc(context.params.channel)
+                .collection(`team/${event.params.team}/channel/`)
+                .doc(event.params.channel)
                 .get();
             const managers = await Promise.all<SlackUser>(
                 channel.data().managers.map(manager => userProfile(manager, slackToken))

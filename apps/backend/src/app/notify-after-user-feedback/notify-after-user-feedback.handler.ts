@@ -1,15 +1,15 @@
 import { userProfile } from '../slack/fetch-user-profile';
 import { sendSlackMessage } from '../slack/send-slack-message';
+import {onDocumentCreated} from 'firebase-functions/v2/firestore';
 
 export const notifyAfterUserFeedbackFactory = (
-    functions: import('firebase-functions/v1').FunctionBuilder,
     config: Record<string, any>
-) => functions.firestore.document('team/{team}/inbox/{chapterLeader}/message/{messageId}').onCreate(
-    async (change, context) => {
-        const message = change.data();
+) => onDocumentCreated('team/{team}/inbox/{chapterLeader}/message/{messageId}',
+    async (event) => {
+        const message = event.data.data();
         const slackToken = config.slack.bottoken;
         if (slackToken) {
-            const slackUser = await userProfile(context.params.chapterLeader, slackToken);
+            const slackUser = await userProfile(event.params.chapterLeader, slackToken);
             await sendSlackMessage(slackToken, {
                 channel: `@${slackUser.name}`,
                 text: `You have new feedback!`,

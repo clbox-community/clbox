@@ -1,3 +1,5 @@
+import {onDocumentUpdated} from 'firebase-functions/v2/firestore';
+
 function changedArray(before, after) {
     const newItems = [];
     const missingItems = [];
@@ -35,16 +37,15 @@ function asStatsUpdate(firebase, before, after) {
 }
 
 export const updateFilterStatsAfterInboxChangeFactory = (
-    functions: import('firebase-functions/v1').FunctionBuilder,
     config: Record<string, any>,
     firebase: typeof import('firebase-admin')
-) => functions.firestore.document('team/{team}/user/{user}/inbox/{messageId}').onUpdate(
-    async (change, context) => {
+) => onDocumentUpdated('team/{team}/user/{user}/inbox/{messageId}',
+    async (event) => {
         console.log(`Update user filter stats after inbox message update`);
         const statsDoc = firebase.firestore()
-            .collection(`team/${context.params.team}/user/${context.params.user}/data`)
+            .collection(`team/${event.params.team}/user/${event.params.user}/data`)
             .doc(`inbox-filter-stats`);
-        const update = asStatsUpdate(firebase, change.before.data(), change.after.data());
+        const update = asStatsUpdate(firebase, event.data.before.data(), event.data.after.data());
         console.log(`${statsDoc.path}=>${JSON.stringify(update)}`);
         await statsDoc.set(update, {merge: true});
     }

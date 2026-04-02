@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import { onMessagePublished } from 'firebase-functions/v2/pubsub';
 import { PendingFeedbackMessage } from '../pending-feedback-message';
 import { SlackUserProfile } from '../slack/slack-user-profile';
 import { userList } from '../slack/fetch-user-list';
@@ -46,7 +47,6 @@ async function failedToSendFeedback(firebase: typeof import('firebase-admin'), h
 }
 
 export const storeUserFeedbackFactory = (
-    functions: import('firebase-functions/v1').FunctionBuilder,
     config: Record<string, any>,
     firebase: typeof import('firebase-admin'),
     topic: string) => {
@@ -54,12 +54,12 @@ export const storeUserFeedbackFactory = (
         Authorization: `Bearer ${config.slack.bottoken}`,
         'Content-type': 'application/json'
     };
-    return functions.pubsub.topic(topic).onPublish(
-        async (topicMessage) => {
+    return onMessagePublished(topic,
+        async (event) => {
             console.log('Sending feedback after pubsub event');
 
             const usersIndex = await userList(config.slack.bottoken);
-            const payload: PendingFeedbackMessage = JSON.parse(Buffer.from(topicMessage.data, 'base64').toString());
+            const payload: PendingFeedbackMessage = JSON.parse(Buffer.from(event.data.message.data, 'base64').toString());
 
             console.log(`Feedback to store [fromUser=${payload.user}, toUser=${payload.mention}]`);
 

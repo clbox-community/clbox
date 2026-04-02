@@ -1,9 +1,10 @@
+import {onDocumentWritten} from 'firebase-functions/v2/firestore';
+
 export const aggregateSkillRoadmapStatsHandlerFactory = (
-    functions: import('firebase-functions/v1').FunctionBuilder,
     firebase: typeof import('firebase-admin')
-) => functions.firestore.document('team/{team}/user/{user}/data/skills').onWrite(
-    async (change, context) => {
-        console.log({ user: context.params.user, change });
+) => onDocumentWritten('team/{team}/user/{user}/data/skills',
+    async (event) => {
+        console.log({ user: event.params.user, change: event.data });
     }
 );
 

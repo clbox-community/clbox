@@ -1,7 +1,6 @@
 import {PubSub} from '@google-cloud/pubsub';
 import * as firebase from 'firebase-admin';
-import * as functions from 'firebase-functions/v1';
-import {FunctionBuilder} from 'firebase-functions/v1';
+import {setGlobalOptions} from 'firebase-functions/v2';
 import {createUserFactory} from './app/create-user/create-user.handler';
 import {expireUserAccountsFactory} from './app/expire-user-accounts/expire-user-accounts-factory';
 import {feedbackStatsFactory} from './app/feedback-stats/feedback-stats-factory';
@@ -42,53 +41,45 @@ import { aggregateSkillRoadmapStatsHandlerFactory } from './app/aggregate-skill-
 
 firebase.initializeApp();
 
-const region = functions.region('europe-west3');
-const functionBuilder: () => FunctionBuilder = () => region
-    .runWith({
-        maxInstances: 3,
-        memory: '256MB'
-    });
+setGlobalOptions({
+    region: 'europe-west3',
+    memory: '256MiB',
+    maxInstances: 3,
+});
 
-export const storeUserFeedback = storeUserFeedbackFactory(functionBuilder(), functions.config(), firebase, 'pending-user-feedbacks');
-export const storeChannelFeedback = storeChannelFeedbackHandlerFactory(functionBuilder(), functions.config(), firebase, 'pending-channel-feedbacks');
-export const notifyAfterUserFeedback = notifyAfterUserFeedbackFactory(functionBuilder(), functions.config());
-export const notifyAfterChannelFeedback = notifyAfterChannelFeedbackFactory(functionBuilder(), functions.config(), firebase);
-export const notifyAfterLeaderChange = notificationAfterLeaderChangeFactory(functionBuilder(), functions.config());
-export const notifyAfterSurveyCreated = notificationAfterSurveyCreatedFactory(functionBuilder(), functions.config());
-export const feedbackStats = feedbackStatsFactory(functionBuilder(), firebase);
-export const userFeedbackStats = userFeedbackStatsFactory(functionBuilder(), firebase);
-export const createUser = createUserFactory(functionBuilder(), firebase);
-export const expireUserAccounts = expireUserAccountsFactory(functionBuilder(), firebase);
-export const getChapterStats = getChapterStatsFactory(functionBuilder(), firebase);
-export const updateFilterStatsAfterInboxCreate = updateFilterStatsAfterInboxCreateFactory(functionBuilder(), functions.config(), firebase);
-export const updateFilterStatsAfterInboxChange = updateFilterStatsAfterInboxChangeFactory(functionBuilder(), functions.config(), firebase);
-export const updateFilterStatsAfterInboxDelete = updateFilterStatsAfterInboxDeleteFactory(functionBuilder(), functions.config(), firebase);
-export const updateCampaignAfterSurvey = updateCampaignAfterSurveyFactory(functionBuilder(), firebase);
+const config = {
+    slack: {
+        bottoken: process.env.SLACK_BOTTOKEN ?? '',
+        signingsecret: process.env.SLACK_SIGNINGSECRET ?? '',
+    },
+    webapp: {
+        url: process.env.WEBAPP_URL ?? '',
+    },
+};
+
+export const storeUserFeedback = storeUserFeedbackFactory(config, firebase, 'pending-user-feedbacks');
+export const storeChannelFeedback = storeChannelFeedbackHandlerFactory(config, firebase, 'pending-channel-feedbacks');
+export const notifyAfterUserFeedback = notifyAfterUserFeedbackFactory(config);
+export const notifyAfterChannelFeedback = notifyAfterChannelFeedbackFactory(config, firebase);
+export const notifyAfterLeaderChange = notificationAfterLeaderChangeFactory(config);
+export const notifyAfterSurveyCreated = notificationAfterSurveyCreatedFactory(config);
+export const feedbackStats = feedbackStatsFactory(firebase);
+export const userFeedbackStats = userFeedbackStatsFactory(firebase);
+export const createUser = createUserFactory(firebase);
+export const expireUserAccounts = expireUserAccountsFactory(firebase);
+export const getChapterStats = getChapterStatsFactory(firebase);
+export const updateFilterStatsAfterInboxCreate = updateFilterStatsAfterInboxCreateFactory(config, firebase);
+export const updateFilterStatsAfterInboxChange = updateFilterStatsAfterInboxChangeFactory(config, firebase);
+export const updateFilterStatsAfterInboxDelete = updateFilterStatsAfterInboxDeleteFactory(config, firebase);
+export const updateCampaignAfterSurvey = updateCampaignAfterSurveyFactory(firebase);
 export const kudosHandler = kudosHandlerFactory(
-    functionBuilder().runWith({memory: '512MB', maxInstances: 5, }),
-    functions.config(),
+    config,
     new PubSub(),
     'pending-user-feedbacks',
     'pending-channel-feedbacks'
 );
-export const userAssessmentsWriteHandler = userAssessmentsWriteHandlerFactory(
-    functionBuilder().runWith({}),
-    firebase
-);
-export const userAssessmentsFinishHandler = userAssessmentsFinishHandlerFactory(
-    functionBuilder().runWith({}),
-    firebase
-);
-export const exportTechSkillsCron = exportTechSkillsFactory(
-    functionBuilder().runWith({}),
-    functions.config(),
-    firebase
-);
-export const updatePublicProfileHandler = updatePublicProfileHandlerFactory(
-    functionBuilder().runWith({}),
-    firebase
-)
-export const aggregateSkillRoadmapStatsHandler = aggregateSkillRoadmapStatsHandlerFactory(
-    functionBuilder().runWith({}),
-    firebase
-)
+export const userAssessmentsWriteHandler = userAssessmentsWriteHandlerFactory(firebase);
+export const userAssessmentsFinishHandler = userAssessmentsFinishHandlerFactory(firebase);
+export const exportTechSkillsCron = exportTechSkillsFactory(config, firebase);
+export const updatePublicProfileHandler = updatePublicProfileHandlerFactory(firebase);
+export const aggregateSkillRoadmapStatsHandler = aggregateSkillRoadmapStatsHandlerFactory(firebase);

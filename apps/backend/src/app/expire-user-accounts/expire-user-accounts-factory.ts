@@ -1,5 +1,6 @@
+import {onSchedule} from 'firebase-functions/v2/scheduler';
+
 export const expireUserAccountsFactory = (
-    functions: import('firebase-functions/v1').FunctionBuilder,
     firebase: typeof import('firebase-admin')
 ) => {
     const firestore = firebase.firestore();
@@ -29,9 +30,7 @@ export const expireUserAccountsFactory = (
         }
     }
 
-    return functions.pubsub.schedule('0 3 * * 1-7')
-        .timeZone('Europe/Warsaw')
-        .onRun(async ctx => {
+    return onSchedule({ schedule: '0 3 * * 1-7', timeZone: 'Europe/Warsaw' }, async () => {
             const teams = await fetchTeams();
             await Promise.all(teams.map(async team => {
                 const users = await expiringUsers(team);
@@ -64,6 +63,5 @@ export const expireUserAccountsFactory = (
                     })
                 );
             }));
-            return null;
         })
 };

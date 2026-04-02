@@ -1,3 +1,5 @@
+import {onDocumentCreated} from 'firebase-functions/v2/firestore';
+
 function asStatsUpdate(firebase, message) {
     const update = {};
 
@@ -29,16 +31,15 @@ function asStatsUpdate(firebase, message) {
 }
 
 export const updateFilterStatsAfterInboxCreateFactory = (
-    functions: import('firebase-functions/v1').FunctionBuilder,
     config: Record<string, any>,
     firebase: typeof import('firebase-admin')
-) => functions.firestore.document('team/{team}/user/{user}/inbox/{messageId}').onCreate(
-    async (change, context) => {
+) => onDocumentCreated('team/{team}/user/{user}/inbox/{messageId}',
+    async (event) => {
         console.log(`Update user filter stats after inbox message create`);
         const statsDoc = firebase.firestore()
-            .collection(`team/${context.params.team}/user/${context.params.user}/data`)
+            .collection(`team/${event.params.team}/user/${event.params.user}/data`)
             .doc(`inbox-filter-stats`);
-        const update = asStatsUpdate(firebase, change.data());
+        const update = asStatsUpdate(firebase, event.data.data());
         console.log(`${statsDoc.path}=>${JSON.stringify(update)}`);
         await statsDoc.set(update, {merge: true});
     }

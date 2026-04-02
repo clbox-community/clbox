@@ -3,6 +3,7 @@ import {PendingFeedbackMessage} from '../pending-feedback-message';
 import {SlackUserProfile} from '../slack/slack-user-profile';
 import {userList} from "../slack/fetch-user-list";
 import {sendSlackMessage} from "../slack/send-slack-message";
+import {onMessagePublished} from 'firebase-functions/v2/pubsub';
 
 function now() {
     return new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
@@ -24,14 +25,13 @@ function asMessage(channel, fromUser: SlackUserProfile, payload: PendingFeedback
 
 
 export const storeChannelFeedbackHandlerFactory = (
-    functions: import('firebase-functions/v1').FunctionBuilder,
     config: Record<string, any>,
     firebase: typeof import('firebase-admin'),
     topic: string) => {
-    return functions.pubsub.topic(topic).onPublish(
-        async (topicMessage) => {
+    return onMessagePublished(topic,
+        async (event) => {
             const usersIndex = await userList(config.slack.bottoken);
-            const payload: PendingFeedbackMessage = JSON.parse(Buffer.from(topicMessage.data, 'base64').toString());
+            const payload: PendingFeedbackMessage = JSON.parse(Buffer.from(event.data.message.data, 'base64').toString());
 
             const fromUser: SlackUserProfile = usersIndex[payload.user]?.profile;
             const firestore = firebase.firestore();

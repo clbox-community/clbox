@@ -1,14 +1,15 @@
+import {onDocumentCreated} from 'firebase-functions/v2/firestore';
+
 export const feedbackStatsFactory = (
-  functions: import('firebase-functions/v1').FunctionBuilder,
   firebase: typeof import('firebase-admin')
-) => functions.firestore.document('team/{team}/inbox/{chapterLeader}/message/{messageId}').onCreate(
-  async (change, context) => {
+) => onDocumentCreated('team/{team}/inbox/{chapterLeader}/message/{messageId}',
+  async (event) => {
     const firestore = firebase.firestore();
 
-    const {date} = change.data() as { date: string };
+    const {date} = event.data.data() as { date: string };
     const month = date.substring(0, 7);
     const day = date.substring(0, 10);
-    const monthRef = firestore.collection(`team/${context.params.team}/stats`).doc(month);
+    const monthRef = firestore.collection(`team/${event.params.team}/stats`).doc(month);
 
     await firestore.runTransaction(async trn => {
       const monthDoc = await trn.get(monthRef);

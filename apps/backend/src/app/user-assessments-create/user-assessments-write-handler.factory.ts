@@ -1,21 +1,21 @@
 import { Assessment, UserAssessment, UserAssessmentRef, UserAssessmentVerifiedCategories } from 'assessment-model';
+import {onDocumentWritten} from 'firebase-functions/v2/firestore';
 
 export const userAssessmentsWriteHandlerFactory = (
-    functions: import('firebase-functions/v1').FunctionBuilder,
     firebase: typeof import('firebase-admin')
-) => functions.firestore.document('team/{team}/assessment/{assessment}').onWrite(
-    async (change, context) => {
-        if (!change.after.exists) {
+) => onDocumentWritten('team/{team}/assessment/{assessment}',
+    async (event) => {
+        if (!event.data.after.exists) {
             console.log(`Skipping user assessment documents when assessment deleted`);
             // todo: if we will ever flush user assessment documents we should store them on the side to not lose user data
             return;
         }
 
         const db = firebase.firestore();
-        const prevAssessment = change.before.data() as Assessment | undefined;
-        const assessment = change.after.data() as Assessment;
+        const prevAssessment = event.data.before.data() as Assessment | undefined;
+        const assessment = event.data.after.data() as Assessment;
         const assessors: string[] = assessment?.assessors ?? [];
-        const assessmentCategories= await db.doc(`team/${context.params.team}/user/${assessment.assessed}/data/assessment-categories`).get();
+        const assessmentCategories= await db.doc(`team/${event.params.team}/user/${assessment.assessed}/data/assessment-categories`).get();
 
         for (const assessor of assessors) {
             if (prevAssessment?.assessors?.includes(assessor)) {
@@ -25,7 +25,7 @@ export const userAssessmentsWriteHandlerFactory = (
 
             const userAssessment: UserAssessment = {
                 ...assessment,
-                assessmentId: change.after.id,
+                assessmentId: event.data.after.id,
                 assessor: assessor,
                 verifiedCategories: assessmentCategories?.data() as UserAssessmentVerifiedCategories ?? {},
                 askedQuestion: {},
@@ -35,12 +35,12 @@ export const userAssessmentsWriteHandlerFactory = (
                 responseValue: {},
                 finished: false
             };
-            const assessmentDocRef = db.doc(`team/${context.params.team}/assessment/${change.after.id}/result/${assessor}`);
+            const assessmentDocRef = db.doc(`team/${event.params.team}/assessment/${event.data.after.id}/result/${assessor}`);
             console.log(`Updating assessment result document for user [data=${JSON.stringify(userAssessment)}, ref=${assessmentDocRef.path}]`);
             await assessmentDocRef.set(userAssessment);
 
             const userAssessmentRef: UserAssessmentRef = {
-                assessmentId: change.after.id,
+                assessmentId: event.data.after.id,
                 assessorId: assessor,
                 userAssessmentId: assessor,
                 assessedId: assessment.assessed,
@@ -48,7 +48,7 @@ export const userAssessmentsWriteHandlerFactory = (
                 deadline: assessment.deadline,
                 finished: false
             };
-            const userAssessmentDocRef = db.doc(`team/${context.params.team}/user/${assessor}/user-assessment-pending/${change.after.id}`);
+            const userAssessmentDocRef = db.doc(`team/${event.params.team}/user/${assessor}/user-assessment-pending/${event.data.after.id}`);
             console.log(`Updating user assessment for [data=${JSON.stringify(userAssessmentRef)}, path=${userAssessmentDocRef.path}]`);
             await userAssessmentDocRef.set(userAssessmentRef);
         }
