@@ -1,6 +1,6 @@
 import {PubSub} from '@google-cloud/pubsub';
 import * as firebase from 'firebase-admin';
-import {setGlobalOptions} from 'firebase-functions/v2';
+import {GlobalOptions, setGlobalOptions} from 'firebase-functions/v2';
 import {createUserFactory} from './app/create-user/create-user.handler';
 import {expireUserAccountsFactory} from './app/expire-user-accounts/expire-user-accounts-factory';
 import {feedbackStatsFactory} from './app/feedback-stats/feedback-stats-factory';
@@ -41,11 +41,13 @@ import { aggregateSkillRoadmapStatsHandlerFactory } from './app/aggregate-skill-
 
 firebase.initializeApp();
 
-setGlobalOptions({
+const defaultOptions: GlobalOptions = {
     region: 'europe-west3',
     memory: '256MiB',
-    maxInstances: 3,
-});
+    maxInstances: 1,
+};
+
+setGlobalOptions(defaultOptions);
 
 const config = {
     slack: {
@@ -71,7 +73,7 @@ export const notifyAfterSurveyCreated = notificationAfterSurveyCreatedFactory(co
 export const feedbackStats = feedbackStatsFactory(firebase);
 export const userFeedbackStats = userFeedbackStatsFactory(firebase);
 export const createUser = createUserFactory(firebase);
-export const expireUserAccounts = expireUserAccountsFactory(firebase);
+export const expireUserAccounts = expireUserAccountsFactory(firebase, defaultOptions);
 export const getChapterStats = getChapterStatsFactory(firebase);
 export const updateFilterStatsAfterInboxCreate = updateFilterStatsAfterInboxCreateFactory(config, firebase);
 export const updateFilterStatsAfterInboxChange = updateFilterStatsAfterInboxChangeFactory(config, firebase);
@@ -79,12 +81,13 @@ export const updateFilterStatsAfterInboxDelete = updateFilterStatsAfterInboxDele
 export const updateCampaignAfterSurvey = updateCampaignAfterSurveyFactory(firebase);
 export const kudosHandler = kudosHandlerFactory(
     config,
+    defaultOptions,
     new PubSub(),
     'pending-user-feedbacks',
     'pending-channel-feedbacks'
 );
 export const userAssessmentsWriteHandler = userAssessmentsWriteHandlerFactory(firebase);
 export const userAssessmentsFinishHandler = userAssessmentsFinishHandlerFactory(firebase);
-export const exportTechSkillsCron = exportTechSkillsFactory(config, firebase);
+export const exportTechSkillsCron = exportTechSkillsFactory(config, firebase, defaultOptions);
 export const updatePublicProfileHandler = updatePublicProfileHandlerFactory(firebase);
 export const aggregateSkillRoadmapStatsHandler = aggregateSkillRoadmapStatsHandlerFactory(firebase);

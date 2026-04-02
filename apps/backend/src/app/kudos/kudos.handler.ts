@@ -5,10 +5,11 @@ import {onRequest} from 'firebase-functions/v2/https';
 
 export const kudosHandlerFactory = (
     config: Record<string, any>,
+    options: import('firebase-functions/v2').GlobalOptions,
     pubsub: import('@google-cloud/pubsub').PubSub,
     userFeedbackTopic: string,
     channelFeedbackTopic: string) =>
-    onRequest({ memory: '512MiB', maxInstances: 5 }, async (request, response) => {
+    onRequest(options, async (request, response) => {
         if (request.method !== 'POST') {
             response.status(405).send('Invalid request method (only POST allowed)');
         }
