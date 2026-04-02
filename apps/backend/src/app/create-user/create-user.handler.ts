@@ -19,6 +19,10 @@ export const createUserFactory = (
 
     const registerRequest = request.data as CreateUserRequest;
     const emailMatch = registerRequest?.email?.match(emailRegex);
+    if (!emailMatch) {
+      console.warn(`Invalid email format: ${registerRequest?.email}`);
+      return { status: 'bad' };
+    }
     const emailDomain = emailMatch[1];
 
     const invitations = firebase.firestore().collection('invitation');
