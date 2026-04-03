@@ -1,4 +1,4 @@
-import {Survey} from "../../../../web-app/src/app/features/survey/model/survey";
+import {Survey} from "../../../../webapp/src/app/features/survey/model/survey";
 
 type SurveyWithId = Survey & { id: string };
 

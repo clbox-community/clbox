@@ -21,7 +21,7 @@
         "update": "nx migrate latest",
         "dep-graph": "nx dep-graph",
         "help": "nx help",
-        "build:web-app": "NX_PUBLIC_APP_VERSION=$(git log -n 1 --pretty=format:'%H') nx build --prod --project web-app",
+        "build:webapp": "NX_PUBLIC_APP_VERSION=$(git log -n 1 --pretty=format:'%H') nx build --prod --project webapp",
         "build:backend": "nx build --prod --project backend",
         "workspace-generator": "nx workspace-generator"
     },

@@ -9,6 +9,6 @@ export default {
         ],
     },
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'html'],
-    coverageDirectory: '../../coverage/apps/web-app',
-    displayName: 'web-app',
+    coverageDirectory: '../../coverage/apps/webapp',
+    displayName: 'webapp',
 };

@@ -1,7 +1,7 @@
 {
-    "name": "web-app",
+    "name": "webapp",
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
-    "sourceRoot": "apps/web-app/src",
+    "sourceRoot": "apps/webapp/src",
     "projectType": "application",
     "tags": [],
     "generators": {},
@@ -9,12 +9,12 @@
         "build": {
             "executor": "@nx/webpack:webpack",
             "options": {
-                "outputPath": "dist/apps/web-app",
-                "index": "apps/web-app/src/index.html",
-                "main": "apps/web-app/src/main.tsx",
-                "polyfills": "apps/web-app/src/polyfills.ts",
-                "tsConfig": "apps/web-app/tsconfig.app.json",
-                "assets": ["apps/web-app/src/favicon.ico", "apps/web-app/src/assets"],
+                "outputPath": "dist/apps/webapp",
+                "index": "apps/webapp/src/index.html",
+                "main": "apps/webapp/src/main.tsx",
+                "polyfills": "apps/webapp/src/polyfills.ts",
+                "tsConfig": "apps/webapp/tsconfig.app.json",
+                "assets": ["apps/webapp/src/favicon.ico", "apps/webapp/src/assets"],
                 "styles": [],
                 "scripts": [],
                 "webpackConfig": "@nx/react/plugins/webpack"
@@ -23,8 +23,8 @@
                 "production": {
                     "fileReplacements": [
                         {
-                            "replace": "apps/web-app/src/environments/environment.ts",
-                            "with": "apps/web-app/src/environments/environment.prod.ts"
+                            "replace": "apps/webapp/src/environments/environment.ts",
+                            "with": "apps/webapp/src/environments/environment.prod.ts"
                         }
                     ],
                     "optimization": true,
@@ -48,11 +48,11 @@
         "serve": {
             "executor": "@nx/webpack:dev-server",
             "options": {
-                "buildTarget": "web-app:build"
+                "buildTarget": "webapp:build"
             },
             "configurations": {
                 "production": {
-                    "buildTarget": "web-app:build:production"
+                    "buildTarget": "webapp:build:production"
                 }
             }
         },
@@ -60,15 +60,15 @@
             "executor": "@nrwl/linter:eslint",
             "options": {
                 "lintFilePatterns": [
-                    "apps/web-app/**/*.js",
-                    "apps/web-app/**/*.jsx",
-                    "apps/web-app/**/*.ts",
-                    "apps/web-app/**/*.tsx",
-                    "apps/web-app/**/*.spec.ts",
-                    "apps/web-app/**/*.spec.tsx",
-                    "apps/web-app/**/*.spec.js",
-                    "apps/web-app/**/*.spec.jsx",
-                    "apps/web-app/**/*.d.ts"
+                    "apps/webapp/**/*.js",
+                    "apps/webapp/**/*.jsx",
+                    "apps/webapp/**/*.ts",
+                    "apps/webapp/**/*.tsx",
+                    "apps/webapp/**/*.spec.ts",
+                    "apps/webapp/**/*.spec.tsx",
+                    "apps/webapp/**/*.spec.js",
+                    "apps/webapp/**/*.spec.jsx",
+                    "apps/webapp/**/*.d.ts"
                 ]
             },
             "outputs": ["{options.outputFile}"]
@@ -76,9 +76,9 @@
         "test": {
             "executor": "@nx/jest:jest",
             "options": {
-                "jestConfig": "apps/web-app/jest.config.ts"
+                "jestConfig": "apps/webapp/jest.config.ts"
             },
-            "outputs": ["{workspaceRoot}/coverage/apps/web-app"]
+            "outputs": ["{workspaceRoot}/coverage/apps/webapp"]
         }
     }
 }

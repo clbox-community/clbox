@@ -1,5 +1,5 @@
 {
-    "defaultProject": "web-app",
+    "defaultProject": "webapp",
     "generators": {
         "@nrwl/next": {
             "application": {
