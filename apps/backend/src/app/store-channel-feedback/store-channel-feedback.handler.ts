@@ -3,6 +3,7 @@ import {PendingFeedbackMessage} from '../pending-feedback-message';
 import {SlackUserProfile} from '../slack/slack-user-profile';
 import {userList} from "../slack/fetch-user-list";
 import {sendSlackMessage} from "../slack/send-slack-message";
+import { SlackUser } from '../slack/slack-user';
 
 function now() {
     return new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
@@ -22,7 +23,6 @@ function asMessage(channel, fromUser: SlackUserProfile, payload: PendingFeedback
     };
 }
 
-
 export const storeChannelFeedbackHandlerFactory = (
     functions: import('firebase-functions/v1').FunctionBuilder,
     config: Record<string, any>,
@@ -33,8 +33,10 @@ export const storeChannelFeedbackHandlerFactory = (
             const usersIndex = await userList(config.slack.bottoken);
             const payload: PendingFeedbackMessage = JSON.parse(Buffer.from(topicMessage.data, 'base64').toString());
 
-            const fromUser: SlackUserProfile = usersIndex[payload.user]?.profile;
+            const fromSlackUser: SlackUser = usersIndex[payload.user];
+
             const firestore = firebase.firestore();
+            const fromUser = (await firestore.collection(`team/${payload.team}/user/`).where('slackMemberId', '==', fromSlackUser.id).limit(1).get()).docs[0]?.data();
 
             const channel = await firestore.collection(`team/${payload.team}/channel`)
                 .doc(payload.mention)
@@ -52,7 +54,7 @@ export const storeChannelFeedbackHandlerFactory = (
                                 .doc(channelInboxDoc.id)
                         );
 
-                    const message = asMessage(channel.data(), fromUser, payload);
+                    const message = asMessage(channel.data(), fromSlackUser.profile, payload);
                     userInboxDocs.forEach(doc => trn.set(doc, message));
                     trn.set(channelInboxDoc, message);
                     trn.set(sentDoc, message);

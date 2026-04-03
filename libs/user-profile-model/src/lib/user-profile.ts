@@ -8,6 +8,7 @@ export type UserProfile = Pick<
     | 'chapterLeader'
     | 'display_name'
     | 'email'
+    | 'slackMemberId'
     | 'teams'
     | 'projects'
     | 'seniority'

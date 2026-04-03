@@ -10,12 +10,6 @@ import {kudosHandlerFactory} from './app/kudos/kudos.handler';
 import {
     notificationAfterLeaderChangeFactory
 } from './app/notification-after-leader-change/notification-after-leader-change-factory';
-import {
-    notificationAfterSurveyCreatedFactory
-} from './app/notification-after-survey-created/notification-after-survey-created-factory';
-import {
-    notifyAfterChannelFeedbackFactory
-} from "./app/notify-after-channel-feedback/notify-after-channel-feedback.handler";
 import {notifyAfterUserFeedbackFactory} from './app/notify-after-user-feedback/notify-after-user-feedback.handler';
 import {storeChannelFeedbackHandlerFactory} from "./app/store-channel-feedback/store-channel-feedback.handler";
 import {storeUserFeedbackFactory} from './app/store-user-feedback/store-user-feedback.handler';
@@ -51,10 +45,10 @@ const functionBuilder: () => FunctionBuilder = () => region
 
 export const storeUserFeedback = storeUserFeedbackFactory(functionBuilder(), functions.config(), firebase, 'pending-user-feedbacks');
 export const storeChannelFeedback = storeChannelFeedbackHandlerFactory(functionBuilder(), functions.config(), firebase, 'pending-channel-feedbacks');
-export const notifyAfterUserFeedback = notifyAfterUserFeedbackFactory(functionBuilder(), functions.config());
-export const notifyAfterChannelFeedback = notifyAfterChannelFeedbackFactory(functionBuilder(), functions.config(), firebase);
-export const notifyAfterLeaderChange = notificationAfterLeaderChangeFactory(functionBuilder(), functions.config());
-export const notifyAfterSurveyCreated = notificationAfterSurveyCreatedFactory(functionBuilder(), functions.config());
+export const notifyAfterUserFeedback = notifyAfterUserFeedbackFactory(functionBuilder(), functions.config(), firebase);
+// export const notifyAfterChannelFeedback = notifyAfterChannelFeedbackFactory(functionBuilder(), functions.config(), firebase);
+export const notifyAfterLeaderChange = notificationAfterLeaderChangeFactory(functionBuilder(), functions.config(), firebase);
+// export const notifyAfterSurveyCreated = notificationAfterSurveyCreatedFactory(functionBuilder(), functions.config());
 export const feedbackStats = feedbackStatsFactory(functionBuilder(), firebase);
 export const userFeedbackStats = userFeedbackStatsFactory(functionBuilder(), firebase);
 export const createUser = createUserFactory(functionBuilder(), firebase);

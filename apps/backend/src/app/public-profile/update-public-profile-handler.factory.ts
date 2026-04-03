@@ -18,6 +18,7 @@ export const updatePublicProfileHandlerFactory = (
             const user = change.after.data();
             const updatedPublicProfile: UserPublicProfile = {
                 display_name: user.display_name,
+                slackMemberId: user.slackMemberId,
                 email: user.email,
                 textForm: user.textForm,
                 seniority: user.seniority,

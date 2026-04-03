@@ -1,6 +1,6 @@
-import {checkSlackSignature} from '../slack/check-slack-signature';
-import {PendingFeedbackMessage} from '../pending-feedback-message';
-import {SlashCommandRequest} from '../slack/slash-command-request';
+import { checkSlackSignature } from '../slack/check-slack-signature';
+import { PendingFeedbackMessage } from '../pending-feedback-message';
+import { SlashCommandRequest } from '../slack/slash-command-request';
 
 export const kudosHandlerFactory = (
     functions: import('firebase-functions/v1').FunctionBuilder,
@@ -28,35 +28,41 @@ export const kudosHandlerFactory = (
         const userMention = slashCommand.text.match(/@[^\s]+/);
         const channelMention = slashCommand.text.match(/#[^\s]+/);
         if (userMention && userMention.length === 1) {
-          const mention = userMention[0].substr(1);
-          const feedback = slashCommand.text.substr(mention.length + 2);
+            const mention = userMention[0].substr(1);
+            const feedback = slashCommand.text.substr(mention.length + 2);
 
-          await pubsub.topic(userFeedbackTopic).publish(Buffer.from(JSON.stringify(<PendingFeedbackMessage>{
-            mention, feedback, user: slashCommand.user_name, team: slashCommand.team_domain
-          })));
+            await pubsub.topic(userFeedbackTopic).publish(Buffer.from(JSON.stringify(<PendingFeedbackMessage>{
+                mention, feedback, user: slashCommand.user_name, userId: slashCommand.user_id, team: slashCommand.team_domain
+            })));
 
-          response.contentType('json')
-            .status(200)
-            .send({
-              'response_type': 'ephemeral',
-              'text': `Thank you for your feedback!`
-            });
+            response.contentType('json')
+                .status(200)
+                .send({
+                    'response_type': 'ephemeral',
+                    'text': `Thank you for your feedback!`
+                });
         } else if (channelMention && channelMention.length === 1) {
-          const mention = channelMention[0].substr(1);
-          const feedback = slashCommand.text.substr(mention.length + 2);
+            const mention = channelMention[0].substr(1);
+            const feedback = slashCommand.text.substr(mention.length + 2);
 
-          console.log(`Channel feedback for ${mention}: ${feedback}`);
+            console.log(`Channel feedback for ${mention}: ${feedback}`);
+            // await pubsub.topic(channelFeedbackTopic).publish(Buffer.from(JSON.stringify(<PendingFeedbackMessage>{
+            //   mention, feedback, user: slashCommand.user_name, userId: slashCommand.user_id, team: slashCommand.team_domain
+            // })));
+            //
+            // response.contentType('json')
+            //   .status(200)
+            //   .send({
+            //     'response_type': 'ephemeral',
+            //     'text': `Thank you for your feedback!`
+            //   });
 
-          await pubsub.topic(channelFeedbackTopic).publish(Buffer.from(JSON.stringify(<PendingFeedbackMessage>{
-            mention, feedback, user: slashCommand.user_name, team: slashCommand.team_domain
-          })));
-
-          response.contentType('json')
-            .status(200)
-            .send({
-              'response_type': 'ephemeral',
-              'text': `Thank you for your feedback!`
-            });
+            response.contentType('json')
+                .status(200)
+                .send({
+                    'response_type': 'ephemeral',
+                    'text': `Channel feedback is currently suspended due to maintenance. Please contact channel manager directly. Your message was: ${feedback}`
+                });
         } else {
             response.contentType('json')
                 .status(200)

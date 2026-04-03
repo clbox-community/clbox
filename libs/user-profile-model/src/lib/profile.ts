@@ -6,6 +6,7 @@ export interface Profile {
     seniority: string;
     chapterLeader: string;
     display_name: string;
+    slackMemberId: string;
     email: string;
     expireDate: string;
     leader: boolean;
