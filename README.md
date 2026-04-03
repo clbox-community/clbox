@@ -25,7 +25,7 @@ $ firebase functions:secrets:set SKILLS_EXPORTKEY
 
 ### Local development
 
-For local development, create a `.env.local` file (add to `.gitignore` or use an already-ignored name) in `apps/backend/` with:
+For local development, create a `.env.local` file (gitignored) in `apps/backend/` with:
 
 ```
 SLACK_BOTTOKEN=your-bot-token

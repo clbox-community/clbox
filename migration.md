@@ -103,9 +103,8 @@ firebase functions:config:unset webapp
 
 ## Local development
 
-For local development, create a file `apps/backend/.env.local` in the
-`apps/backend/` directory with the plain-text values (make sure to add it to
-`.gitignore` if it isn't already covered):
+For local development, create a file `apps/backend/.env.local` (gitignored)
+with the plain-text values:
 
 ```
 SLACK_BOTTOKEN=xoxb-your-bot-token

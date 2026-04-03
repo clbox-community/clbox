@@ -42,7 +42,7 @@ const functionBuilder: () => FunctionBuilder = () => region
     .runWith({
         maxInstances: 3,
         memory: '256MB',
-        secrets: ['SLACK_BOTTOKEN', 'SLACK_SIGNINGSECRET', 'WEBAPP_URL', 'SKILLS_EXPORTKEY'],
+        secrets: ['SLACK_BOTTOKEN', 'SLACK_SIGNINGSECRET', 'WEBAPP_URL'],
     });
 
 const config = {
@@ -53,12 +53,9 @@ const config = {
     webapp: {
         url: process.env.WEBAPP_URL ?? '',
     },
-    skills: {
-        exportkey: process.env.SKILLS_EXPORTKEY ?? '',
-    },
 };
 
-const missingEnvVars = ['SLACK_BOTTOKEN', 'SLACK_SIGNINGSECRET', 'WEBAPP_URL', 'SKILLS_EXPORTKEY'].filter(v => !process.env[v]);
+const missingEnvVars = ['SLACK_BOTTOKEN', 'SLACK_SIGNINGSECRET', 'WEBAPP_URL'].filter(v => !process.env[v]);
 if (missingEnvVars.length > 0) {
     console.warn(`Missing environment variables: ${missingEnvVars.join(', ')}. Some functions may not work correctly.`);
 }
@@ -94,8 +91,8 @@ export const userAssessmentsFinishHandler = userAssessmentsFinishHandlerFactory(
     firebase
 );
 export const exportTechSkillsCron = exportTechSkillsFactory(
-    functionBuilder().runWith({}),
-    config,
+    functionBuilder().runWith({secrets: ['SKILLS_EXPORTKEY']}),
+    {...config, skills: {exportkey: process.env.SKILLS_EXPORTKEY ?? ''}},
     firebase
 );
 export const updatePublicProfileHandler = updatePublicProfileHandlerFactory(

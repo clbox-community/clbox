@@ -18,11 +18,8 @@ const config = {
     webapp: {
         url: process.env.WEBAPP_URL ?? '',
     },
-    skills: {
-        exportkey: process.env.SKILLS_EXPORTKEY ?? '',
-    },
 };
 
 (async function () {
-    await exportTechSkills(config, firebase);
+    await exportTechSkills({...config, skills: {exportkey: process.env.SKILLS_EXPORTKEY ?? ''}}, firebase);
 })();
