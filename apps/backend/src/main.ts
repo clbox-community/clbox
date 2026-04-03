@@ -42,6 +42,11 @@ const functionBuilder: () => FunctionBuilder = () => region
     .runWith({
         maxInstances: 3,
         memory: '256MB',
+    });
+const slackFunctionBuilder: () => FunctionBuilder = () => region
+    .runWith({
+        maxInstances: 3,
+        memory: '256MB',
         secrets: ['SLACK_BOTTOKEN', 'SLACK_SIGNINGSECRET', 'WEBAPP_URL'],
     });
 
@@ -56,11 +61,11 @@ const config = {
 };
 
 
-export const storeUserFeedback = storeUserFeedbackFactory(functionBuilder(), config, firebase, 'pending-user-feedbacks');
-export const storeChannelFeedback = storeChannelFeedbackHandlerFactory(functionBuilder(), config, firebase, 'pending-channel-feedbacks');
-export const notifyAfterUserFeedback = notifyAfterUserFeedbackFactory(functionBuilder(), config, firebase);
+export const storeUserFeedback = storeUserFeedbackFactory(slackFunctionBuilder(), config, firebase, 'pending-user-feedbacks');
+export const storeChannelFeedback = storeChannelFeedbackHandlerFactory(slackFunctionBuilder(), config, firebase, 'pending-channel-feedbacks');
+export const notifyAfterUserFeedback = notifyAfterUserFeedbackFactory(slackFunctionBuilder(), config, firebase);
 // export const notifyAfterChannelFeedback = notifyAfterChannelFeedbackFactory(functionBuilder(), config, firebase);
-export const notifyAfterLeaderChange = notificationAfterLeaderChangeFactory(functionBuilder(), config, firebase);
+export const notifyAfterLeaderChange = notificationAfterLeaderChangeFactory(slackFunctionBuilder(), config, firebase);
 // export const notifyAfterSurveyCreated = notificationAfterSurveyCreatedFactory(functionBuilder(), config);
 export const feedbackStats = feedbackStatsFactory(functionBuilder(), firebase);
 export const userFeedbackStats = userFeedbackStatsFactory(functionBuilder(), firebase);
@@ -72,7 +77,7 @@ export const updateFilterStatsAfterInboxChange = updateFilterStatsAfterInboxChan
 export const updateFilterStatsAfterInboxDelete = updateFilterStatsAfterInboxDeleteFactory(functionBuilder(), config, firebase);
 export const updateCampaignAfterSurvey = updateCampaignAfterSurveyFactory(functionBuilder(), firebase);
 export const kudosHandler = kudosHandlerFactory(
-    functionBuilder().runWith({memory: '512MB', maxInstances: 5, }),
+    slackFunctionBuilder().runWith({memory: '512MB', maxInstances: 5, }),
     config,
     new PubSub(),
     'pending-user-feedbacks',
