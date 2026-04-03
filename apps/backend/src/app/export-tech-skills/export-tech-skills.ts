@@ -21,7 +21,7 @@ export const exportTechSkills = async (
 
     const exportKey: string = config.skills?.exportkey;
     if (!exportKey) {
-        throw new Error(`Public key for encryption not present in configuration. Be sure to setup public key with config key skills.exportkey.`);
+        throw new Error(`Public key for encryption not present in configuration. Be sure to set the SKILLS_EXPORTKEY secret via Secret Manager (firebase functions:secrets:set SKILLS_EXPORTKEY).`);
     }
 
     console.log(`Encrypting file using public key ${exportKey.substring(0, 8)}...`);
