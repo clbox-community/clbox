@@ -1,7 +1,10 @@
-### Starting with custom env
+### Starting with custom env (web app)
+
+`.dev.local.env` holds the `NX_PUBLIC_*` Firebase config for the **web app**.
+Copy `.env.template` to `.dev.local.env`, fill in your project values, then run:
 
 ```
-dotenvx run --env-file=.dev.local.env -- nx serve
+dotenvx run --env-file=.dev.local.env -- nx serve web-app
 ```
 
 ### Setting up environment variables for Cloud Functions
@@ -23,9 +26,9 @@ $ firebase functions:secrets:set SKILLS_EXPORTKEY
 > If you previously used `firebase functions:config:set`, see [migration.md](migration.md)
 > for instructions on migrating existing values to the new approach.
 
-### Local development
+### Local development (backend)
 
-For local development, create a `.env.local` file (gitignored) in `apps/backend/` with:
+For local development of the backend, create an `apps/backend/.env.local` file (gitignored) with:
 
 ```
 SLACK_BOTTOKEN=your-bot-token
@@ -34,4 +37,8 @@ WEBAPP_URL=https://your-webapp-url
 SKILLS_EXPORTKEY=your-export-public-key
 ```
 
-Then run the emulator or serve command with that file loaded.
+Then serve the backend with that file loaded:
+
+```
+dotenvx run --env-file=apps/backend/.env.local -- nx serve backend
+```
