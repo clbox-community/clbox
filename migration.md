@@ -60,10 +60,10 @@ firebase functions:secrets:set SKILLS_EXPORTKEY
 Verify the secrets were created:
 
 ```bash
-firebase functions:secrets:get SLACK_SIGNINGSECRET
-firebase functions:secrets:get SLACK_BOTTOKEN
-firebase functions:secrets:get WEBAPP_URL
-firebase functions:secrets:get SKILLS_EXPORTKEY
+firebase functions:secrets:access SLACK_SIGNINGSECRET
+firebase functions:secrets:access SLACK_BOTTOKEN
+firebase functions:secrets:access WEBAPP_URL
+firebase functions:secrets:access SKILLS_EXPORTKEY
 ```
 
 > **Note for Firebase Functions v1:** secrets from Cloud Secret Manager are only
