@@ -41,7 +41,8 @@ const region = functions.region('europe-west3');
 const functionBuilder: () => FunctionBuilder = () => region
     .runWith({
         maxInstances: 3,
-        memory: '256MB'
+        memory: '256MB',
+        secrets: ['SLACK_BOTTOKEN', 'SLACK_SIGNINGSECRET', 'WEBAPP_URL', 'SKILLS_EXPORTKEY'],
     });
 
 const config = {
@@ -52,9 +53,12 @@ const config = {
     webapp: {
         url: process.env.WEBAPP_URL ?? '',
     },
+    skills: {
+        exportkey: process.env.SKILLS_EXPORTKEY ?? '',
+    },
 };
 
-const missingEnvVars = ['SLACK_BOTTOKEN', 'SLACK_SIGNINGSECRET', 'WEBAPP_URL'].filter(v => !process.env[v]);
+const missingEnvVars = ['SLACK_BOTTOKEN', 'SLACK_SIGNINGSECRET', 'WEBAPP_URL', 'SKILLS_EXPORTKEY'].filter(v => !process.env[v]);
 if (missingEnvVars.length > 0) {
     console.warn(`Missing environment variables: ${missingEnvVars.join(', ')}. Some functions may not work correctly.`);
 }

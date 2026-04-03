@@ -16,6 +16,8 @@ $ firebase functions:secrets:set SLACK_BOTTOKEN
 # enter value when prompted
 $ firebase functions:secrets:set WEBAPP_URL
 # enter value when prompted
+$ firebase functions:secrets:set SKILLS_EXPORTKEY
+# enter value when prompted
 ```
 
 > If you previously used `firebase functions:config:set`, see [migration.md](migration.md)
@@ -23,12 +25,13 @@ $ firebase functions:secrets:set WEBAPP_URL
 
 ### Local development
 
-For local development, create a `.env.local` file (gitignored) in `apps/backend/` with:
+For local development, create a `.env.local` file (add to `.gitignore` or use an already-ignored name) in `apps/backend/` with:
 
 ```
 SLACK_BOTTOKEN=your-bot-token
 SLACK_SIGNINGSECRET=your-signing-secret
 WEBAPP_URL=https://your-webapp-url
+SKILLS_EXPORTKEY=your-export-public-key
 ```
 
 Then run the emulator or serve command with that file loaded.

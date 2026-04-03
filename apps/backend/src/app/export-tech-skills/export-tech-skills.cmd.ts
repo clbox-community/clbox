@@ -18,6 +18,9 @@ const config = {
     webapp: {
         url: process.env.WEBAPP_URL ?? '',
     },
+    skills: {
+        exportkey: process.env.SKILLS_EXPORTKEY ?? '',
+    },
 };
 
 (async function () {

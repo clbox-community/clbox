@@ -37,6 +37,7 @@ Note down the values for:
 | `slack.signingsecret`    | `SLACK_SIGNINGSECRET`  |
 | `slack.bottoken`         | `SLACK_BOTTOKEN`       |
 | `webapp.url`             | `WEBAPP_URL`           |
+| `skills.exportkey`       | `SKILLS_EXPORTKEY`     |
 
 ### 2. Store the values as Cloud Secrets (recommended)
 
@@ -51,6 +52,9 @@ firebase functions:secrets:set SLACK_BOTTOKEN
 
 firebase functions:secrets:set WEBAPP_URL
 # Paste the value of webapp.url when prompted
+
+firebase functions:secrets:set SKILLS_EXPORTKEY
+# Paste the value of skills.exportkey when prompted
 ```
 
 Verify the secrets were created:
@@ -59,7 +63,14 @@ Verify the secrets were created:
 firebase functions:secrets:get SLACK_SIGNINGSECRET
 firebase functions:secrets:get SLACK_BOTTOKEN
 firebase functions:secrets:get WEBAPP_URL
+firebase functions:secrets:get SKILLS_EXPORTKEY
 ```
+
+> **Note for Firebase Functions v1:** secrets from Cloud Secret Manager are only
+> injected into `process.env` at function invocation when each secret is declared
+> on the function via `runWith({ secrets: [...] })`. The current code already
+> declares all four secrets in the shared `functionBuilder`, so they will be
+> available automatically after deploy.
 
 ### 3. Deploy the updated functions
 
@@ -92,13 +103,15 @@ firebase functions:config:unset webapp
 
 ## Local development
 
-For local development, create a file `apps/backend/.env.local` (it is
-gitignored) with the plain-text values:
+For local development, create a file `apps/backend/.env.local` in the
+`apps/backend/` directory with the plain-text values (make sure to add it to
+`.gitignore` if it isn't already covered):
 
 ```
 SLACK_BOTTOKEN=xoxb-your-bot-token
 SLACK_SIGNINGSECRET=your-signing-secret
 WEBAPP_URL=https://your-webapp-url
+SKILLS_EXPORTKEY=your-export-public-key
 ```
 
 Pass it to the emulator or serve command, for example:
