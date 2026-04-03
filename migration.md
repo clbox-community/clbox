@@ -68,9 +68,10 @@ firebase functions:secrets:get SKILLS_EXPORTKEY
 
 > **Note for Firebase Functions v1:** secrets from Cloud Secret Manager are only
 > injected into `process.env` at function invocation when each secret is declared
-> on the function via `runWith({ secrets: [...] })`. The current code already
-> declares all four secrets in the shared `functionBuilder`, so they will be
-> available automatically after deploy.
+> on the function via `runWith({ secrets: [...] })`. The shared `functionBuilder`
+> declares `SLACK_BOTTOKEN`, `SLACK_SIGNINGSECRET`, and `WEBAPP_URL`; `SKILLS_EXPORTKEY`
+> is declared separately only on `exportTechSkillsCron`, so it is not injected into
+> every function automatically.
 
 ### 3. Deploy the updated functions
 

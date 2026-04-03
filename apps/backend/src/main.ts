@@ -55,10 +55,6 @@ const config = {
     },
 };
 
-const missingEnvVars = ['SLACK_BOTTOKEN', 'SLACK_SIGNINGSECRET', 'WEBAPP_URL'].filter(v => !process.env[v]);
-if (missingEnvVars.length > 0) {
-    console.warn(`Missing environment variables: ${missingEnvVars.join(', ')}. Some functions may not work correctly.`);
-}
 
 export const storeUserFeedback = storeUserFeedbackFactory(functionBuilder(), config, firebase, 'pending-user-feedbacks');
 export const storeChannelFeedback = storeChannelFeedbackHandlerFactory(functionBuilder(), config, firebase, 'pending-channel-feedbacks');
