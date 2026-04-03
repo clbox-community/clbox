@@ -243,7 +243,7 @@ Po implementacji agent powinien:
 | Faza | Status | Data | Uwagi |
 |------|--------|------|-------|
 | Specyfikacja | `[ ] szkic` `[ ] gotowa` `[ ] zatwierdzona` | | |
-| Planowanie | `[ ] nie started` `[ ] w toku` `[ ] gotowe` | | |
-| Implementacja | `[ ] nie started` `[ ] w toku` `[ ] gotowe` | | |
-| Review | `[ ] nie started` `[ ] w toku` `[ ] zatwierdzone` | | |
-| Deploy | `[ ] nie started` `[ ] w toku` `[ ] wdrożone` | | |
+| Planowanie | `[ ] nie rozpoczęte` `[ ] w toku` `[ ] gotowe` | | |
+| Implementacja | `[ ] nie rozpoczęte` `[ ] w toku` `[ ] gotowe` | | |
+| Review | `[ ] nie rozpoczęte` `[ ] w toku` `[ ] zatwierdzone` | | |
+| Deploy | `[ ] nie rozpoczęte` `[ ] w toku` `[ ] wdrożone` | | |
