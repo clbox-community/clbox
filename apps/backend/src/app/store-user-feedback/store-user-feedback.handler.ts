@@ -2,6 +2,7 @@ import fetch from 'node-fetch';
 import { PendingFeedbackMessage } from '../pending-feedback-message';
 import { SlackUserProfile } from '../slack/slack-user-profile';
 import { userList } from '../slack/fetch-user-list';
+import { SlackUser } from '../slack/slack-user';
 
 function now() {
     return new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
@@ -63,10 +64,10 @@ export const storeUserFeedbackFactory = (
 
             console.log(`Feedback to store [fromUser=${payload.user}, toUser=${payload.mention}]`);
 
-            const fromUser: SlackUserProfile = usersIndex[payload.user]?.profile;
-            const forUser: SlackUserProfile = usersIndex[payload.mention]?.profile;
+            const fromSlackUser: SlackUser = usersIndex[payload.user];
+            const forSlackUser = usersIndex[payload.mention];
 
-            if (!fromUser) {
+            if (!fromSlackUser) {
                 await failedToSendFeedback(
                     firebase,
                     slackHttpHeaders,
@@ -77,7 +78,7 @@ export const storeUserFeedbackFactory = (
                 console.error(`Can't send feedback due to missing author profile (${payload.user}).`)
                 return;
             }
-            if (!forUser) {
+            if (!forSlackUser) {
                 await failedToSendFeedback(
                     firebase,
                     slackHttpHeaders,
@@ -91,21 +92,46 @@ export const storeUserFeedbackFactory = (
 
             const firestore = firebase.firestore();
             const userCollection = firestore.collection(`team/${payload.team}/user/`);
-            const chapterLeader = (await userCollection.doc(forUser.email).get())?.data()?.chapterLeader;
 
-            if (chapterLeader !== undefined) {
+            const fromUser = (await userCollection.where('slackMemberId', '==', fromSlackUser.id).limit(1).get()).docs[0]?.data();
+            if (!fromUser) {
+                await failedToSendFeedback(
+                    firebase,
+                    slackHttpHeaders,
+                    payload,
+                    `Can't find user matching slack member`,
+                    `User mentioned in feedback (${payload.mention}) not found by slack member id.`
+                )
+                console.error(`User not found by slack id [type=fromUser, slackMemberId=${fromSlackUser.id}]`);
+                return;
+            }
+
+            const forUser = (await userCollection.where('slackMemberId', '==', forSlackUser.id).limit(1).get()).docs[0]?.data();
+            if (!forUser) {
+                await failedToSendFeedback(
+                    firebase,
+                    slackHttpHeaders,
+                    payload,
+                    `Can't find user matching slack member`,
+                    `User mentioned in feedback (${payload.mention}) not found by slack member id.`
+                )
+                console.error(`User not found by slack id [type=forUser, slackMemberId=${forSlackUser.id}]`);
+                return;
+            }
+
+            if (forUser.chapterLeader !== undefined) {
                 await firestore.runTransaction(async trn => {
-                    const inboxDoc = firestore.collection(`team/${payload.team}/user/${chapterLeader}/inbox`).doc();
+                    const inboxDoc = firestore.collection(`team/${payload.team}/user/${forUser.chapterLeader}/inbox`).doc();
                     const sentDoc = firestore.collection(`team/${payload.team}/user/${fromUser.email}/sent`).doc(inboxDoc.id);
 
-                    const inboxLegacyDoc = firestore.collection(`team/${payload.team}/inbox/${chapterLeader}/message`).doc(inboxDoc.id);
+                    const inboxLegacyDoc = firestore.collection(`team/${payload.team}/inbox/${forUser.chapterLeader}/message`).doc(inboxDoc.id);
                     const sentLegacyDoc = firestore.collection(`team/${payload.team}/sent/${fromUser.email}/message`).doc(inboxDoc.id);
 
-                    trn.set(inboxLegacyDoc, message(forUser, fromUser, payload));
-                    trn.set(sentLegacyDoc, message(forUser, fromUser, payload));
+                    trn.set(inboxLegacyDoc, message(forSlackUser.profile, fromSlackUser.profile, payload));
+                    trn.set(sentLegacyDoc, message(forSlackUser.profile, fromSlackUser.profile, payload));
 
-                    trn.set(inboxDoc, message(forUser, fromUser, payload));
-                    trn.set(sentDoc, message(forUser, fromUser, payload));
+                    trn.set(inboxDoc, message(forSlackUser.profile, fromSlackUser.profile, payload));
+                    trn.set(sentDoc, message(forSlackUser.profile, fromSlackUser.profile, payload));
                 });
             } else {
                 await failedToSendFeedback(
