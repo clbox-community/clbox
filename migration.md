@@ -2,7 +2,7 @@
 
 This guide describes how to migrate an existing deployment from the old
 `firebase functions:config` approach to the new environment variable approach
-introduced when the backend was upgraded to Firebase Functions v2.
+introduced when the backend was migrated to read configuration from `process.env`.
 
 ## Background
 
@@ -17,8 +17,8 @@ firebase functions:config:set webapp.url="..."
 These values were read in code via `functions.config().slack.signingsecret`, etc.
 
 The new approach reads values from standard OS environment variables
-(`process.env.SLACK_SIGNINGSECRET`, etc.), which is the recommended pattern for
-Firebase Functions v2 and is compatible with [Cloud Secret Manager](https://firebase.google.com/docs/functions/config-env#secret-manager).
+(`process.env.SLACK_SIGNINGSECRET`, etc.), which is the recommended pattern
+compatible with [Cloud Secret Manager](https://firebase.google.com/docs/functions/config-env#secret-manager).
 
 ---
 
@@ -37,6 +37,7 @@ Note down the values for:
 | `slack.signingsecret`    | `SLACK_SIGNINGSECRET`  |
 | `slack.bottoken`         | `SLACK_BOTTOKEN`       |
 | `webapp.url`             | `WEBAPP_URL`           |
+| `skills.exportkey`       | `SKILLS_EXPORTKEY`     |
 
 ### 2. Store the values as Cloud Secrets (recommended)
 
@@ -51,15 +52,26 @@ firebase functions:secrets:set SLACK_BOTTOKEN
 
 firebase functions:secrets:set WEBAPP_URL
 # Paste the value of webapp.url when prompted
+
+firebase functions:secrets:set SKILLS_EXPORTKEY
+# Paste the value of skills.exportkey when prompted
 ```
 
 Verify the secrets were created:
 
 ```bash
-firebase functions:secrets:get SLACK_SIGNINGSECRET
-firebase functions:secrets:get SLACK_BOTTOKEN
-firebase functions:secrets:get WEBAPP_URL
+firebase functions:secrets:access SLACK_SIGNINGSECRET
+firebase functions:secrets:access SLACK_BOTTOKEN
+firebase functions:secrets:access WEBAPP_URL
+firebase functions:secrets:access SKILLS_EXPORTKEY
 ```
+
+> **Note for Firebase Functions v1:** secrets from Cloud Secret Manager are only
+> injected into `process.env` at function invocation when each secret is declared
+> on the function via `runWith({ secrets: [...] })`. The shared `functionBuilder`
+> declares `SLACK_BOTTOKEN`, `SLACK_SIGNINGSECRET`, and `WEBAPP_URL`; `SKILLS_EXPORTKEY`
+> is declared separately only on `exportTechSkillsCron`, so it is not injected into
+> every function automatically.
 
 ### 3. Deploy the updated functions
 
@@ -67,7 +79,7 @@ firebase functions:secrets:get WEBAPP_URL
 firebase deploy --only functions
 ```
 
-Cloud Functions v2 will automatically pick up the secrets from Secret Manager
+Cloud Functions will automatically pick up the secrets from Secret Manager
 because they match the environment variable names used in `process.env`.
 
 ### 4. Verify the deployment
@@ -86,19 +98,20 @@ firebase functions:config:unset webapp
 ```
 
 > **Note:** Removing the old config has no effect on the running functions
-> because v2 functions no longer read from `functions.config()`.
+> because they no longer read from `functions.config()`.
 
 ---
 
 ## Local development
 
-For local development, create a file `apps/backend/.env.local` (it is
-gitignored) with the plain-text values:
+For local development, create a file `apps/backend/.env.local` (gitignored)
+with the plain-text values:
 
 ```
 SLACK_BOTTOKEN=xoxb-your-bot-token
 SLACK_SIGNINGSECRET=your-signing-secret
 WEBAPP_URL=https://your-webapp-url
+SKILLS_EXPORTKEY=your-export-public-key
 ```
 
 Pass it to the emulator or serve command, for example:

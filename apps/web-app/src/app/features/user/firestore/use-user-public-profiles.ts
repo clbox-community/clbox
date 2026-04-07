@@ -13,6 +13,7 @@ export function useUserPublicProfiles(teamId: string): UserPublicProfile[] {
                     .get()
                     .then(result => setUsers(result.docs.map(doc => doc.data()).map(doc => ({
                         display_name: doc.display_name,
+                        slackMemberId: doc.slackMemberId,
                         email: doc.email,
                         chapterLeader: doc.chapterLeader,
                         teams: doc.teams,

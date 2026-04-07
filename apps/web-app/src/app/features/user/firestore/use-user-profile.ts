@@ -14,6 +14,7 @@ export function useUserProfile(teamId: string, userId: string): UserProfile {
                     .then(doc => doc.data())
                     .then(doc => setUser({
                         email: doc.email,
+                        slackMemberId: doc.slackMemberId,
                         chapterLeader: doc.chapterLeader,
                         display_name: doc.display_name,
                         teams: doc.teams,

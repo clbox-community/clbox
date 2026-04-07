@@ -1,4 +1,3 @@
-import * as functions from 'firebase-functions/v1';
 import * as firebase from 'firebase-admin';
 import {exportTechSkills} from "./export-tech-skills";
 
@@ -11,6 +10,16 @@ firebase.initializeApp({
     storageBucket
 });
 
+const config = {
+    slack: {
+        bottoken: process.env.SLACK_BOTTOKEN ?? '',
+        signingsecret: process.env.SLACK_SIGNINGSECRET ?? '',
+    },
+    webapp: {
+        url: process.env.WEBAPP_URL ?? '',
+    },
+};
+
 (async function () {
-    await exportTechSkills(functions.config(), firebase);
+    await exportTechSkills({...config, skills: {exportkey: process.env.SKILLS_EXPORTKEY ?? ''}}, firebase);
 })();

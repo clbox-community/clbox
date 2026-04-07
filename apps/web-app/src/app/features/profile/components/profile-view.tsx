@@ -98,6 +98,10 @@ export const ProfileView = ({profile}) => <OneColumnLayout>
                     )}
                 </RowValue>
             </Row>}
+            <Row>
+                <RowLabel>Slack ID</RowLabel>
+                <RowValue>{profile.slackMemberId}</RowValue>
+            </Row>
         </CardContent>
     </Card>
 </OneColumnLayout>;

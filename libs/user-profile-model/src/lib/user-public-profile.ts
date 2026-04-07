@@ -4,6 +4,7 @@ import { Profile } from './profile';
 export type UserPublicProfile = Pick<
     Profile,
     'display_name'
+    | 'slackMemberId'
     | 'email'
     // TODO: wszystko poniżej tego komentarza nie wydaje się potrzebne w publicznym profilu
     | 'chapterLeader'
