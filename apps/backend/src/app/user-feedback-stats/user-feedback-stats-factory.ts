@@ -2,11 +2,11 @@ import {onDocumentCreated} from 'firebase-functions/v2/firestore';
 
 export const userFeedbackStatsFactory = (
   firebase: typeof import('firebase-admin')
-) => onDocumentCreated('team/{team}/sent/{user}/message/{messageId}',
+) => onDocumentCreated<{ date: string }>('team/{team}/sent/{user}/message/{messageId}',
   async (event) => {
     const firestore = firebase.firestore();
 
-    const {date} = event.data.data() as { date: string };
+    const {date} = event.data.data();
     const day = date.substring(0, 10);
     const year = date.substring(0, 4);
     const statsRef = firestore

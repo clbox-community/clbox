@@ -14,10 +14,10 @@ export const createUserFactory = (
     }
   }
 
-  return onCall(async (request) => {
+  return onCall<CreateUserRequest>(async (request) => {
     console.log(`Request for user registration (${JSON.stringify(request.data)})`);
 
-    const registerRequest = request.data as CreateUserRequest;
+    const registerRequest = request.data;
     const emailMatch = registerRequest?.email?.match(emailRegex);
     if (!emailMatch) {
       console.warn(`Invalid email format: ${registerRequest?.email}`);
