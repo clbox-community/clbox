@@ -7,13 +7,13 @@ interface GetChapterStatsRequest {
 
 export const getChapterStatsFactory = (
   firebase: typeof import('firebase-admin')
-) => onCall(async (request) => {
+) => onCall<GetChapterStatsRequest>(async (request) => {
   if (!request.auth?.token?.email) {
     throw new Error(`Functions requires authentication`);
   }
   const firestore = firebase.firestore();
   const auth = request.auth?.token?.email;
-  const data = request.data as GetChapterStatsRequest;
+  const data = request.data;
 
   const users = await firestore
     .collection(`/team/${data.team}/user`)
