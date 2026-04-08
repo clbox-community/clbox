@@ -1,5 +1,6 @@
 import {PubSub} from '@google-cloud/pubsub';
 import * as firebase from 'firebase-admin';
+import {setGlobalOptions} from 'firebase-functions/v2';
 import type {GlobalOptions} from 'firebase-functions/v2';
 
 import {createUserFactory} from './app/create-user/create-user.handler';
@@ -42,6 +43,8 @@ const v2Options: GlobalOptions = {
     memory: '256MiB',
 };
 
+setGlobalOptions(v2Options);
+
 const slackV2Options: GlobalOptions = {
     ...v2Options,
     secrets: ['SLACK_BOTTOKEN', 'SLACK_SIGNINGSECRET', 'WEBAPP_URL'],
@@ -58,7 +61,7 @@ const config = {
 };
 
 
-export const storeUserFeedback = storeUserFeedbackFactory(config, firebase, 'pending-user-feedbacks');
+export const storeUserFeedback = storeUserFeedbackFactory(config, firebase, 'pending-user-feedbacks', slackV2Options);
 export const storeChannelFeedback = storeChannelFeedbackHandlerFactory(config, firebase, 'pending-channel-feedbacks', slackV2Options);
 export const notifyAfterUserFeedback = notifyAfterUserFeedbackFactory(config, firebase, slackV2Options);
 // export const notifyAfterChannelFeedback = notifyAfterChannelFeedbackFactory(functionBuilder(), config, firebase);

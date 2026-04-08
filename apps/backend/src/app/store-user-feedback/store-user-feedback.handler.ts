@@ -4,6 +4,7 @@ import { PendingFeedbackMessage } from '../pending-feedback-message';
 import { SlackUserProfile } from '../slack/slack-user-profile';
 import { userList } from '../slack/fetch-user-list';
 import { SlackUser } from '../slack/slack-user';
+import type { GlobalOptions } from 'firebase-functions/v2';
 
 function now() {
     return new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
@@ -50,12 +51,13 @@ async function failedToSendFeedback(firebase: typeof import('firebase-admin'), h
 export const storeUserFeedbackFactory = (
     config: Record<string, any>,
     firebase: typeof import('firebase-admin'),
-    topic: string) => {
+    topic: string,
+    options?: GlobalOptions) => {
     const slackHttpHeaders = {
         Authorization: `Bearer ${config.slack.bottoken}`,
         'Content-type': 'application/json'
     };
-    return onMessagePublished(topic,
+    return onMessagePublished({topic, ...options},
         async (event) => {
             console.log('Sending feedback after pubsub event');
 
