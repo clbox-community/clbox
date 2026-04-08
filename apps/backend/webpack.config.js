@@ -19,7 +19,7 @@ module.exports = composePlugins(
                     'dependencies': {
                         'tslib': '',
                         'firebase-admin': '11.8.0',
-                        'firebase-functions': '^4.6.0',
+                        'firebase-functions': '^6.3.2',
                         'node-fetch': ''
                     },
                     'engines': {
