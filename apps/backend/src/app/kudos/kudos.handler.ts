@@ -13,6 +13,7 @@ export const kudosHandlerFactory = (
     onRequest(options ?? {}, async (request, response) => {
         if (request.method !== 'POST') {
             response.status(405).send('Invalid request method (only POST allowed)');
+            return;
         }
         if (!checkSlackSignature(
             config.slack.signingsecret,
