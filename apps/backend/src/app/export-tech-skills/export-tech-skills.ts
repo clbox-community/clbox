@@ -14,12 +14,11 @@ const encrypt = (key, plaintext) => {
 }
 
 export const exportTechSkills = async (
-    config: Record<string, any>,
     firebase: typeof import('firebase-admin')
 ) => {
     const bucket = firebase.storage().bucket();
 
-    const exportKey: string = config.skills?.exportkey;
+    const exportKey: string = process.env.SKILLS_EXPORTKEY;
     if (!exportKey) {
         throw new Error(`Public key for encryption not present in configuration. Be sure to set the SKILLS_EXPORTKEY secret via Secret Manager (firebase functions:secrets:set SKILLS_EXPORTKEY).`);
     }

@@ -3,7 +3,6 @@ import {onSchedule} from 'firebase-functions/v2/scheduler';
 import type {GlobalOptions} from 'firebase-functions/v2';
 
 export const notifyPendingSurveyFactory = (
-    config: Record<string, any>,
     firebase: typeof import('firebase-admin'),
     options: GlobalOptions
 ) => onSchedule({
@@ -11,5 +10,5 @@ export const notifyPendingSurveyFactory = (
     schedule: '0 9 * * 1-5',
     timeZone: 'Europe/Warsaw',
 }, async () => notifyPendingSurveyHandler(
-    firebase, config
+    firebase
 ));

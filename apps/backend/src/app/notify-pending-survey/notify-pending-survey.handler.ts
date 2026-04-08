@@ -2,7 +2,7 @@ import {Survey} from "../../../../web-app/src/app/features/survey/model/survey";
 
 type SurveyWithId = Survey & { id: string };
 
-export const notifyPendingSurveyHandler = async (firebase: typeof import('firebase-admin'), config: Record<string, any>) => {
+export const notifyPendingSurveyHandler = async (firebase: typeof import('firebase-admin')) => {
     const firestore = firebase.firestore();
 
     const thresholdDate = new Date();
@@ -33,7 +33,7 @@ export const notifyPendingSurveyHandler = async (firebase: typeof import('fireba
                 const slackUser = {name: 'Test#' + user};
 
                 const notificationText = `Czekają na Ciebie ankiety: ${
-                    byUser[user].map(survey => `${config.webapp.url}s/${team.id}/${survey.id}`).join(', ')
+                    byUser[user].map(survey => `${process.env.WEBAPP_URL}s/${team.id}/${survey.id}`).join(', ')
                 }`;
                 const notification = {
                     channel: `@${slackUser.name}`,

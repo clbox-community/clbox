@@ -4,12 +4,11 @@ export const expireUserAccountsFactory = (
     firebase: typeof import('firebase-admin'),
     options: import('firebase-functions/v2').GlobalOptions
 ) => {
-    const firestore = firebase.firestore();
-    const fetchTeams = async () => {
+    const fetchTeams = async (firestore: import('firebase-admin').firestore.Firestore) => {
         const teams = await firestore.collection(`team`).get();
         return teams.docs.map(doc => doc.id);
     };
-    const expiringUsers = async (team: string) => {
+    const expiringUsers = async (firestore: import('firebase-admin').firestore.Firestore, team: string) => {
         return await firestore.collection(`team/${team}/user`)
             .where('withExpire', '==', true)
             .get();
@@ -32,9 +31,10 @@ export const expireUserAccountsFactory = (
     }
 
     return onSchedule({ ...options, schedule: '0 3 * * 1-7', timeZone: 'Europe/Warsaw' }, async () => {
-            const teams = await fetchTeams();
+            const firestore = firebase.firestore();
+            const teams = await fetchTeams(firestore);
             await Promise.all(teams.map(async team => {
-                const users = await expiringUsers(team);
+                const users = await expiringUsers(firestore, team);
                 await Promise.all(users.docs
                     .filter(user => !isActive(user.data()))
                     .map(async user => {

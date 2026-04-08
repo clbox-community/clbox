@@ -10,16 +10,6 @@ firebase.initializeApp({
     storageBucket
 });
 
-const config = {
-    slack: {
-        bottoken: process.env.SLACK_BOTTOKEN ?? '',
-        signingsecret: process.env.SLACK_SIGNINGSECRET ?? '',
-    },
-    webapp: {
-        url: process.env.WEBAPP_URL ?? '',
-    },
-};
-
 (async function () {
-    await exportTechSkills({...config, skills: {exportkey: process.env.SKILLS_EXPORTKEY ?? ''}}, firebase);
+    await exportTechSkills(firebase);
 })();

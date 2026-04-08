@@ -25,12 +25,11 @@ function asMessage(channel, fromUser: SlackUserProfile, payload: PendingFeedback
 }
 
 export const storeChannelFeedbackHandlerFactory = (
-    config: Record<string, any>,
     firebase: typeof import('firebase-admin'),
     topic: string,
     options: GlobalOptions) => {
     return onMessagePublished({topic, ...options}, async (event) => {
-        const usersIndex = await userList(config.slack.bottoken);
+        const usersIndex = await userList(process.env.SLACK_BOTTOKEN);
         const payload: PendingFeedbackMessage = JSON.parse(Buffer.from(event.data.message.data, 'base64').toString());
 
         const fromSlackUser: SlackUser = usersIndex[payload.user];
@@ -78,7 +77,7 @@ export const storeChannelFeedbackHandlerFactory = (
                 firestore.collection(`team/${payload.team}/channel/failed-to-deliver/inbox`).add({
                     msg: `Can't find channel for feedback`, date: now(), payload
                 }),
-                sendSlackMessage(config.slack.bottoken, {
+                sendSlackMessage(process.env.SLACK_BOTTOKEN, {
                     channel: `@${payload.user}`,
                     text: `Channel mentioned in feedback (${payload.mention}) not found.`
                 })

@@ -49,19 +49,19 @@ async function failedToSendFeedback(firebase: typeof import('firebase-admin'), h
 }
 
 export const storeUserFeedbackFactory = (
-    config: Record<string, any>,
     firebase: typeof import('firebase-admin'),
     topic: string,
     options: GlobalOptions) => {
-    const slackHttpHeaders = {
-        Authorization: `Bearer ${config.slack.bottoken}`,
-        'Content-type': 'application/json'
-    };
     return onMessagePublished({topic, ...options},
         async (event) => {
             console.log('Sending feedback after pubsub event');
 
-            const usersIndex = await userList(config.slack.bottoken);
+            const slackHttpHeaders = {
+                Authorization: `Bearer ${process.env.SLACK_BOTTOKEN}`,
+                'Content-type': 'application/json'
+            };
+
+            const usersIndex = await userList(process.env.SLACK_BOTTOKEN);
             const payload: PendingFeedbackMessage = JSON.parse(Buffer.from(event.data.message.data, 'base64').toString());
 
             console.log(`Feedback to store [fromUser=${payload.user}, toUser=${payload.mention}]`);

@@ -70,7 +70,7 @@ export const CreateUser = () => {
         <Form onSubmit={handleSubmit}>
             <FullWithTextField id="email" value={state.email} onChange={handleEmailChange} label="Email"/>
             <Spacer/>
-            {state.message ?? <div>state.message</div>}
+            {state.message && <div>{state.message}</div>}
             <Button color="primary" type="submit">Create account</Button>
             <SecondaryLink color="textSecondary" onClick={onRedirectToLogin}>Return to login</SecondaryLink>
         </Form>

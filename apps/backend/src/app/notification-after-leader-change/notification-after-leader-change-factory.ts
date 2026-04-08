@@ -5,7 +5,6 @@ import {onDocumentUpdated} from 'firebase-functions/v2/firestore';
 import type {GlobalOptions} from 'firebase-functions/v2';
 
 export const notificationAfterLeaderChangeFactory = (
-  config: Record<string, any>,
   firebase: typeof import('firebase-admin'),
   options: GlobalOptions
 ) => onDocumentUpdated({
@@ -14,7 +13,7 @@ export const notificationAfterLeaderChangeFactory = (
 }, async (event) => {
   if (event.data.after.data().chapterLeader !== event.data.before.data().chapterLeader) {
     console.log(`Notify user after chapter leader change [user=${event.params.user}, newLeader=${event.data.after.data().chapterLeader}]`);
-    const slackToken = config.slack.bottoken;
+    const slackToken = process.env.SLACK_BOTTOKEN;
     if (slackToken) {
       const profileDoc: firestore.DocumentReference<UserPublicProfile> = firebase
         .firestore()

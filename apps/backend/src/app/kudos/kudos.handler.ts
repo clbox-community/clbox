@@ -5,7 +5,6 @@ import {onRequest} from 'firebase-functions/v2/https';
 import type {HttpsOptions} from 'firebase-functions/v2/https';
 
 export const kudosHandlerFactory = (
-    config: Record<string, any>,
     pubsub: import('@google-cloud/pubsub').PubSub,
     userFeedbackTopic: string,
     channelFeedbackTopic: string,
@@ -16,7 +15,7 @@ export const kudosHandlerFactory = (
             return;
         }
         if (!checkSlackSignature(
-            config.slack.signingsecret,
+            process.env.SLACK_SIGNINGSECRET,
             request.headers['x-slack-signature'] as string,
             request.headers['x-slack-request-timestamp'],
             request.rawBody.toString()

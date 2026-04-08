@@ -13,13 +13,4 @@ firebase.initializeApp({
     projectId: project
 });
 
-const config = {
-    webapp: {
-        url: 'webapp.url'
-    },
-    slack: {
-        bottoken: 'slack.bottoken'
-    }
-};
-
-(async () => await notifyPendingSurveyHandler(firebase, config))();
+(async () => await notifyPendingSurveyHandler(firebase))();
