@@ -35,9 +35,23 @@ export const storeChannelFeedbackHandlerFactory = (
         const payload: PendingFeedbackMessage = JSON.parse(Buffer.from(event.data.message.data, 'base64').toString());
 
         const fromSlackUser: SlackUser = usersIndex[payload.user];
-
         const firestore = firebase.firestore();
+        if (!fromSlackUser) {
+            await firestore.collection(`team/${payload.team}/channel/failed-to-deliver/inbox`).add({
+                msg: `Can't find slack user for feedback author`, date: now(), payload
+            });
+            console.error(`Can't find slack user for feedback author (${payload.user}).`);
+            return;
+        }
+
         const fromUser = (await firestore.collection(`team/${payload.team}/user/`).where('slackMemberId', '==', fromSlackUser.id).limit(1).get()).docs[0]?.data();
+        if (!fromUser) {
+            await firestore.collection(`team/${payload.team}/channel/failed-to-deliver/inbox`).add({
+                msg: `Can't find user matching slack member for feedback author`, date: now(), payload
+            });
+            console.error(`User not found by slack id [slackMemberId=${fromSlackUser.id}]`);
+            return;
+        }
 
         const channel = await firestore.collection(`team/${payload.team}/channel`)
             .doc(payload.mention)

@@ -32,7 +32,6 @@ function asStatsUpdate(firebase, message) {
 }
 
 export const updateFilterStatsAfterInboxCreateFactory = (
-    config: Record<string, any>,
     firebase: typeof import('firebase-admin'),
     options: GlobalOptions
 ) => onDocumentCreated({document: 'team/{team}/user/{user}/inbox/{messageId}', ...options},
