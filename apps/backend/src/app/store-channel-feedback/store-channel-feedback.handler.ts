@@ -29,7 +29,7 @@ export const storeChannelFeedbackHandlerFactory = (
     config: Record<string, any>,
     firebase: typeof import('firebase-admin'),
     topic: string,
-    options?: GlobalOptions) => {
+    options: GlobalOptions) => {
     return onMessagePublished({topic, ...options}, async (event) => {
         const usersIndex = await userList(config.slack.bottoken);
         const payload: PendingFeedbackMessage = JSON.parse(Buffer.from(event.data.message.data, 'base64').toString());

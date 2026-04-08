@@ -52,7 +52,7 @@ export const storeUserFeedbackFactory = (
     config: Record<string, any>,
     firebase: typeof import('firebase-admin'),
     topic: string,
-    options?: GlobalOptions) => {
+    options: GlobalOptions) => {
     const slackHttpHeaders = {
         Authorization: `Bearer ${config.slack.bottoken}`,
         'Content-type': 'application/json'

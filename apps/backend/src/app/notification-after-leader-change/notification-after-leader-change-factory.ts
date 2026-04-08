@@ -7,7 +7,7 @@ import type {GlobalOptions} from 'firebase-functions/v2';
 export const notificationAfterLeaderChangeFactory = (
   config: Record<string, any>,
   firebase: typeof import('firebase-admin'),
-  options?: GlobalOptions
+  options: GlobalOptions
 ) => onDocumentUpdated({
   document: 'team/{team}/user/{user}',
   ...options

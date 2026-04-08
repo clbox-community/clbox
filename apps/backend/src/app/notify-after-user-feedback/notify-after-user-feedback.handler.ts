@@ -7,7 +7,7 @@ import type {GlobalOptions} from 'firebase-functions/v2';
 export const notifyAfterUserFeedbackFactory = (
   config: Record<string, any>,
   firebase: typeof import('firebase-admin'),
-  options?: GlobalOptions
+  options: GlobalOptions
 ) => onDocumentCreated({
   document: 'team/{team}/inbox/{chapterLeader}/message/{messageId}',
   ...options
