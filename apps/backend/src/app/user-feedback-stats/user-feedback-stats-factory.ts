@@ -1,12 +1,10 @@
 import {onDocumentCreated} from 'firebase-functions/v2/firestore';
 import type {GlobalOptions} from 'firebase-functions/v2';
 
-const documentPath = 'team/{team}/sent/{user}/message/{messageId}' as const;
-
 export const userFeedbackStatsFactory = (
   firebase: typeof import('firebase-admin'),
   options: GlobalOptions
-) => onDocumentCreated({document: documentPath, ...options},
+) => onDocumentCreated({document: 'team/{team}/sent/{user}/message/{messageId}' as const, ...options},
   async (event) => {
     const firestore = firebase.firestore();
     if (!event.data) return;
