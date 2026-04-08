@@ -43,9 +43,16 @@ export const CreateUser = () => {
         event.preventDefault();
 
         try {
-            await firebaseApp.functions('europe-west3').httpsCallable('createUser')({
+            const result = await firebaseApp.functions('europe-west3').httpsCallable('createUser')({
                 email: state.email
             });
+            if (result.data?.status !== 'ok') {
+                setState({
+                    ...state,
+                    message: 'Account creation failed. Please check your email and try again.'
+                });
+                return;
+            }
             await firebaseApp.auth().sendPasswordResetEmail(state.email);
             setState({
                 ...state,
