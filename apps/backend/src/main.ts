@@ -1,8 +1,7 @@
 import {PubSub} from '@google-cloud/pubsub';
 import * as firebase from 'firebase-admin';
-import * as functions from 'firebase-functions/v1';
-import {FunctionBuilder} from 'firebase-functions/v1';
-
+import type {GlobalOptions} from 'firebase-functions/v2';
+import {defineSecret} from 'firebase-functions/params';
 import {createUserFactory} from './app/create-user/create-user.handler';
 import {expireUserAccountsFactory} from './app/expire-user-accounts/expire-user-accounts-factory';
 import {feedbackStatsFactory} from './app/feedback-stats/feedback-stats-factory';
@@ -37,70 +36,60 @@ import { aggregateSkillRoadmapStatsHandlerFactory } from './app/aggregate-skill-
 
 firebase.initializeApp();
 
-const region = functions.region('europe-west3');
-const functionBuilder: () => FunctionBuilder = () => region
-    .runWith({
-        maxInstances: 3,
-        memory: '256MB',
-    });
-const slackFunctionBuilder: () => FunctionBuilder = () => region
-    .runWith({
-        maxInstances: 3,
-        memory: '256MB',
-        secrets: ['SLACK_BOTTOKEN', 'SLACK_SIGNINGSECRET', 'WEBAPP_URL'],
-    });
+const SLACK_BOTTOKEN = defineSecret('SLACK_BOTTOKEN');
+const SLACK_SIGNINGSECRET = defineSecret('SLACK_SIGNINGSECRET');
+const WEBAPP_URL = defineSecret('WEBAPP_URL');
+const SKILLS_EXPORTKEY = defineSecret('SKILLS_EXPORTKEY');
 
-const config = {
-    slack: {
-        bottoken: process.env.SLACK_BOTTOKEN ?? '',
-        signingsecret: process.env.SLACK_SIGNINGSECRET ?? '',
-    },
-    webapp: {
-        url: process.env.WEBAPP_URL ?? '',
-    },
+const functionOptions: GlobalOptions = {
+    region: 'europe-west3',
+    maxInstances: 3,
+    memory: '256MiB',
 };
 
+const slackFunctionOptions: GlobalOptions = {
+    ...functionOptions,
+    secrets: [SLACK_BOTTOKEN, SLACK_SIGNINGSECRET, WEBAPP_URL],
+};
 
-export const storeUserFeedback = storeUserFeedbackFactory(slackFunctionBuilder(), config, firebase, 'pending-user-feedbacks');
-export const storeChannelFeedback = storeChannelFeedbackHandlerFactory(slackFunctionBuilder(), config, firebase, 'pending-channel-feedbacks');
-export const notifyAfterUserFeedback = notifyAfterUserFeedbackFactory(slackFunctionBuilder(), config, firebase);
+export const storeUserFeedback = storeUserFeedbackFactory(firebase, 'pending-user-feedbacks', slackFunctionOptions);
+export const storeChannelFeedback = storeChannelFeedbackHandlerFactory(firebase, 'pending-channel-feedbacks', slackFunctionOptions);
+export const notifyAfterUserFeedback = notifyAfterUserFeedbackFactory(firebase, slackFunctionOptions);
 // export const notifyAfterChannelFeedback = notifyAfterChannelFeedbackFactory(functionBuilder(), config, firebase);
-export const notifyAfterLeaderChange = notificationAfterLeaderChangeFactory(slackFunctionBuilder(), config, firebase);
+export const notifyAfterLeaderChange = notificationAfterLeaderChangeFactory(firebase, slackFunctionOptions);
 // export const notifyAfterSurveyCreated = notificationAfterSurveyCreatedFactory(functionBuilder(), config);
-export const feedbackStats = feedbackStatsFactory(functionBuilder(), firebase);
-export const userFeedbackStats = userFeedbackStatsFactory(functionBuilder(), firebase);
-export const createUser = createUserFactory(functionBuilder(), firebase);
-export const expireUserAccounts = expireUserAccountsFactory(functionBuilder(), firebase);
-export const getChapterStats = getChapterStatsFactory(functionBuilder(), firebase);
-export const updateFilterStatsAfterInboxCreate = updateFilterStatsAfterInboxCreateFactory(functionBuilder(), config, firebase);
-export const updateFilterStatsAfterInboxChange = updateFilterStatsAfterInboxChangeFactory(functionBuilder(), config, firebase);
-export const updateFilterStatsAfterInboxDelete = updateFilterStatsAfterInboxDeleteFactory(functionBuilder(), config, firebase);
-export const updateCampaignAfterSurvey = updateCampaignAfterSurveyFactory(functionBuilder(), firebase);
+export const feedbackStats = feedbackStatsFactory(firebase, functionOptions);
+export const userFeedbackStats = userFeedbackStatsFactory(firebase, functionOptions);
+export const createUser = createUserFactory(firebase, functionOptions);
+export const expireUserAccounts = expireUserAccountsFactory(firebase, functionOptions);
+export const getChapterStats = getChapterStatsFactory(firebase, functionOptions);
+export const updateFilterStatsAfterInboxCreate = updateFilterStatsAfterInboxCreateFactory(firebase, functionOptions);
+export const updateFilterStatsAfterInboxChange = updateFilterStatsAfterInboxChangeFactory(firebase, functionOptions);
+export const updateFilterStatsAfterInboxDelete = updateFilterStatsAfterInboxDeleteFactory(firebase, functionOptions);
+export const updateCampaignAfterSurvey = updateCampaignAfterSurveyFactory(firebase, functionOptions);
 export const kudosHandler = kudosHandlerFactory(
-    slackFunctionBuilder().runWith({memory: '512MB', maxInstances: 5, }),
-    config,
     new PubSub(),
     'pending-user-feedbacks',
-    'pending-channel-feedbacks'
+    'pending-channel-feedbacks',
+    {...slackFunctionOptions, memory: '512MiB', maxInstances: 5}
 );
 export const userAssessmentsWriteHandler = userAssessmentsWriteHandlerFactory(
-    functionBuilder().runWith({}),
-    firebase
+    firebase,
+    functionOptions
 );
 export const userAssessmentsFinishHandler = userAssessmentsFinishHandlerFactory(
-    functionBuilder().runWith({}),
-    firebase
+    firebase,
+    functionOptions
 );
 export const exportTechSkillsCron = exportTechSkillsFactory(
-    functionBuilder().runWith({secrets: ['SKILLS_EXPORTKEY']}),
-    {...config, skills: {exportkey: process.env.SKILLS_EXPORTKEY ?? ''}},
-    firebase
+    firebase,
+    {...functionOptions, secrets: [SKILLS_EXPORTKEY]}
 );
 export const updatePublicProfileHandler = updatePublicProfileHandlerFactory(
-    functionBuilder().runWith({}),
-    firebase
+    firebase,
+    functionOptions
 )
 export const aggregateSkillRoadmapStatsHandler = aggregateSkillRoadmapStatsHandlerFactory(
-    functionBuilder().runWith({}),
-    firebase
+    firebase,
+    functionOptions
 )

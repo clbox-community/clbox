@@ -1,13 +1,14 @@
+import {onSchedule} from 'firebase-functions/v2/scheduler';
+
 export const expireUserAccountsFactory = (
-    functions: import('firebase-functions/v1').FunctionBuilder,
-    firebase: typeof import('firebase-admin')
+    firebase: typeof import('firebase-admin'),
+    options: import('firebase-functions/v2').GlobalOptions
 ) => {
-    const firestore = firebase.firestore();
-    const fetchTeams = async () => {
+    const fetchTeams = async (firestore: import('firebase-admin').firestore.Firestore) => {
         const teams = await firestore.collection(`team`).get();
         return teams.docs.map(doc => doc.id);
     };
-    const expiringUsers = async (team: string) => {
+    const expiringUsers = async (firestore: import('firebase-admin').firestore.Firestore, team: string) => {
         return await firestore.collection(`team/${team}/user`)
             .where('withExpire', '==', true)
             .get();
@@ -29,12 +30,11 @@ export const expireUserAccountsFactory = (
         }
     }
 
-    return functions.pubsub.schedule('0 3 * * 1-7')
-        .timeZone('Europe/Warsaw')
-        .onRun(async ctx => {
-            const teams = await fetchTeams();
+    return onSchedule({ ...options, schedule: '0 3 * * 1-7', timeZone: 'Europe/Warsaw' }, async () => {
+            const firestore = firebase.firestore();
+            const teams = await fetchTeams(firestore);
             await Promise.all(teams.map(async team => {
-                const users = await expiringUsers(team);
+                const users = await expiringUsers(firestore, team);
                 await Promise.all(users.docs
                     .filter(user => !isActive(user.data()))
                     .map(async user => {
@@ -64,6 +64,5 @@ export const expireUserAccountsFactory = (
                     })
                 );
             }));
-            return null;
         })
 };

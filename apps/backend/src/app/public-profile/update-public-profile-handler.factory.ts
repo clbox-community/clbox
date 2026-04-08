@@ -1,21 +1,22 @@
 import type { firestore } from 'firebase-admin';
-import type { Change } from 'firebase-functions/v1';
+import {onDocumentWritten} from 'firebase-functions/v2/firestore';
+import type {GlobalOptions} from 'firebase-functions/v2';
 import { UserPublicProfile } from 'user-profile-model';
 
 export const updatePublicProfileHandlerFactory = (
-    functions: import('firebase-functions/v1').FunctionBuilder,
-    firebase: typeof import('firebase-admin')
-) => functions.firestore.document('team/{team}/user/{user}').onWrite(
-    async (change: Change<firestore.QueryDocumentSnapshot<UserPublicProfile>>, context) => {
-        console.log(`Updating user public profile after user change on ${change.after.ref.path}`);
+    firebase: typeof import('firebase-admin'),
+    options: GlobalOptions
+) => onDocumentWritten({document: 'team/{team}/user/{user}', ...options},
+    async (event) => {
+        console.log(`Updating user public profile after user change on ${event.data.after.ref.path}`);
 
         const profileDoc: firestore.DocumentReference<UserPublicProfile> = firebase.firestore()
-            .doc(`team/${context.params.team}/profile-public/${context.params.user}`) as firestore.DocumentReference<UserPublicProfile>;
-        if (change.after === undefined) {
+            .doc(`team/${event.params.team}/profile-public/${event.params.user}`) as firestore.DocumentReference<UserPublicProfile>;
+        if (!event.data.after.exists) {
             await profileDoc.delete();
             console.log(`${profileDoc.path} deleted`);
         } else {
-            const user = change.after.data();
+            const user = event.data.after.data() as UserPublicProfile;
             const updatedPublicProfile: UserPublicProfile = {
                 display_name: user.display_name,
                 slackMemberId: user.slackMemberId,

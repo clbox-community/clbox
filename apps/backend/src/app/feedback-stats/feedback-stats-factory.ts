@@ -1,14 +1,19 @@
-export const feedbackStatsFactory = (
-  functions: import('firebase-functions/v1').FunctionBuilder,
-  firebase: typeof import('firebase-admin')
-) => functions.firestore.document('team/{team}/inbox/{chapterLeader}/message/{messageId}').onCreate(
-  async (change, context) => {
-    const firestore = firebase.firestore();
+import {onDocumentCreated} from 'firebase-functions/v2/firestore';
+import type {GlobalOptions} from 'firebase-functions/v2';
 
-    const {date} = change.data() as { date: string };
+const documentPath = 'team/{team}/inbox/{chapterLeader}/message/{messageId}' as const;
+
+export const feedbackStatsFactory = (
+  firebase: typeof import('firebase-admin'),
+  options: GlobalOptions
+) => onDocumentCreated({document: documentPath, ...options},
+  async (event) => {
+    const firestore = firebase.firestore();
+    if (!event.data) return;
+    const {date} = event.data.data() as { date: string };
     const month = date.substring(0, 7);
     const day = date.substring(0, 10);
-    const monthRef = firestore.collection(`team/${context.params.team}/stats`).doc(month);
+    const monthRef = firestore.collection(`team/${event.params.team}/stats`).doc(month);
 
     await firestore.runTransaction(async trn => {
       const monthDoc = await trn.get(monthRef);

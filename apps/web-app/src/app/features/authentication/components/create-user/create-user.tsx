@@ -43,9 +43,16 @@ export const CreateUser = () => {
         event.preventDefault();
 
         try {
-            await firebaseApp.functions('europe-west3').httpsCallable('createUser')({
+            const result = await firebaseApp.functions('europe-west3').httpsCallable('createUser')({
                 email: state.email
             });
+            if (result.data?.status !== 'ok') {
+                setState({
+                    ...state,
+                    message: 'Account creation failed. Please check your email and try again.'
+                });
+                return;
+            }
             await firebaseApp.auth().sendPasswordResetEmail(state.email);
             setState({
                 ...state,
@@ -63,7 +70,7 @@ export const CreateUser = () => {
         <Form onSubmit={handleSubmit}>
             <FullWithTextField id="email" value={state.email} onChange={handleEmailChange} label="Email"/>
             <Spacer/>
-            {state.message ?? <div>state.message</div>}
+            {state.message && <div>{state.message}</div>}
             <Button color="primary" type="submit">Create account</Button>
             <SecondaryLink color="textSecondary" onClick={onRedirectToLogin}>Return to login</SecondaryLink>
         </Form>
