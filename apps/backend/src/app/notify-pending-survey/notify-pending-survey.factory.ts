@@ -7,9 +7,9 @@ export const notifyPendingSurveyFactory = (
     firebase: typeof import('firebase-admin'),
     options: GlobalOptions
 ) => onSchedule({
+    ...options,
     schedule: '0 9 * * 1-5',
     timeZone: 'Europe/Warsaw',
-    ...options
 }, async () => notifyPendingSurveyHandler(
     firebase, config
 ));

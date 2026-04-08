@@ -1,5 +1,4 @@
 import {PendingFeedbackMessage} from '../pending-feedback-message';
-
 import {SlackUserProfile} from '../slack/slack-user-profile';
 import {userList} from "../slack/fetch-user-list";
 import {sendSlackMessage} from "../slack/send-slack-message";

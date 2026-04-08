@@ -42,7 +42,7 @@ const functionOptions: GlobalOptions = {
     memory: '256MiB',
 };
 
-setGlobalOptions({ maxInstances: 0 });
+setGlobalOptions({ maxInstances: 1, region: 'europe-west3', memory: '128MiB' });
 
 const slackFunctionOptions: GlobalOptions = {
     ...functionOptions,
