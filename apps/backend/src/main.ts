@@ -48,7 +48,7 @@ const slackFunctionBuilder: () => functions.FunctionBuilder = () => region
 const v2Options: GlobalOptions = {
     region: 'europe-west3',
     maxInstances: 3,
-    memory: '256MB',
+    memory: '256MiB',
 };
 
 const config = {
