@@ -73,8 +73,8 @@ export const createUser = createUserFactory(firebase, v2Options);
 export const expireUserAccounts = expireUserAccountsFactory(firebase, v2Options);
 export const getChapterStats = getChapterStatsFactory(firebase, v2Options);
 export const updateFilterStatsAfterInboxCreate = updateFilterStatsAfterInboxCreateFactory(config, firebase, v2Options);
-export const updateFilterStatsAfterInboxChange = updateFilterStatsAfterInboxChangeFactory(config, firebase, v2Options);
-export const updateFilterStatsAfterInboxDelete = updateFilterStatsAfterInboxDeleteFactory(config, firebase, v2Options);
+export const updateFilterStatsAfterInboxChange = updateFilterStatsAfterInboxChangeFactory(firebase, v2Options);
+export const updateFilterStatsAfterInboxDelete = updateFilterStatsAfterInboxDeleteFactory(firebase, v2Options);
 export const updateCampaignAfterSurvey = updateCampaignAfterSurveyFactory(firebase, v2Options);
 export const kudosHandler = kudosHandlerFactory(
     config,

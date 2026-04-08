@@ -38,7 +38,6 @@ function asStatsUpdate(firebase, before, after) {
 }
 
 export const updateFilterStatsAfterInboxChangeFactory = (
-    config: Record<string, any>,
     firebase: typeof import('firebase-admin'),
     options: GlobalOptions
 ) => onDocumentUpdated({document: 'team/{team}/user/{user}/inbox/{messageId}', ...options},

@@ -28,7 +28,6 @@ function asStatsUpdate(firebase, message) {
 }
 
 export const updateFilterStatsAfterInboxDeleteFactory = (
-    config: Record<string, any>,
     firebase: typeof import('firebase-admin'),
     options: GlobalOptions
 ) => onDocumentDeleted({document: 'team/{team}/user/{user}/inbox/{messageId}', ...options},
