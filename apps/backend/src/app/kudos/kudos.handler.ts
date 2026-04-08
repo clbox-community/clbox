@@ -1,14 +1,16 @@
 import { checkSlackSignature } from '../slack/check-slack-signature';
 import { PendingFeedbackMessage } from '../pending-feedback-message';
 import { SlashCommandRequest } from '../slack/slash-command-request';
+import {onRequest} from 'firebase-functions/v2/https';
+import type {HttpsOptions} from 'firebase-functions/v2/https';
 
 export const kudosHandlerFactory = (
-    functions: import('firebase-functions/v1').FunctionBuilder,
     config: Record<string, any>,
     pubsub: import('@google-cloud/pubsub').PubSub,
     userFeedbackTopic: string,
-    channelFeedbackTopic: string) =>
-    functions.https.onRequest(async (request, response) => {
+    channelFeedbackTopic: string,
+    options?: HttpsOptions) =>
+    onRequest(options ?? {}, async (request, response) => {
         if (request.method !== 'POST') {
             response.status(405).send('Invalid request method (only POST allowed)');
         }

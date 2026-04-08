@@ -1,12 +1,15 @@
 import {notifyPendingSurveyHandler} from "./notify-pending-survey.handler";
+import {onSchedule} from 'firebase-functions/v2/scheduler';
+import type {GlobalOptions} from 'firebase-functions/v2';
 
 export const notifyPendingSurveyFactory = (
-    functions: import('firebase-functions/v1').FunctionBuilder,
     config: Record<string, any>,
-    firebase: typeof import('firebase-admin')
-) => functions.pubsub
-    .schedule('0 9 * * 1-5')
-    .timeZone('Europe/Warsaw')
-    .onRun(async ctx => notifyPendingSurveyHandler(
-        firebase, config
-    ));
+    firebase: typeof import('firebase-admin'),
+    options?: GlobalOptions
+) => onSchedule({
+    schedule: '0 9 * * 1-5',
+    timeZone: 'Europe/Warsaw',
+    ...options
+}, async () => notifyPendingSurveyHandler(
+    firebase, config
+));

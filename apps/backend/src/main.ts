@@ -1,6 +1,5 @@
 import {PubSub} from '@google-cloud/pubsub';
 import * as firebase from 'firebase-admin';
-import * as functions from 'firebase-functions/v1';
 import type {GlobalOptions} from 'firebase-functions/v2';
 
 import {createUserFactory} from './app/create-user/create-user.handler';
@@ -37,18 +36,15 @@ import { aggregateSkillRoadmapStatsHandlerFactory } from './app/aggregate-skill-
 
 firebase.initializeApp();
 
-const region = functions.region('europe-west3');
-const slackFunctionBuilder: () => functions.FunctionBuilder = () => region
-    .runWith({
-        maxInstances: 3,
-        memory: '256MB',
-        secrets: ['SLACK_BOTTOKEN', 'SLACK_SIGNINGSECRET', 'WEBAPP_URL'],
-    });
-
 const v2Options: GlobalOptions = {
     region: 'europe-west3',
     maxInstances: 3,
     memory: '256MiB',
+};
+
+const slackV2Options: GlobalOptions = {
+    ...v2Options,
+    secrets: ['SLACK_BOTTOKEN', 'SLACK_SIGNINGSECRET', 'WEBAPP_URL'],
 };
 
 const config = {
@@ -63,10 +59,10 @@ const config = {
 
 
 export const storeUserFeedback = storeUserFeedbackFactory(config, firebase, 'pending-user-feedbacks');
-export const storeChannelFeedback = storeChannelFeedbackHandlerFactory(slackFunctionBuilder(), config, firebase, 'pending-channel-feedbacks');
-export const notifyAfterUserFeedback = notifyAfterUserFeedbackFactory(slackFunctionBuilder(), config, firebase);
+export const storeChannelFeedback = storeChannelFeedbackHandlerFactory(config, firebase, 'pending-channel-feedbacks', slackV2Options);
+export const notifyAfterUserFeedback = notifyAfterUserFeedbackFactory(config, firebase, slackV2Options);
 // export const notifyAfterChannelFeedback = notifyAfterChannelFeedbackFactory(functionBuilder(), config, firebase);
-export const notifyAfterLeaderChange = notificationAfterLeaderChangeFactory(slackFunctionBuilder(), config, firebase);
+export const notifyAfterLeaderChange = notificationAfterLeaderChangeFactory(config, firebase, slackV2Options);
 // export const notifyAfterSurveyCreated = notificationAfterSurveyCreatedFactory(functionBuilder(), config);
 export const feedbackStats = feedbackStatsFactory(firebase);
 export const userFeedbackStats = userFeedbackStatsFactory(firebase);
@@ -78,11 +74,11 @@ export const updateFilterStatsAfterInboxChange = updateFilterStatsAfterInboxChan
 export const updateFilterStatsAfterInboxDelete = updateFilterStatsAfterInboxDeleteFactory(config, firebase);
 export const updateCampaignAfterSurvey = updateCampaignAfterSurveyFactory(firebase);
 export const kudosHandler = kudosHandlerFactory(
-    slackFunctionBuilder().runWith({memory: '512MB', maxInstances: 5, }),
     config,
     new PubSub(),
     'pending-user-feedbacks',
-    'pending-channel-feedbacks'
+    'pending-channel-feedbacks',
+    {...slackV2Options, memory: '512MiB', maxInstances: 5}
 );
 export const userAssessmentsWriteHandler = userAssessmentsWriteHandlerFactory(
     firebase
