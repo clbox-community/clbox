@@ -43,7 +43,7 @@ const v2Options: GlobalOptions = {
     memory: '256MiB',
 };
 
-setGlobalOptions(v2Options);
+setGlobalOptions({ maxInstances: 0 });
 
 const slackV2Options: GlobalOptions = {
     ...v2Options,
@@ -67,15 +67,15 @@ export const notifyAfterUserFeedback = notifyAfterUserFeedbackFactory(config, fi
 // export const notifyAfterChannelFeedback = notifyAfterChannelFeedbackFactory(functionBuilder(), config, firebase);
 export const notifyAfterLeaderChange = notificationAfterLeaderChangeFactory(config, firebase, slackV2Options);
 // export const notifyAfterSurveyCreated = notificationAfterSurveyCreatedFactory(functionBuilder(), config);
-export const feedbackStats = feedbackStatsFactory(firebase);
-export const userFeedbackStats = userFeedbackStatsFactory(firebase);
-export const createUser = createUserFactory(firebase);
+export const feedbackStats = feedbackStatsFactory(firebase, v2Options);
+export const userFeedbackStats = userFeedbackStatsFactory(firebase, v2Options);
+export const createUser = createUserFactory(firebase, v2Options);
 export const expireUserAccounts = expireUserAccountsFactory(firebase, v2Options);
-export const getChapterStats = getChapterStatsFactory(firebase);
-export const updateFilterStatsAfterInboxCreate = updateFilterStatsAfterInboxCreateFactory(config, firebase);
-export const updateFilterStatsAfterInboxChange = updateFilterStatsAfterInboxChangeFactory(config, firebase);
-export const updateFilterStatsAfterInboxDelete = updateFilterStatsAfterInboxDeleteFactory(config, firebase);
-export const updateCampaignAfterSurvey = updateCampaignAfterSurveyFactory(firebase);
+export const getChapterStats = getChapterStatsFactory(firebase, v2Options);
+export const updateFilterStatsAfterInboxCreate = updateFilterStatsAfterInboxCreateFactory(config, firebase, v2Options);
+export const updateFilterStatsAfterInboxChange = updateFilterStatsAfterInboxChangeFactory(config, firebase, v2Options);
+export const updateFilterStatsAfterInboxDelete = updateFilterStatsAfterInboxDeleteFactory(config, firebase, v2Options);
+export const updateCampaignAfterSurvey = updateCampaignAfterSurveyFactory(firebase, v2Options);
 export const kudosHandler = kudosHandlerFactory(
     config,
     new PubSub(),
@@ -84,10 +84,12 @@ export const kudosHandler = kudosHandlerFactory(
     {...slackV2Options, memory: '512MiB', maxInstances: 5}
 );
 export const userAssessmentsWriteHandler = userAssessmentsWriteHandlerFactory(
-    firebase
+    firebase,
+    v2Options
 );
 export const userAssessmentsFinishHandler = userAssessmentsFinishHandlerFactory(
-    firebase
+    firebase,
+    v2Options
 );
 export const exportTechSkillsCron = exportTechSkillsFactory(
     {...config, skills: {exportkey: process.env.SKILLS_EXPORTKEY ?? ''}},
@@ -95,8 +97,10 @@ export const exportTechSkillsCron = exportTechSkillsFactory(
     {...v2Options, secrets: ['SKILLS_EXPORTKEY']}
 );
 export const updatePublicProfileHandler = updatePublicProfileHandlerFactory(
-    firebase
+    firebase,
+    v2Options
 )
 export const aggregateSkillRoadmapStatsHandler = aggregateSkillRoadmapStatsHandlerFactory(
-    firebase
+    firebase,
+    v2Options
 )

@@ -1,8 +1,10 @@
 import {onDocumentCreated} from 'firebase-functions/v2/firestore';
+import type {GlobalOptions} from 'firebase-functions/v2';
 
 export const updateCampaignAfterSurveyFactory = (
     firebase: typeof import('firebase-admin'),
-) => onDocumentCreated('team/{team}/campaign/{campaign}/answers/{answer}',
+    options: GlobalOptions,
+) => onDocumentCreated({document: 'team/{team}/campaign/{campaign}/answers/{answer}', ...options},
     async (event) => {
         console.log(`User survey answered [campaign=${event.params.campaign}, answer=${event.data.ref.path}]`);
 

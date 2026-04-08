@@ -1,9 +1,11 @@
 import { Assessment, UserAssessment, UserAssessmentRef, UserAssessmentVerifiedCategories } from 'assessment-model';
 import {onDocumentWritten} from 'firebase-functions/v2/firestore';
+import type {GlobalOptions} from 'firebase-functions/v2';
 
 export const userAssessmentsWriteHandlerFactory = (
-    firebase: typeof import('firebase-admin')
-) => onDocumentWritten('team/{team}/assessment/{assessment}',
+    firebase: typeof import('firebase-admin'),
+    options: GlobalOptions
+) => onDocumentWritten({document: 'team/{team}/assessment/{assessment}', ...options},
     async (event) => {
         if (!event.data.after.exists) {
             console.log(`Skipping user assessment documents when assessment deleted`);

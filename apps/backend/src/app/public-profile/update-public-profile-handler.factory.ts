@@ -1,10 +1,12 @@
 import type { firestore } from 'firebase-admin';
 import {onDocumentWritten} from 'firebase-functions/v2/firestore';
+import type {GlobalOptions} from 'firebase-functions/v2';
 import { UserPublicProfile } from 'user-profile-model';
 
 export const updatePublicProfileHandlerFactory = (
-    firebase: typeof import('firebase-admin')
-) => onDocumentWritten('team/{team}/user/{user}',
+    firebase: typeof import('firebase-admin'),
+    options: GlobalOptions
+) => onDocumentWritten({document: 'team/{team}/user/{user}', ...options},
     async (event) => {
         console.log(`Updating user public profile after user change on ${event.data.after.ref.path}`);
 

@@ -1,4 +1,5 @@
 import {onCall} from 'firebase-functions/v2/https';
+import type {GlobalOptions} from 'firebase-functions/v2';
 
 interface GetChapterStatsRequest {
   team: string;
@@ -6,8 +7,9 @@ interface GetChapterStatsRequest {
 }
 
 export const getChapterStatsFactory = (
-  firebase: typeof import('firebase-admin')
-) => onCall<GetChapterStatsRequest>(async (request) => {
+  firebase: typeof import('firebase-admin'),
+  options: GlobalOptions
+) => onCall<GetChapterStatsRequest>(options, async (request) => {
   if (!request.auth?.token?.email) {
     throw new Error(`Functions requires authentication`);
   }

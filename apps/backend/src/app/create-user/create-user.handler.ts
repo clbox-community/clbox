@@ -1,10 +1,12 @@
 import {CreateUserRequest} from './create-user.request';
 import {onCall} from 'firebase-functions/v2/https';
+import type {GlobalOptions} from 'firebase-functions/v2';
 
 const emailRegex = /^[a-z0-9._-]+@(?<domain>[a-z0-9.-]+\.[a-z]{2,4})$/i;
 
 export const createUserFactory = (
-  firebase: typeof import('firebase-admin')
+  firebase: typeof import('firebase-admin'),
+  options: GlobalOptions
 ) => {
   async function tryToFindUserByEmail(email: string) {
     try {
@@ -14,7 +16,7 @@ export const createUserFactory = (
     }
   }
 
-  return onCall<CreateUserRequest>(async (request) => {
+  return onCall<CreateUserRequest>(options, async (request) => {
     console.log(`Request for user registration (${JSON.stringify(request.data)})`);
 
     const registerRequest = request.data;

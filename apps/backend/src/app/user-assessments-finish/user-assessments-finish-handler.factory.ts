@@ -1,9 +1,11 @@
 import { UserAssessmentRef } from 'assessment-model';
 import {onDocumentCreated} from 'firebase-functions/v2/firestore';
+import type {GlobalOptions} from 'firebase-functions/v2';
 
 export const userAssessmentsFinishHandlerFactory = (
-    firebase: typeof import('firebase-admin')
-) => onDocumentCreated('/team/{team}/user/{assessor}/user-assessment-sent/{id}',
+    firebase: typeof import('firebase-admin'),
+    options: GlobalOptions
+) => onDocumentCreated({document: '/team/{team}/user/{assessor}/user-assessment-sent/{id}', ...options},
     async (event) => {
         console.log(`Assessment finished [id=${event.params.id}]`);
         const db = firebase.firestore();

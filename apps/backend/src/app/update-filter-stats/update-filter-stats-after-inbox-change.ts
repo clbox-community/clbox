@@ -1,4 +1,5 @@
 import {onDocumentUpdated} from 'firebase-functions/v2/firestore';
+import type {GlobalOptions} from 'firebase-functions/v2';
 
 function changedArray(before, after) {
     const newItems = [];
@@ -38,8 +39,9 @@ function asStatsUpdate(firebase, before, after) {
 
 export const updateFilterStatsAfterInboxChangeFactory = (
     config: Record<string, any>,
-    firebase: typeof import('firebase-admin')
-) => onDocumentUpdated('team/{team}/user/{user}/inbox/{messageId}',
+    firebase: typeof import('firebase-admin'),
+    options: GlobalOptions
+) => onDocumentUpdated({document: 'team/{team}/user/{user}/inbox/{messageId}', ...options},
     async (event) => {
         console.log(`Update user filter stats after inbox message update`);
         const statsDoc = firebase.firestore()

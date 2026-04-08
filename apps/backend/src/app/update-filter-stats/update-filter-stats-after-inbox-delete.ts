@@ -1,4 +1,5 @@
 import {onDocumentDeleted} from 'firebase-functions/v2/firestore';
+import type {GlobalOptions} from 'firebase-functions/v2';
 
 function asStatsUpdate(firebase, message) {
     const update = {};
@@ -28,8 +29,9 @@ function asStatsUpdate(firebase, message) {
 
 export const updateFilterStatsAfterInboxDeleteFactory = (
     config: Record<string, any>,
-    firebase: typeof import('firebase-admin')
-) => onDocumentDeleted('team/{team}/user/{user}/inbox/{messageId}',
+    firebase: typeof import('firebase-admin'),
+    options: GlobalOptions
+) => onDocumentDeleted({document: 'team/{team}/user/{user}/inbox/{messageId}', ...options},
     async (event) => {
         console.log(`Update user filter stats after inbox message delete`);
         const statsDoc = firebase.firestore()

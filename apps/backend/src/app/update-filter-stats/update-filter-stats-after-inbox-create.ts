@@ -1,4 +1,5 @@
 import {onDocumentCreated} from 'firebase-functions/v2/firestore';
+import type {GlobalOptions} from 'firebase-functions/v2';
 
 function asStatsUpdate(firebase, message) {
     const update = {};
@@ -32,8 +33,9 @@ function asStatsUpdate(firebase, message) {
 
 export const updateFilterStatsAfterInboxCreateFactory = (
     config: Record<string, any>,
-    firebase: typeof import('firebase-admin')
-) => onDocumentCreated('team/{team}/user/{user}/inbox/{messageId}',
+    firebase: typeof import('firebase-admin'),
+    options: GlobalOptions
+) => onDocumentCreated({document: 'team/{team}/user/{user}/inbox/{messageId}', ...options},
     async (event) => {
         console.log(`Update user filter stats after inbox message create`);
         const statsDoc = firebase.firestore()

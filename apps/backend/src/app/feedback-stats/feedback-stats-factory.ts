@@ -1,8 +1,10 @@
 import {onDocumentCreated} from 'firebase-functions/v2/firestore';
+import type {GlobalOptions} from 'firebase-functions/v2';
 
 export const feedbackStatsFactory = (
-  firebase: typeof import('firebase-admin')
-) => onDocumentCreated<{ date: string }>('team/{team}/inbox/{chapterLeader}/message/{messageId}',
+  firebase: typeof import('firebase-admin'),
+  options: GlobalOptions
+) => onDocumentCreated<{ date: string }>({document: 'team/{team}/inbox/{chapterLeader}/message/{messageId}', ...options},
   async (event) => {
     const firestore = firebase.firestore();
 
