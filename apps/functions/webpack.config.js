@@ -12,7 +12,7 @@ module.exports = composePlugins(
         config.plugins.push(
             new GeneratePackageJsonPlugin(
                 {
-                    'name': 'clbox.backend',
+                    'name': 'clbox.functions',
                     'version': '1.0.0',
                     'main': './main.js',
                     'license': 'AGPL 3.0',
@@ -24,10 +24,10 @@ module.exports = composePlugins(
                         'node-fetch': mainPackageJson.dependencies['node-fetch'],
                     },
                     'engines': {
-                        'node': mainPackageJson.engines.node
+                        'node': '18'
                     }
                 },
-                join(__dirname, '../../dist/apps/backend/package.json')
+                join(__dirname, '../../dist/apps/functions/package.json')
             )
         )
         return config;

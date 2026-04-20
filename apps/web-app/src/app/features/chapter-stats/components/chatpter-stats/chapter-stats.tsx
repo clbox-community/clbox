@@ -56,7 +56,7 @@ const StatsView = ({team}: ViewProps) => {
     const [stats, setStates] = useState<ChapterStats>(undefined);
     useEffect(() => {
         if (team) {
-            firebaseApp.functions('europe-west3').httpsCallable('getChapterStats')({
+            firebaseApp.functions('europe-west3').httpsCallable('getChapterStatsV2')({
                 team: team, statType: 'sent-feedbacks'
             }).then(result => {
                 setStates(result.data);

@@ -34,11 +34,20 @@
             }
         ]
     },
-    "functions": {
-        "predeploy": "npm run -- build:backend",
-        "source": "dist/apps/backend",
-        "runtime": "nodejs20"
-    },
+    "functions": [
+        {
+            "predeploy": "npm run -- build:backend",
+            "source": "dist/apps/backend",
+            "runtime": "nodejs18",
+            "codebase": "functionsv1"
+        },
+        {
+            "predeploy": "npm run -- build:functions",
+            "source": "dist/apps/functions",
+            "runtime": "nodejs20",
+            "codebase": "functions"
+        }
+    ],
     "firestore": {
         "rules": "packages/firestore/firestore.rules"
     }
