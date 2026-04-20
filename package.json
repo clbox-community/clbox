@@ -30,7 +30,7 @@
         "@dotenvx/dotenvx": "^1.7.0",
         "@emotion/react": "11.11.1",
         "@emotion/styled": "11.11.0",
-        "@google-cloud/pubsub": "2.7.0",
+        "@google-cloud/pubsub": "2.19.4",
         "@mui/icons-material": "^5.16.6",
         "@mui/material": "^5.16.6",
         "@nx/react": "20.4.5",
