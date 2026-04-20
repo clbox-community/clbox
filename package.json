@@ -65,7 +65,7 @@
         "@babel/preset-typescript": "7.12.7",
         "@nrwl/js": "19.5.6",
         "@nrwl/linter": "19.5.6",
-        "@nrwl/webpack": "19.5.6",
+        "@nrwl/webpack": "19.8.4",
         "@nx/eslint-plugin": "20.4.5",
         "@nx/jest": "20.4.5",
         "@nx/js": "20.4.5",
