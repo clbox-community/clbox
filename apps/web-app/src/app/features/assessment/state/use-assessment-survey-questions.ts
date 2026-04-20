@@ -172,6 +172,7 @@ export const useAssessmentSurveyQuestions = (assessment: UserAssessment,
             updatedAssessment.askedQuestion[question.question.id] = true;
             updatedAssessment.responseValue[question.question.id] = answerValue;
             updatedAssessment.questionTime[question.question.id] = time;
+            updatedAssessment.currentQuestion = question.question.id;
             if (comment) {
                 updatedAssessment.comment[question.question.id] = comment;
             }
