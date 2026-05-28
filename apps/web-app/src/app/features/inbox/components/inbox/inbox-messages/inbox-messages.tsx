@@ -57,7 +57,7 @@ const connector = connect(
     (state: AppState) => ({
         messages: state.inbox.messages?.byId && Object.values(state.inbox.messages?.byId),
         inboxLabels: Object
-            .entries(state.inbox.stats.labels)
+            .entries(state.inbox?.stats?.labels ?? {})
             .filter(entry => entry[1] > 0)
             .map(entry => entry[0])
     }),
